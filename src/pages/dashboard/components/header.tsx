@@ -229,6 +229,8 @@ export function Header({
           placeholderIcon={BookOpen}
           id="header-cover-upload"
           compact
+          sourceMode="both"
+          bookId={book.id}
         />
 
         {/* Edit Form */}

@@ -38,7 +38,24 @@
     }
   },
   "form_image": {
-    "add_image": "Adicionar Imagem"
+    "add_image": "Adicionar Imagem",
+    "from_computer": "Do Computador",
+    "from_gallery": "Da Galeria",
+    "choose_from_gallery": "Escolher da Galeria",
+    "choose_source": "De onde você quer a imagem?",
+    "choose_source_description": "Escolha a origem da imagem",
+    "from_computer_description": "Enviar do seu dispositivo",
+    "from_gallery_description": "Escolher da sua galeria"
+  },
+  "gallery_picker": {
+    "title": "Escolher da Galeria",
+    "search_placeholder": "Buscar por título ou descrição...",
+    "empty": "Nenhuma imagem na galeria",
+    "no_results": "Nenhuma imagem encontrada",
+    "try_different_search": "Tente uma busca diferente",
+    "upload_images_first": "Adicione imagens à galeria primeiro",
+    "showing_results": "Mostrando {{count}} de {{total}} imagens",
+    "total_images": "{{count}} imagens disponíveis"
   },
   "empty_field": "Não especificado",
   "loading": "Carregando...",

@@ -3,10 +3,13 @@ import { useState, useRef } from "react";
 import { ImagePlus, Upload, LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { GalleryPickerModal } from "@/components/modals/gallery-picker-modal";
+import { ImageSourceDialog } from "@/components/modals/image-source-dialog";
 import { Label } from "@/components/ui/label";
 
 type ImageShape = "square" | "rounded" | "circle";
 type ImageFit = "fill" | "cover" | "contain";
+type SourceMode = "computer" | "both";
 
 interface FormImageUploadProps {
   /**
@@ -87,6 +90,16 @@ interface FormImageUploadProps {
    * Compact mode - hides label, reduces padding
    */
   compact?: boolean;
+  /**
+   * Source mode:
+   * - 'computer': Upload do computador apenas (default)
+   * - 'both': Permite escolher entre computador ou galeria
+   */
+  sourceMode?: SourceMode;
+  /**
+   * bookId necessário quando sourceMode='both' para filtrar galeria
+   */
+  bookId?: string;
 }
 
 /**
@@ -152,11 +165,15 @@ export function FormImageUpload({
   showLabel = true,
   labelClassName = "text-primary",
   compact = false,
+  sourceMode = "computer",
+  bookId = "",
 }: FormImageUploadProps) {
   const { t } = useTranslation("common");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | undefined>(value);
   const [isHovered, setIsHovered] = useState(false);
+  const [isSourceDialogOpen, setIsSourceDialogOpen] = useState(false);
+  const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -177,6 +194,29 @@ export function FormImageUpload({
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+  };
+
+  const handleGallerySelect = (imageDataUrl: string) => {
+    setPreview(imageDataUrl);
+    onChange(imageDataUrl);
+  };
+
+  const handleUploadAreaClick = () => {
+    if (sourceMode === "both") {
+      // Show source selection dialog
+      setIsSourceDialogOpen(true);
+    } else {
+      // Direct to computer upload
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleSelectComputer = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleSelectGallery = () => {
+    setIsGalleryModalOpen(true);
   };
 
   // Shape classes
@@ -221,11 +261,11 @@ export function FormImageUpload({
         />
 
         {preview ? (
-          <label
-            htmlFor={id}
+          <div
             className="cursor-pointer block"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onClick={handleUploadAreaClick}
           >
             <div
               className={`relative ${width} ${height} ${shapeClass} overflow-hidden border group`}
@@ -245,19 +285,17 @@ export function FormImageUpload({
                 <Upload className="h-12 w-12 text-white" />
               </div>
             </div>
-          </label>
+          </div>
         ) : (
-          <label
-            htmlFor={id}
+          <div
             className="cursor-pointer block"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onClick={handleUploadAreaClick}
           >
             <div
               className={`relative ${width} ${height} border-dashed border-2 transition-colors ${shapeClass} flex flex-col items-center justify-center gap-2 bg-purple-950/40 overflow-hidden ${
-                isHovered
-                  ? "border-primary"
-                  : "border-muted-foreground/25"
+                isHovered ? "border-primary" : "border-muted-foreground/25"
               }`}
             >
               <PlaceholderIcon className="h-12 w-12 text-muted-foreground/60" />
@@ -280,11 +318,31 @@ export function FormImageUpload({
                 </span>
               </div>
             </div>
-          </label>
+          </div>
         )}
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
+
+      {/* Source Selection Dialog */}
+      {sourceMode === "both" && (
+        <ImageSourceDialog
+          open={isSourceDialogOpen}
+          onOpenChange={setIsSourceDialogOpen}
+          onSelectComputer={handleSelectComputer}
+          onSelectGallery={handleSelectGallery}
+        />
+      )}
+
+      {/* Gallery Picker Modal */}
+      {sourceMode === "both" && (
+        <GalleryPickerModal
+          open={isGalleryModalOpen}
+          onOpenChange={setIsGalleryModalOpen}
+          bookId={bookId || undefined}
+          onSelect={handleGallerySelect}
+        />
+      )}
     </div>
   );
 }

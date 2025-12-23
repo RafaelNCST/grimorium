@@ -24,6 +24,7 @@ interface PropsCreateItemModalView {
   onClose: () => void;
   onSubmit: (e: React.FormEvent) => void;
   isValid: boolean;
+  bookId: string;
 }
 
 export function CreateItemModalView({
@@ -32,6 +33,7 @@ export function CreateItemModalView({
   onClose,
   onSubmit,
   isValid,
+  bookId,
 }: PropsCreateItemModalView) {
   const { t } = useTranslation("create-item");
   const {
@@ -74,6 +76,8 @@ export function CreateItemModalView({
           imageFit="cover"
           placeholderIcon={Package}
           id="item-image-upload"
+          sourceMode="both"
+          bookId={bookId}
         />
       </div>
 

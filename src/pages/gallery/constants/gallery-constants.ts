@@ -3,9 +3,8 @@ export const MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024;
 export const MAX_FILE_SIZE_MB = 100;
 
 // Thumbnail dimensions
-export const THUMBNAIL_MAX_WIDTH = 400;
-export const THUMBNAIL_MAX_HEIGHT = 400;
-export const THUMBNAIL_QUALITY = 0.8;
+export const THUMBNAIL_MAX_WIDTH = 500;
+export const THUMBNAIL_MAX_HEIGHT = 500;
 
 // Supported image formats
 export const SUPPORTED_IMAGE_FORMATS = [
@@ -25,4 +24,4 @@ export const GRID_GAP = 4;
 export const GALLERY_DIRECTORY = "gallery";
 export const THUMBNAILS_DIRECTORY = "gallery/thumbnails";
 export const THUMBNAIL_FILE_PREFIX = "thumb_";
-export const THUMBNAIL_FORMAT = "jpg";
+export const THUMBNAIL_FORMAT = "png";

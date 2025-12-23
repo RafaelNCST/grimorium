@@ -162,6 +162,8 @@ export function CreateCharacterModalView({
           imageFit="cover"
           showLabel={false}
           placeholderIcon={User}
+          sourceMode="both"
+          bookId={bookId}
         />
 
         {/* Name, Age, Gender */}

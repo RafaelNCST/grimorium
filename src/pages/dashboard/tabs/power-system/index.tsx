@@ -118,6 +118,7 @@ export function PowerSystemTab({ bookId }: PowerSystemTabProps) {
       // Data
       systems={systems}
       systemToEdit={systemToEdit}
+      bookId={bookId}
       // UI State
       isEditMode={isEditMode}
       // Loading States

@@ -243,6 +243,40 @@ export async function loadThumbnailWithFallback(
 }
 
 /**
+ * Load original image as data URL
+ * @param item - Gallery item (needs originalPath and mimeType)
+ * @returns Data URL for the original full-quality image
+ */
+export async function loadOriginalImageAsDataURL(
+  item: Pick<IGalleryItem, 'originalPath' | 'mimeType'>
+): Promise<string> {
+  return safeDBOperation(async () => {
+    const { readFile } = await import("@tauri-apps/plugin-fs");
+    const { bytesToDataURL } = await import("@/pages/gallery/utils/image-utils");
+
+    try {
+      // Read original file from filesystem
+      const bytes = await readFile(item.originalPath, {
+        baseDir: BaseDirectory.AppData,
+      });
+
+      // Convert to data URL with original mime type
+      return bytesToDataURL(bytes, item.mimeType);
+    } catch (error) {
+      console.error(
+        `[loadOriginalImageAsDataURL] Failed to load original image:`,
+        error
+      );
+      throw new Error(
+        `Cannot load original image: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  }, 'loadOriginalImageAsDataURL');
+}
+
+/**
  * Delete image file from file system
  * @param originalPath - Relative path to the image file
  */

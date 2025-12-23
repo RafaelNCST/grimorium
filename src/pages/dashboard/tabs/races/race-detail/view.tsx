@@ -160,6 +160,8 @@ export function RaceDetailView({
               imageFit="cover"
               placeholderIcon={Dna}
               id="race-image-upload"
+              sourceMode="both"
+              bookId={bookId}
             />
           </div>
 

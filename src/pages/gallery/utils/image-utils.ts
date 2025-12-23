@@ -1,14 +1,14 @@
 /**
  * Gera um thumbnail de uma imagem usando Canvas API
  * @param imageSrc - Source da imagem (data URL ou file path)
- * @param maxWidth - Largura máxima do thumbnail (default: 400px)
- * @param maxHeight - Altura máxima do thumbnail (default: 400px)
- * @returns Promise com data URL do thumbnail em JPEG 80% quality
+ * @param maxWidth - Largura máxima do thumbnail (default: 500px)
+ * @param maxHeight - Altura máxima do thumbnail (default: 500px)
+ * @returns Promise com data URL do thumbnail em PNG (lossless)
  */
 export async function generateThumbnail(
   imageSrc: string,
-  maxWidth: number = 400,
-  maxHeight: number = 400
+  maxWidth: number = 500,
+  maxHeight: number = 500
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -44,7 +44,7 @@ export async function generateThumbnail(
       // Draw resized image
       ctx.drawImage(img, 0, 0, width, height);
 
-      // Convert to base64 with compression
+      // Convert to PNG (lossless format - no quality loss)
       canvas.toBlob(
         (blob) => {
           if (!blob) {
@@ -59,8 +59,7 @@ export async function generateThumbnail(
           reader.onerror = () => reject(new Error("Failed to read blob"));
           reader.readAsDataURL(blob);
         },
-        "image/jpeg",
-        0.8 // 80% quality
+        "image/png"
       );
     };
 
@@ -259,7 +258,7 @@ export async function saveThumbnailToFile(
 
 /**
  * Carrega thumbnail do filesystem como data URL
- * @param thumbnailPath - Path relativo do thumbnail (ex: "gallery/thumbnails/thumb_123.jpg")
+ * @param thumbnailPath - Path relativo do thumbnail (ex: "gallery/thumbnails/thumb_123.png")
  * @returns Data URL do thumbnail para uso em <img src>
  */
 export async function loadThumbnailAsDataURL(
@@ -270,8 +269,8 @@ export async function loadThumbnailAsDataURL(
   // Ler arquivo do filesystem
   const bytes = await readFile(thumbnailPath, { baseDir: BaseDirectory.AppData });
 
-  // Converter para data URL (sempre JPEG para thumbnails)
-  return bytesToDataURL(bytes, "image/jpeg");
+  // Converter para data URL (sempre PNG para thumbnails)
+  return bytesToDataURL(bytes, "image/png");
 }
 
 /**

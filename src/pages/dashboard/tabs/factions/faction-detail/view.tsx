@@ -243,6 +243,8 @@ export function FactionDetailView({
                 imageFit="cover"
                 placeholderIcon={Shield}
                 id="faction-image-upload"
+                sourceMode="both"
+                bookId={bookId}
               />
             </div>
           </div>

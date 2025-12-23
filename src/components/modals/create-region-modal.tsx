@@ -281,6 +281,8 @@ export function CreateRegionModal({
                             shape="rounded"
                             placeholderIcon={MapIcon}
                             id="region-image-upload"
+                            sourceMode="both"
+                            bookId={bookId}
                           />
                         </div>
                       </div>

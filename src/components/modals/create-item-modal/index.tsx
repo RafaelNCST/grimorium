@@ -8,12 +8,14 @@ interface PropsCreateItemModal {
   open: boolean;
   onClose: () => void;
   onConfirm: (itemData: ItemFormSchema) => void;
+  bookId: string;
 }
 
 export function CreateItemModal({
   open,
   onClose,
   onConfirm,
+  bookId,
 }: PropsCreateItemModal) {
   const form = useItemForm();
   const { handleSubmit, reset } = form;
@@ -74,6 +76,7 @@ export function CreateItemModal({
       onClose={handleClose}
       onSubmit={onSubmit}
       isValid={isValid}
+      bookId={bookId}
     />
   );
 }

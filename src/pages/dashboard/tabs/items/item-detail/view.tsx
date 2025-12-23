@@ -212,6 +212,8 @@ export const ItemDetailView = React.memo(
                 imageFit="cover"
                 placeholderIcon={Package}
                 id="item-image-upload"
+                sourceMode="both"
+                bookId={bookId}
               />
             </div>
 

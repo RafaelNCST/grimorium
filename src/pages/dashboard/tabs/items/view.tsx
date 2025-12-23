@@ -18,6 +18,7 @@ interface PropsItemsView {
   selectedCategories: string[];
   selectedStatuses: string[];
   showCreateModal: boolean;
+  bookId: string;
   onSearchTermChange: (term: string) => void;
   onCategoryFilterChange: (category: string) => void;
   onStatusFilterChange: (status: string) => void;
@@ -35,6 +36,7 @@ const ItemsViewComponent = function ItemsView({
   selectedCategories,
   selectedStatuses,
   showCreateModal,
+  bookId,
   onSearchTermChange,
   onCategoryFilterChange,
   onStatusFilterChange,
@@ -149,6 +151,7 @@ const ItemsViewComponent = function ItemsView({
         open={showCreateModal}
         onClose={() => onShowCreateModalChange(false)}
         onConfirm={onCreateItem}
+        bookId={bookId}
       />
     </>
   );

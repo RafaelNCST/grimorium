@@ -121,6 +121,8 @@ export function CreateFactionModalView({
                   placeholderIcon={ShieldIcon}
                   id="faction-image-upload"
                   compact
+                  sourceMode="both"
+                  bookId={bookId}
                 />
 
                 {/* Faction Name */}

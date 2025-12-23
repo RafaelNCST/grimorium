@@ -170,6 +170,7 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
       selectedCategories={selectedCategories}
       selectedStatuses={selectedStatuses}
       showCreateModal={showCreateModal}
+      bookId={bookId}
       onSearchTermChange={setSearchTerm}
       onCategoryFilterChange={handleCategoryFilterChange}
       onStatusFilterChange={handleStatusFilterChange}

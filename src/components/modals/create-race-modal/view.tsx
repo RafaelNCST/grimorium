@@ -39,7 +39,7 @@ export function CreateRaceModalView({
   isValid,
   isSubmitting,
   availableRaces: _availableRaces,
-  bookId: _bookId,
+  bookId,
 }: PropsCreateRaceModalView) {
   const { t } = useTranslation("create-race");
   const {
@@ -79,6 +79,8 @@ export function CreateRaceModalView({
                   imageFit="cover"
                   placeholderIcon={Dna}
                   id="race-image-upload"
+                  sourceMode="both"
+                  bookId={bookId}
                 />
               </div>
 

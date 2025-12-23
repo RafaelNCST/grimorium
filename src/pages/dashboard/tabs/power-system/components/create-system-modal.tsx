@@ -42,6 +42,7 @@ interface CreateSystemModalProps {
     language?: string
   ) => Promise<void>;
   existingSystems: IPowerSystem[];
+  bookId: string;
 }
 
 const formSchema = z.object({
@@ -108,6 +109,7 @@ export function CreateSystemModal({
   onClose,
   onSubmit,
   existingSystems,
+  bookId,
 }: CreateSystemModalProps) {
   const { t, i18n } = useTranslation("power-system");
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
@@ -226,6 +228,8 @@ export function CreateSystemModal({
                     showLabel={false}
                     compact
                     placeholderIcon={Zap}
+                    sourceMode="both"
+                    bookId={bookId}
                   />
 
                   {/* System Name */}

@@ -258,6 +258,8 @@ export function RegionDetailView({
                 shape="rounded"
                 placeholderIcon={MapIcon}
                 id="region-image-upload"
+                sourceMode="both"
+                bookId={bookId}
               />
             </div>
           </div>

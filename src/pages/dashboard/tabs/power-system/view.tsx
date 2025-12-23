@@ -11,6 +11,7 @@ interface PowerSystemViewProps {
   // Data
   systems: IPowerSystem[];
   systemToEdit: IPowerSystem | null;
+  bookId: string;
 
   // UI State
   isEditMode: boolean;
@@ -41,6 +42,7 @@ export function PowerSystemView({
   // Data
   systems,
   systemToEdit,
+  bookId,
 
   // UI State
   isEditMode,
@@ -84,6 +86,7 @@ export function PowerSystemView({
         onClose={onCloseCreateSystemModal}
         onSubmit={onCreateSystem}
         existingSystems={systems}
+        bookId={bookId}
       />
       <EditSystemModal
         isOpen={isEditSystemModalOpen}
