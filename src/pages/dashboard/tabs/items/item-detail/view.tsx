@@ -213,7 +213,7 @@ export const ItemDetailView = React.memo(
                 placeholderIcon={Package}
                 id="item-image-upload"
                 sourceMode="both"
-                bookId={bookId}
+                bookId={item.bookId}
               />
             </div>
 
