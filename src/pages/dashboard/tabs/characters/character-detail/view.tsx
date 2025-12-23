@@ -7,6 +7,7 @@ import {
   Calendar,
   Heart,
   Image,
+  ScrollText,
   Trash2,
   User,
   Users,
@@ -186,6 +187,8 @@ interface CharacterDetailViewProps {
   selectedLinkForEdit: IPowerCharacterLink | null;
   onCloseEditLinkModal: () => void;
   onSavePowerLink: (linkId: string, customLabel: string) => Promise<void>;
+  isLogsModalOpen: boolean;
+  onLogsModalToggle: () => void;
 }
 
 export function CharacterDetailView({
@@ -235,6 +238,8 @@ export function CharacterDetailView({
   selectedLinkForEdit,
   onCloseEditLinkModal,
   onSavePowerLink,
+  isLogsModalOpen: _isLogsModalOpen,
+  onLogsModalToggle,
 }: CharacterDetailViewProps) {
   const { t } = useTranslation(["character-detail", "create-character"]);
   const { t: tEmpty } = useTranslation("empty-states");
@@ -1245,6 +1250,12 @@ export function CharacterDetailView({
             onDelete={onDeleteModalOpen}
             deleteTooltip={t("common:tooltips.delete")}
             extraActions={[
+              {
+                label: t("character-detail:header.logs"),
+                icon: ScrollText,
+                onClick: onLogsModalToggle,
+                tooltip: t("character-detail:header.logs"),
+              },
               {
                 label: t("character-detail:header.gallery"),
                 icon: Image,

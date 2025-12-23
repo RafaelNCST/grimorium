@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-status";
 import { FACTION_TYPES_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-types";
+import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
 import { getFactionById } from "@/lib/db/factions.service";
 import { FactionSchema } from "@/lib/validation/faction-schema";
 import { useCharactersStore } from "@/stores/characters-store";
@@ -57,6 +58,7 @@ export function FactionDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [hasChapterMetrics, setHasChapterMetrics] = useState<boolean | null>(null);
+  const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
   const [uiState, setUiState] = useState<IFactionUIState>(() => {
     const stored = localStorage.getItem("factionDetailAdvancedSectionOpen");
     return {
@@ -525,6 +527,14 @@ export function FactionDetail() {
         onConfirm={handleConfirmCancel}
       />
 
+      <EntityLogsModal
+        open={isLogsModalOpen}
+        onOpenChange={setIsLogsModalOpen}
+        entityId={factionId}
+        entityType="faction"
+        bookId={dashboardId}
+      />
+
       <FactionDetailView
         faction={faction}
         editData={editData}
@@ -572,6 +582,8 @@ export function FactionDetail() {
         onAdvancedSectionToggle={handleAdvancedSectionToggle}
         onSectionVisibilityChange={handleSectionVisibilityChange}
         hasChanges={hasChanges}
+        isLogsModalOpen={isLogsModalOpen}
+        onLogsModalToggle={() => setIsLogsModalOpen(!isLogsModalOpen)}
       />
     </>
   );

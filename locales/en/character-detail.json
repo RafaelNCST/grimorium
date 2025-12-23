@@ -8,7 +8,8 @@
     "save": "Save",
     "quick_navigation": "Quick Navigation",
     "notes": "Notes",
-    "gallery": "Gallery"
+    "gallery": "Gallery",
+    "logs": "Logs"
   },
   "sections": {
     "basic_info": "Basic Information",

@@ -34,6 +34,7 @@ import { ALIGNMENTS_CONSTANT } from "./constants/alignments-constant";
 import { RELATIONSHIP_TYPES_CONSTANT } from "./constants/relationship-types-constant";
 import { getRelationshipTypeData } from "./utils/get-relationship-type-data";
 import { CharacterDetailView } from "./view";
+import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
 
 // Extended type to include page/section titles
 interface IPowerLinkWithTitles extends IPowerCharacterLink {
@@ -124,6 +125,9 @@ export function CharacterDetail() {
   const [isEditLinkModalOpen, setIsEditLinkModalOpen] = useState(false);
   const [selectedLinkForEdit, setSelectedLinkForEdit] =
     useState<IPowerCharacterLink | null>(null);
+
+  // Entity logs state
+  const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
 
   // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -843,6 +847,14 @@ export function CharacterDetail() {
         onConfirm={handleConfirmCancel}
       />
 
+      <EntityLogsModal
+        open={isLogsModalOpen}
+        onOpenChange={setIsLogsModalOpen}
+        entityId={characterId}
+        entityType="character"
+        bookId={dashboardId}
+      />
+
       <CharacterDetailView
         character={character}
         editData={editData}
@@ -905,6 +917,8 @@ export function CharacterDetail() {
         selectedLinkForEdit={selectedLinkForEdit}
         onCloseEditLinkModal={() => setIsEditLinkModalOpen(false)}
         onSavePowerLink={handleSaveLink}
+        isLogsModalOpen={isLogsModalOpen}
+        onLogsModalToggle={() => setIsLogsModalOpen(!isLogsModalOpen)}
       />
     </>
   );

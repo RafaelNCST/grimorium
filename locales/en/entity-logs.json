@@ -1,0 +1,29 @@
+{
+  "modal": {
+    "title": "Logs",
+    "description": "History of changes throughout the work",
+    "empty_state": "No logs yet.",
+    "empty_state_description": "Start by creating a new log.",
+    "loading": "Loading...",
+    "create_button": "Create New Log"
+  },
+  "create_edit_modal": {
+    "title_create": "Create New Log",
+    "title_edit": "Edit Log",
+    "description_create": "Add a new change log to the timeline",
+    "description_edit": "Edit the log information",
+    "cancel": "Cancel",
+    "save": "Save",
+    "create": "Create"
+  },
+  "fields": {
+    "chapter": "Chapter",
+    "chapter_label": "In which chapter?",
+    "importance": "Event importance",
+    "importance_minor": "Minor Event",
+    "importance_major": "Major Event",
+    "importance_critical": "Critical Event",
+    "description": "What happened?",
+    "description_placeholder": "Lost an arm in battle against the orcs, discovered to be the king's son, swore revenge against his master's killer..."
+  }
+}

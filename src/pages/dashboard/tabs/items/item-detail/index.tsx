@@ -20,6 +20,7 @@ import { type IFieldVisibility } from "@/types/character-types";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { ItemDetailView } from "./view";
+import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
 
 export default function ItemDetail() {
   const { itemId, dashboardId } = useParams({
@@ -73,6 +74,7 @@ export default function ItemDetail() {
   const [hasChapterMetrics, setHasChapterMetrics] = useState<boolean | null>(
     null
   );
+  const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
 
   // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -496,6 +498,14 @@ export default function ItemDetail() {
         onConfirm={handleConfirmCancel}
       />
 
+      <EntityLogsModal
+        open={isLogsModalOpen}
+        onOpenChange={setIsLogsModalOpen}
+        entityId={itemId}
+        entityType="item"
+        bookId={dashboardId}
+      />
+
       <ItemDetailView
         item={item}
         editData={editData}
@@ -541,6 +551,8 @@ export default function ItemDetail() {
         onAdvancedSectionToggle={handleAdvancedSectionToggle}
         toggleSection={toggleSection}
         setHasChapterMetrics={setHasChapterMetrics}
+        isLogsModalOpen={isLogsModalOpen}
+        onLogsModalToggle={() => setIsLogsModalOpen(!isLogsModalOpen)}
       />
     </>
   );

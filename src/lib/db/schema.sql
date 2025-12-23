@@ -288,3 +288,34 @@ CREATE INDEX IF NOT EXISTS idx_plot_arcs_book_id ON plot_arcs(book_id);
 CREATE INDEX IF NOT EXISTS idx_plot_arcs_order ON plot_arcs(book_id, order_index);
 CREATE INDEX IF NOT EXISTS idx_plot_events_arc_id ON plot_events(arc_id);
 CREATE INDEX IF NOT EXISTS idx_plot_events_order ON plot_events(arc_id, order_index);
+
+-- REGISTROS DE ENTIDADES (ENTITY LOGS)
+CREATE TABLE IF NOT EXISTS entity_logs (
+  id TEXT PRIMARY KEY,
+  entity_id TEXT NOT NULL,
+  entity_type TEXT NOT NULL, -- 'character', 'item', 'faction', 'race', 'region'
+  book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+
+  -- Momento do registro
+  moment_type TEXT NOT NULL, -- 'chapter' or 'prehistory'
+  chapter_number TEXT, -- Número do capítulo (se moment_type = 'chapter')
+  prehistory_period TEXT, -- Período da pré-história (se moment_type = 'prehistory')
+
+  -- Importância do evento
+  importance TEXT NOT NULL, -- 'minor', 'major', 'critical'
+
+  -- Descrição da mudança
+  description TEXT NOT NULL,
+
+  -- Ordenação (para drag and drop)
+  order_index INTEGER NOT NULL DEFAULT 0,
+
+  -- Timestamps
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+-- ÍNDICES PARA REGISTROS
+CREATE INDEX IF NOT EXISTS idx_entity_logs_entity ON entity_logs(entity_id, entity_type);
+CREATE INDEX IF NOT EXISTS idx_entity_logs_book_id ON entity_logs(book_id);
+CREATE INDEX IF NOT EXISTS idx_entity_logs_order ON entity_logs(entity_id, entity_type, order_index);

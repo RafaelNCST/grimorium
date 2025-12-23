@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { AlertCircle, BookOpen, Info, Package, Image } from "lucide-react";
+import { AlertCircle, BookOpen, Info, Package, Image, ScrollText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -100,6 +100,8 @@ interface ItemDetailViewProps {
   onAdvancedSectionToggle: () => void;
   toggleSection: (sectionName: string) => void;
   setHasChapterMetrics: (value: boolean | null) => void;
+  isLogsModalOpen: boolean;
+  onLogsModalToggle: () => void;
 }
 
 export const ItemDetailView = React.memo(
@@ -141,6 +143,8 @@ export const ItemDetailView = React.memo(
     onAdvancedSectionToggle,
     toggleSection: _toggleSection,
     setHasChapterMetrics,
+    isLogsModalOpen,
+    onLogsModalToggle,
   }: ItemDetailViewProps) => {
     const { t } = useTranslation(["item-detail", "create-item"]);
 
@@ -790,6 +794,12 @@ export const ItemDetailView = React.memo(
               onCancel={onCancel}
               onDelete={onDeleteModalOpen}
               extraActions={[
+                {
+                  label: t("item-detail:header.logs"),
+                  icon: ScrollText,
+                  onClick: onLogsModalToggle,
+                  tooltip: t("item-detail:header.logs"),
+                },
                 {
                   label: t("item-detail:header.gallery"),
                   icon: Image,

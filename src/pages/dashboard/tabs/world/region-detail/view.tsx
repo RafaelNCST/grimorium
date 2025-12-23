@@ -9,6 +9,7 @@ import {
   Image,
   Map as MapIcon,
   BookOpen,
+  ScrollText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -107,6 +108,8 @@ interface RegionDetailViewProps {
   onEditDataChange: (field: string, value: unknown) => void;
   onAdvancedSectionToggle: () => void;
   onTimelineSectionToggle: () => void;
+  isLogsModalOpen: boolean;
+  onLogsModalToggle: () => void;
 }
 
 export function RegionDetailView({
@@ -151,6 +154,8 @@ export function RegionDetailView({
   onEditDataChange,
   onAdvancedSectionToggle,
   onTimelineSectionToggle: _onTimelineSectionToggle,
+  isLogsModalOpen,
+  onLogsModalToggle,
 }: RegionDetailViewProps) {
   const { t } = useTranslation([
     "region-detail",
@@ -1165,6 +1170,12 @@ export function RegionDetailView({
             editTooltip={t("common:tooltips.edit")}
             deleteTooltip={t("common:tooltips.delete")}
             extraActions={[
+              {
+                label: t("region-detail:header.logs"),
+                icon: ScrollText,
+                onClick: onLogsModalToggle,
+                tooltip: t("region-detail:header.logs"),
+              },
               {
                 label: t("region-detail:header.gallery"),
                 icon: Image,

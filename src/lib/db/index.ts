@@ -948,6 +948,39 @@ async function runMigrations(database: Database): Promise<void> {
       // Column already exists - safe to ignore
     }
 
+    // Create entity_logs table for entity change tracking
+    try {
+      await database.execute(`
+        CREATE TABLE IF NOT EXISTS entity_logs (
+          id TEXT PRIMARY KEY,
+          entity_id TEXT NOT NULL,
+          entity_type TEXT NOT NULL,
+          book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+          moment_type TEXT NOT NULL,
+          chapter_number TEXT,
+          prehistory_period TEXT,
+          importance TEXT NOT NULL,
+          description TEXT NOT NULL,
+          order_index INTEGER NOT NULL DEFAULT 0,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL
+        )
+      `);
+
+      // Create indexes for entity_logs
+      await database.execute(
+        "CREATE INDEX IF NOT EXISTS idx_entity_logs_entity ON entity_logs(entity_id, entity_type)"
+      );
+      await database.execute(
+        "CREATE INDEX IF NOT EXISTS idx_entity_logs_book_id ON entity_logs(book_id)"
+      );
+      await database.execute(
+        "CREATE INDEX IF NOT EXISTS idx_entity_logs_order ON entity_logs(entity_id, entity_type, order_index)"
+      );
+    } catch (_error) {
+      // Table already exists - safe to ignore
+    }
+
     // Migrate gallery_items to make thumbnail_base64 nullable (it's deprecated)
     try {
       // Check if we need to migrate by checking if thumbnail_base64 is NOT NULL

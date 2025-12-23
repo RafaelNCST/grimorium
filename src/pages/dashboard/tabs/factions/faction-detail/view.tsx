@@ -10,6 +10,7 @@ import {
   Image,
   AlertCircle,
   BookOpen,
+  ScrollText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -98,6 +99,8 @@ interface FactionDetailViewProps {
   onAdvancedSectionToggle: () => void;
   onSectionVisibilityChange: (sectionName: string, isVisible: boolean) => void;
   hasChanges: boolean;
+  isLogsModalOpen: boolean;
+  onLogsModalToggle: () => void;
 }
 
 export function FactionDetailView({
@@ -138,6 +141,8 @@ export function FactionDetailView({
   onAdvancedSectionToggle,
   onSectionVisibilityChange,
   hasChanges,
+  isLogsModalOpen,
+  onLogsModalToggle,
 }: FactionDetailViewProps) {
   const { t } = useTranslation([
     "faction-detail",
@@ -1360,6 +1365,12 @@ export function FactionDetailView({
             editTooltip={t("common:tooltips.edit")}
             deleteTooltip={t("common:tooltips.delete")}
             extraActions={[
+              {
+                label: t("faction-detail:header.logs"),
+                icon: ScrollText,
+                onClick: onLogsModalToggle,
+                tooltip: t("faction-detail:header.logs"),
+              },
               {
                 label: t("faction-detail:header.gallery"),
                 icon: Image,

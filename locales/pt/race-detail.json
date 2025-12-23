@@ -12,7 +12,8 @@
     "change_image": "Clique para alterar a imagem",
     "add_note": "Adicionar Nota",
     "notes": "Anotações",
-    "gallery": "Galeria"
+    "gallery": "Galeria",
+    "logs": "Registros"
   },
   "sections": {
     "basic_info": "Informações Básicas",

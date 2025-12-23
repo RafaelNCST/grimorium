@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { Dna, Users, Image, AlertCircle, BookOpen } from "lucide-react";
+import { Dna, Users, Image, AlertCircle, BookOpen, ScrollText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -85,6 +85,8 @@ interface RaceDetailViewProps {
   toggleSection: (sectionName: string) => void;
   hasChapterMetrics: boolean | null;
   setHasChapterMetrics: (value: boolean | null) => void;
+  isLogsModalOpen: boolean;
+  onLogsModalToggle: () => void;
 }
 
 // Helper component for empty state
@@ -131,6 +133,8 @@ export function RaceDetailView({
   toggleSection: _toggleSection,
   hasChapterMetrics,
   setHasChapterMetrics,
+  isLogsModalOpen: _isLogsModalOpen,
+  onLogsModalToggle,
 }: RaceDetailViewProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { t } = useTranslation(["race-detail", "create-race"] as any);
@@ -1217,6 +1221,12 @@ export function RaceDetailView({
             editTooltip={t("common:tooltips.edit")}
             deleteTooltip={t("common:tooltips.delete")}
             extraActions={[
+              {
+                label: t("race-detail:buttons.logs"),
+                icon: ScrollText,
+                onClick: onLogsModalToggle,
+                tooltip: t("race-detail:buttons.logs"),
+              },
               {
                 label: t("race-detail:buttons.gallery"),
                 icon: Image,

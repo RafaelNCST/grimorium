@@ -1,0 +1,29 @@
+{
+  "modal": {
+    "title": "Registros",
+    "description": "Histórico de mudanças ao longo da obra",
+    "empty_state": "Nenhum registro ainda.",
+    "empty_state_description": "Comece criando um novo registro.",
+    "loading": "Carregando...",
+    "create_button": "Criar Novo Registro"
+  },
+  "create_edit_modal": {
+    "title_create": "Criar Novo Registro",
+    "title_edit": "Editar Registro",
+    "description_create": "Adicione um novo registro de mudança na linha do tempo",
+    "description_edit": "Edite as informações do registro",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "create": "Criar"
+  },
+  "fields": {
+    "chapter": "Capítulo",
+    "chapter_label": "Em qual capítulo?",
+    "importance": "Importância do evento",
+    "importance_minor": "Evento Pequeno",
+    "importance_major": "Evento Grande",
+    "importance_critical": "Evento Crítico",
+    "description": "O que aconteceu?",
+    "description_placeholder": "Perdeu um braço na batalha contra os orcs, descobriu ser filho do rei, jurou vingança contra o assassino de seu mestre..."
+  }
+}

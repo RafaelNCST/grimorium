@@ -13,6 +13,7 @@ import { useRacesStore } from "@/stores/races-store";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { RaceDetailView } from "./view";
+import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
 
 import type { IRace } from "../types/race-types";
 import type {
@@ -64,6 +65,9 @@ export function RaceDetail() {
   const [hasChapterMetrics, setHasChapterMetrics] = useState<boolean | null>(
     null
   );
+
+  // Entity logs state
+  const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
 
   // Original states for comparison
   const [originalFieldVisibility, setOriginalFieldVisibility] =
@@ -483,6 +487,14 @@ export function RaceDetail() {
         onConfirm={handleConfirmCancel}
       />
 
+      <EntityLogsModal
+        open={isLogsModalOpen}
+        onOpenChange={setIsLogsModalOpen}
+        entityId={raceId}
+        entityType="race"
+        bookId={dashboardId}
+      />
+
       <RaceDetailView
         race={race}
         editData={editData}
@@ -520,6 +532,8 @@ export function RaceDetail() {
         toggleSection={toggleSection}
         hasChapterMetrics={hasChapterMetrics}
         setHasChapterMetrics={setHasChapterMetrics}
+        isLogsModalOpen={isLogsModalOpen}
+        onLogsModalToggle={() => setIsLogsModalOpen(!isLogsModalOpen)}
       />
     </>
   );

@@ -28,6 +28,7 @@ import {
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { RegionDetailView } from "./view";
+import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
 
 export function RegionDetail() {
   const { dashboardId, regionId } = useParams({
@@ -102,6 +103,9 @@ export function RegionDetail() {
   const [hasChapterMetrics, setHasChapterMetrics] = useState<boolean | null>(
     null
   );
+
+  // Entity logs state
+  const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
 
   // Refs to always have the latest visibility values
   const sectionVisibilityRef = useRef<ISectionVisibility>({});
@@ -781,6 +785,14 @@ export function RegionDetail() {
         onConfirm={handleConfirmCancel}
       />
 
+      <EntityLogsModal
+        open={isLogsModalOpen}
+        onOpenChange={setIsLogsModalOpen}
+        entityId={regionId}
+        entityType="region"
+        bookId={dashboardId}
+      />
+
       <RegionDetailView
         region={region}
         editData={editData}
@@ -823,6 +835,8 @@ export function RegionDetail() {
         onEditDataChange={handleEditDataChange}
         onAdvancedSectionToggle={handleAdvancedSectionToggle}
         onTimelineSectionToggle={handleTimelineSectionToggle}
+        isLogsModalOpen={isLogsModalOpen}
+        onLogsModalToggle={() => setIsLogsModalOpen(!isLogsModalOpen)}
       />
     </>
   );
