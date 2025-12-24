@@ -182,30 +182,29 @@ export function ChapterCard({
 
   return (
     <Card className="hover:shadow-md transition-shadow relative overflow-hidden">
-      {/* Status Badge - Large identifier at top left */}
-      {showStatus && (
-        <div className="absolute top-0 left-0 z-10">
+      {/* Badges container - Status and Plot Arc side by side at top left */}
+      <div className="absolute top-0 left-0 z-10 flex gap-2">
+        {/* Status Badge */}
+        {showStatus && (
           <Badge
             variant="secondary"
             className={`${statusConfig[chapter.status].color} text-white pointer-events-none rounded-none rounded-br-lg px-4 py-2 text-sm font-semibold shadow-md`}
           >
             {statusConfig[chapter.status].label}
           </Badge>
-        </div>
-      )}
+        )}
 
-      {/* Plot Arc Badge - identifier at top right */}
-      {chapter.plotArc && (
-        <div className="absolute top-0 right-0 z-10">
+        {/* Plot Arc Badge */}
+        {chapter.plotArc && (
           <Badge
             variant="secondary"
-            className={`${getPlotArcBadgeColor(chapter.plotArc.status)} text-white pointer-events-none rounded-none rounded-bl-lg px-4 py-2 text-sm font-semibold shadow-md gap-1.5`}
+            className={`${getPlotArcBadgeColor(chapter.plotArc.status)} text-white pointer-events-none rounded-none rounded-bl-lg rounded-br-lg px-4 py-2 text-sm font-semibold shadow-md gap-1.5`}
           >
             <BookOpen className="w-3.5 h-3.5" />
             {chapter.plotArc.name}
           </Badge>
-        </div>
-      )}
+        )}
+      </div>
 
       <CardHeader
         className={`pb-4 cursor-pointer hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 ${
