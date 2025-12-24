@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import type { PlotArcStatus } from "@/types/plot-types";
+
 import type { EntityMention } from "@/components/modals/create-chapter-modal";
 import {
   ExportPreviewModal,
@@ -39,6 +41,20 @@ type ChapterStatus =
   | "finished"
   | "published";
 
+// Helper function to get plot arc badge color based on status
+function getPlotArcBadgeColor(status?: PlotArcStatus): string {
+  switch (status) {
+    case "finished":
+      return "bg-emerald-500 border-emerald-600";
+    case "current":
+      return "bg-blue-500 border-blue-600";
+    case "planning":
+      return "bg-amber-500 border-amber-600";
+    default:
+      return "bg-purple-500 border-purple-600"; // fallback color
+  }
+}
+
 interface Chapter {
   id: string;
   number: number;
@@ -50,7 +66,7 @@ interface Chapter {
   lastEdited: Date;
   summary?: string;
   content?: string;
-  plotArc?: { id: string; name: string };
+  plotArc?: { id: string; name: string; status?: PlotArcStatus };
   mentionedCharacters?: EntityMention[];
   mentionedRegions?: EntityMention[];
   mentionedItems?: EntityMention[];
@@ -178,9 +194,22 @@ export function ChapterCard({
         </div>
       )}
 
+      {/* Plot Arc Badge - identifier at top right */}
+      {chapter.plotArc && (
+        <div className="absolute top-0 right-0 z-10">
+          <Badge
+            variant="secondary"
+            className={`${getPlotArcBadgeColor(chapter.plotArc.status)} text-white pointer-events-none rounded-none rounded-bl-lg px-4 py-2 text-sm font-semibold shadow-md gap-1.5`}
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            {chapter.plotArc.name}
+          </Badge>
+        </div>
+      )}
+
       <CardHeader
         className={`pb-4 cursor-pointer hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 ${
-          showStatus ? "pt-14" : "pt-6"
+          showStatus || chapter.plotArc ? "pt-14" : "pt-6"
         }`}
         onClick={() => onClick?.(chapter.id)}
       >
@@ -279,6 +308,22 @@ export function ChapterCard({
                 )}
               </div>
 
+              {/* Summary Section */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">
+                  {t("summary.title")}
+                </h4>
+                {chapter.summary ? (
+                  <p className="text-sm text-muted-foreground">
+                    {chapter.summary}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">
+                    {t("summary.no_summary")}
+                  </p>
+                )}
+              </div>
+
               {/* Metrics Section */}
               <div>
                 <h4 className="text-sm font-medium mb-2">
@@ -331,22 +376,6 @@ export function ChapterCard({
                     </span>
                   </div>
                 </div>
-              </div>
-
-              {/* Summary Section */}
-              <div>
-                <h4 className="text-sm font-medium mb-2">
-                  {t("summary.title")}
-                </h4>
-                {chapter.summary ? (
-                  <p className="text-sm text-muted-foreground">
-                    {chapter.summary}
-                  </p>
-                ) : (
-                  <p className="text-sm text-muted-foreground italic">
-                    {t("summary.no_summary")}
-                  </p>
-                )}
               </div>
 
               {/* Entities Section */}

@@ -55,7 +55,7 @@ interface Chapter {
   characterCountWithSpaces: number;
   lastEdited: Date;
   summary?: string;
-  plotArc?: { id: string; name: string };
+  plotArc?: { id: string; name: string; status?: import("@/types/plot-types").PlotArcStatus };
   mentionedCharacters?: EntityMention[];
   mentionedRegions?: EntityMention[];
   mentionedItems?: EntityMention[];
@@ -136,30 +136,33 @@ export function ChaptersPage() {
 
     if (cachedChapters.length === 0) return [];
 
-    return cachedChapters.map((ch) => ({
-      id: ch.id,
-      number: parseFloat(ch.chapterNumber),
-      title: ch.title,
-      status: ch.status,
-      wordCount: ch.wordCount,
-      characterCount: ch.characterCount,
-      characterCountWithSpaces: ch.characterCountWithSpaces || 0,
-      lastEdited: new Date(ch.lastEdited),
-      summary: ch.summary,
-      plotArc: ch.plotArcId
-        ? plotArcs.find((arc) => arc.id === ch.plotArcId)
+    return cachedChapters.map((ch) => {
+      const arc = ch.plotArcId ? plotArcs.find((arc) => arc.id === ch.plotArcId) : undefined;
+
+      return {
+        id: ch.id,
+        number: parseFloat(ch.chapterNumber),
+        title: ch.title,
+        status: ch.status,
+        wordCount: ch.wordCount,
+        characterCount: ch.characterCount,
+        characterCountWithSpaces: ch.characterCountWithSpaces || 0,
+        lastEdited: new Date(ch.lastEdited),
+        summary: ch.summary,
+        plotArc: arc
           ? {
-              id: ch.plotArcId,
-              name: plotArcs.find((arc) => arc.id === ch.plotArcId)!.name,
+              id: arc.id,
+              name: arc.name,
+              status: arc.status,
             }
-          : undefined
-        : undefined,
-      mentionedCharacters: ch.mentionedCharacters || [],
-      mentionedRegions: ch.mentionedRegions || [],
-      mentionedItems: ch.mentionedItems || [],
-      mentionedFactions: ch.mentionedFactions || [],
-      mentionedRaces: ch.mentionedRaces || [],
-    }));
+          : undefined,
+        mentionedCharacters: ch.mentionedCharacters || [],
+        mentionedRegions: ch.mentionedRegions || [],
+        mentionedItems: ch.mentionedItems || [],
+        mentionedFactions: ch.mentionedFactions || [],
+        mentionedRaces: ch.mentionedRaces || [],
+      };
+    });
   }, [chaptersCache, plotArcs]);
 
   // Remover loading quando houver cache

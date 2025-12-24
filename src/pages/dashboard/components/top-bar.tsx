@@ -70,6 +70,24 @@ export function TopBar({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
+              variant="magical"
+              onClick={onNavigateToChapters}
+              className="gap-2"
+            >
+              <FileText className="w-5 h-5" />
+              {t("common:tooltips.chapters")}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="text-sm font-medium">
+              {t("common:tooltips.chapters")}
+            </p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
               variant="ghost"
               size="icon"
               onClick={() => onShowDeleteDialog(true)}
@@ -81,24 +99,6 @@ export function TopBar({
           <TooltipContent>
             <p className="text-sm font-medium">
               {t("common:tooltips.delete_book")}
-            </p>
-          </TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onNavigateToChapters}
-              className="hover:bg-accent hover:text-accent-foreground"
-            >
-              <FileText className="w-5 h-5" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className="text-sm font-medium">
-              {t("common:tooltips.chapters")}
             </p>
           </TooltipContent>
         </Tooltip>
