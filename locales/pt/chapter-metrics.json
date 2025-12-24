@@ -28,6 +28,7 @@
     "total_characters": "Caracteres",
     "total_characters_with_spaces": "Caracteres com espaço",
     "total_paragraphs": "Parágrafos",
-    "total_dialogues": "Diálogos"
+    "total_dialogues": "Diálogos",
+    "chapter_limit_exceeded": "Aviso: Este arco de tamanho {{arcSize}} foi planejado para até {{maxChapters}} capítulos, mas possui {{totalChapters}} capítulos no momento."
   }
 }

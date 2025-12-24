@@ -12,6 +12,7 @@ import {
   getPlotArcById,
   updatePlotArc,
 } from "@/lib/db/plot.service";
+import { checkAndShowArcWarning } from "@/lib/helpers/chapter-arc-warning";
 import { useBookEditorSettingsStore } from "@/stores/book-editor-settings-store";
 import { useChaptersStore } from "@/stores/chapters-store";
 import type { IPlotArc } from "@/types/plot-types";
@@ -103,8 +104,7 @@ function ChapterEditorContent() {
   const [showPlotArcEventsSidebar, setShowPlotArcEventsSidebar] =
     useState(false);
   const [currentPlotArc, setCurrentPlotArc] = useState<IPlotArc | null>(null);
-
-  // Stats modal state
+  const isManualArcChangeRef = useRef(false);
   const [showStatsDetailModal, setShowStatsDetailModal] = useState(false);
 
   // Session timer hook (GLOBAL - não reseta ao trocar de capítulo)
@@ -284,13 +284,21 @@ function ChapterEditorContent() {
     loadArcs();
   }, [dashboardId]);
 
-  // Load current plot arc when plotArcId changes
   useEffect(() => {
     const loadCurrentArc = async () => {
       if (chapter.plotArcId) {
         try {
           const arc = await getPlotArcById(chapter.plotArcId);
           setCurrentPlotArc(arc);
+
+          await checkAndShowArcWarning(
+            dashboardId,
+            chapter.plotArcId,
+            arc,
+            isManualArcChangeRef.current
+          );
+
+          isManualArcChangeRef.current = false;
         } catch (error) {
           console.error("Error loading current arc:", error);
           setCurrentPlotArc(null);
@@ -300,7 +308,7 @@ function ChapterEditorContent() {
       }
     };
     loadCurrentArc();
-  }, [chapter.plotArcId]);
+  }, [chapter.plotArcId, dashboardId]);
 
   // Debounced auto-save (primary strategy - saves 2 seconds after user stops typing)
   useEffect(() => {
@@ -739,9 +747,10 @@ function ChapterEditorContent() {
           }
           plotArcId={chapter.plotArcId}
           availableArcs={availableArcs}
-          onPlotArcChange={(arcId) =>
-            setChapter((prev) => ({ ...prev, plotArcId: arcId }))
-          }
+          onPlotArcChange={(arcId) => {
+            isManualArcChangeRef.current = true;
+            setChapter((prev) => ({ ...prev, plotArcId: arcId }));
+          }}
           onUndo={() => textEditorRef.current?.undo()}
           onRedo={() => textEditorRef.current?.redo()}
           canUndo={textEditorRef.current?.canUndo ?? false}

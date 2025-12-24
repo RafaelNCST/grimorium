@@ -87,6 +87,11 @@ export function FormattingToolbar({
   // Use format state hook to detect active formatting
   const formatState = useFormatState();
 
+  const handleArcSelect = (arcId: string | undefined) => {
+    onPlotArcChange(arcId);
+    setIsArcModalOpen(false);
+  };
+
   // Map status values to their display colors (matching PlotArcCard)
   const STATUS_DISPLAY_COLORS: Record<string, string> = {
     finished:
@@ -398,9 +403,7 @@ export function FormattingToolbar({
             {/* No Arc Option */}
             <button
               type="button"
-              onClick={() => {
-                onPlotArcChange(undefined);
-              }}
+              onClick={() => handleArcSelect(undefined)}
               className={cn(
                 "w-full text-left p-3 rounded-lg border-2 transition-colors duration-200",
                 "hover:bg-white/5 dark:hover:bg-white/10",
@@ -461,9 +464,7 @@ export function FormattingToolbar({
                   <button
                     key={arc.id}
                     type="button"
-                    onClick={() => {
-                      onPlotArcChange(arc.id);
-                    }}
+                    onClick={() => handleArcSelect(arc.id)}
                     className={cn(
                       "w-full text-left p-4 rounded-lg border-2 transition-colors duration-200",
                       "hover:bg-white/5 dark:hover:bg-white/10",

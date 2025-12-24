@@ -9,6 +9,7 @@ import { SplashScreen } from "@/components/splash-screen";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAutomaticCleanup } from "@/hooks/useAutomaticCleanup";
 import { useErrorModalStore } from "@/stores/error-modal-store";
+import { ChapterArcWarningProvider } from "@/lib/helpers/chapter-arc-warning";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -36,18 +37,19 @@ const App = () => {
 
   return (
     <TooltipProvider>
-      <InboxInitializer />
-      <RouterProvider router={router} />
-      <ResetDatabaseButton />
+      <ChapterArcWarningProvider>
+        <InboxInitializer />
+        <RouterProvider router={router} />
+        <ResetDatabaseButton />
 
-      {/* Modal global de erro do banco de dados */}
-      {errorType && (
-        <DatabaseErrorModal
-          isOpen={isOpen}
-          errorType={errorType}
-          onClose={hideError}
-        />
-      )}
+        {errorType && (
+          <DatabaseErrorModal
+            isOpen={isOpen}
+            errorType={errorType}
+            onClose={hideError}
+          />
+        )}
+      </ChapterArcWarningProvider>
     </TooltipProvider>
   );
 };

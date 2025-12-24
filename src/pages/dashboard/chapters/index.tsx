@@ -32,7 +32,8 @@ import {
   migrateChaptersFromLocalStorage,
   hasChaptersInLocalStorage,
 } from "@/lib/db/migrate-chapters";
-import { getPlotArcsByBookId } from "@/lib/db/plot.service";
+import { getPlotArcsByBookId, getPlotArcById } from "@/lib/db/plot.service";
+import { checkAndShowArcWarning } from "@/lib/helpers/chapter-arc-warning";
 import { type ChapterData, useChaptersStore } from "@/stores/chapters-store";
 import type { IPlotArc } from "@/types/plot-types";
 
@@ -289,6 +290,17 @@ export function ChaptersPage() {
         .setCachedChapters([...currentCache, newChapterData]);
 
       setShowCreateModal(false);
+
+      if (data.plotArcId) {
+        try {
+          const arc = await getPlotArcById(data.plotArcId);
+          if (arc) {
+            await checkAndShowArcWarning(dashboardId, data.plotArcId, arc);
+          }
+        } catch (error) {
+          console.error("Failed to check arc warning:", error);
+        }
+      }
     } catch (error) {
       console.error("[ChaptersPage] Erro ao criar capítulo:", error);
     }

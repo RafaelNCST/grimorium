@@ -28,6 +28,7 @@
     "total_characters": "Characters",
     "total_characters_with_spaces": "Characters with spaces",
     "total_paragraphs": "Paragraphs",
-    "total_dialogues": "Dialogues"
+    "total_dialogues": "Dialogues",
+    "chapter_limit_exceeded": "Warning: This {{arcSize}} arc was planned for up to {{maxChapters}} chapters, but currently has {{totalChapters}} chapters."
   }
 }

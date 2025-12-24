@@ -112,6 +112,7 @@ export const FormPlotArcButton = React.forwardRef<
 
     const handleSelect = (arcId: string | undefined) => {
       onChange(arcId);
+      setIsOpen(false);
     };
 
     return (

@@ -5,6 +5,7 @@ import enAdvancedSettings from "../../locales/en/advanced-settings.json";
 import enChapterCard from "../../locales/en/chapter-card.json";
 import enChapterEditor from "../../locales/en/chapter-editor.json";
 import enChapterMetrics from "../../locales/en/chapter-metrics.json";
+import enChapterWarnings from "../../locales/en/chapter-warnings.json";
 import enChapters from "../../locales/en/chapters.json";
 import enCharacterDetail from "../../locales/en/character-detail.json";
 import enCharacters from "../../locales/en/characters.json";
@@ -47,6 +48,7 @@ import ptAdvancedSettings from "../../locales/pt/advanced-settings.json";
 import ptChapterCard from "../../locales/pt/chapter-card.json";
 import ptChapterEditor from "../../locales/pt/chapter-editor.json";
 import ptChapterMetrics from "../../locales/pt/chapter-metrics.json";
+import ptChapterWarnings from "../../locales/pt/chapter-warnings.json";
 import ptChapters from "../../locales/pt/chapters.json";
 import ptCharacterDetail from "../../locales/pt/character-detail.json";
 import ptCharacters from "../../locales/pt/characters.json";
@@ -98,6 +100,7 @@ const resources = {
     "character-detail": enCharacterDetail,
     "chapter-editor": enChapterEditor,
     "chapter-metrics": enChapterMetrics,
+    "chapter-warnings": enChapterWarnings,
     "create-book": enCreateBook,
     "create-chapter": enCreateChapter,
     "create-character": enCreateCharacter,
@@ -142,6 +145,7 @@ const resources = {
     "character-detail": ptCharacterDetail,
     "chapter-editor": ptChapterEditor,
     "chapter-metrics": ptChapterMetrics,
+    "chapter-warnings": ptChapterWarnings,
     "create-book": ptCreateBook,
     "create-chapter": ptCreateChapter,
     "create-character": ptCreateCharacter,

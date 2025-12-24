@@ -1049,6 +1049,7 @@ export function PlotArcDetailView({
                 <PlotArcChapterMetricsSection
                   bookId={bookId}
                   plotArcId={arc.id}
+                  arcSize={arc.size}
                   onChapterClick={(chapterId) =>
                     (window.location.href = `/dashboard/chapters/${chapterId}`)
                   }

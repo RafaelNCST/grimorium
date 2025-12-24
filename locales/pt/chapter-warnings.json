@@ -1,0 +1,8 @@
+{
+  "modal": {
+    "title": "Aviso de Capítulos Excedidos",
+    "description": "O arco '{{arcName}}' ({{arcSize}}) foi planejado para até {{maxChapters}} capítulos, mas já possui {{totalChapters}} capítulos.",
+    "message": "Este aviso é apenas informativo. Você pode continuar adicionando capítulos se desejar.",
+    "confirm": "Entendi"
+  }
+}

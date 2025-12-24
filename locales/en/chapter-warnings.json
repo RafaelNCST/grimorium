@@ -1,0 +1,8 @@
+{
+  "modal": {
+    "title": "Chapter Limit Exceeded",
+    "description": "The arc '{{arcName}}' ({{arcSize}}) was planned for up to {{maxChapters}} chapters, but already has {{totalChapters}} chapters.",
+    "message": "This is just an informative warning. You can continue adding chapters if you wish.",
+    "confirm": "Got it"
+  }
+}

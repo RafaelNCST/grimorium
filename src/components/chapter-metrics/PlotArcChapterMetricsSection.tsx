@@ -9,10 +9,16 @@ import {
   getPlotArcChapterMetrics,
   type PlotArcChapterMetrics,
 } from "@/lib/services/chapter-metrics.service";
+import {
+  shouldShowChapterWarning,
+  getChapterLimitForSize,
+} from "@/lib/constants/plot-arc-chapter-limits";
+import type { PlotArcSize } from "@/types/plot-types";
 
 interface PropsPlotArcChapterMetricsSection {
   bookId: string;
   plotArcId: string;
+  arcSize: PlotArcSize;
   onChapterClick: (chapterId: string) => void;
   /** Callback when metrics are loaded */
   onMetricsLoad?: (hasMetrics: boolean) => void;
@@ -23,6 +29,7 @@ interface PropsPlotArcChapterMetricsSection {
 export function PlotArcChapterMetricsSection({
   bookId,
   plotArcId,
+  arcSize,
   onChapterClick: _onChapterClick,
   onMetricsLoad,
   isEditMode = false,
@@ -95,6 +102,17 @@ export function PlotArcChapterMetricsSection({
               </p>
             </div>
           </div>
+
+          {/* Chapter Limit Warning */}
+          {shouldShowChapterWarning(metrics.totalChapters, arcSize) && (
+            <InfoAlert>
+              {t("plot_section.chapter_limit_exceeded", {
+                totalChapters: metrics.totalChapters,
+                maxChapters: getChapterLimitForSize(arcSize).maxChapters,
+                arcSize: arcSize,
+              })}
+            </InfoAlert>
+          )}
 
           {/* Metrics Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
