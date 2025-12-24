@@ -110,7 +110,8 @@
       "Bash(powershell.exe -Command \"Stop-Process -Force -Id 2312\")",
       "Bash(Start-Sleep -Seconds 5)",
       "Bash(powershell.exe:*)",
-      "Bash(Out-String -Stream)"
+      "Bash(Out-String -Stream)",
+      "WebFetch(domain:www.radix-ui.com)"
     ],
     "deny": [
       "Bash(git push --force:*)",

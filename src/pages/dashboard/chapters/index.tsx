@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useMemo } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -314,6 +314,10 @@ export function ChaptersPage() {
   };
 
   const handleChapterDelete = (chapterId: string) => {
+    // Capturar posição do scroll antes de abrir o modal
+    if (parentRef.current) {
+      scrollPositionRef.current = parentRef.current.scrollTop;
+    }
     setChapterToDelete(chapterId);
     setShowDeleteDialog(true);
   };
@@ -324,6 +328,9 @@ export function ChaptersPage() {
 
   // Virtualização - Ref para o container
   const parentRef = useRef<HTMLDivElement>(null);
+
+  // Ref para armazenar a posição do scroll
+  const scrollPositionRef = useRef<number>(0);
 
   // Estado para controlar se deve usar virtualização
   const [shouldVirtualize, setShouldVirtualize] = useState(false);
@@ -337,6 +344,34 @@ export function ChaptersPage() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Prevenir scroll jump quando modal abre/fecha usando useLayoutEffect (síncrono)
+  useLayoutEffect(() => {
+    if (!parentRef.current) return;
+
+    const container = parentRef.current;
+    const savedPosition = scrollPositionRef.current;
+
+    // Restaurar posição imediatamente quando o modal muda de estado
+    if (savedPosition !== 0) {
+      container.scrollTop = savedPosition;
+    }
+
+    // Observar mudanças no scroll e forçar a posição quando o modal está aberto
+    const observer = new MutationObserver(() => {
+      if (showDeleteDialog && container.scrollTop !== savedPosition) {
+        container.scrollTop = savedPosition;
+      }
+    });
+
+    // Observar mudanças no DOM que possam afetar o scroll
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['data-scroll-locked', 'style'],
+    });
+
+    return () => observer.disconnect();
+  }, [showDeleteDialog]);
 
   // Componente auxiliar para lista virtualizada
   const VirtualizedChapterList = ({
@@ -628,7 +663,16 @@ export function ChaptersPage() {
 
       {/* Delete Single Chapter Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent
+          onOpenAutoFocus={(e) => {
+            // Prevent auto-focus to avoid scrolling the list when modal opens
+            e.preventDefault();
+          }}
+          onCloseAutoFocus={(e) => {
+            // Prevent auto-focus to avoid scrolling when modal closes
+            e.preventDefault();
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>{t("chapters:delete.title")}</AlertDialogTitle>
             <AlertDialogDescription>

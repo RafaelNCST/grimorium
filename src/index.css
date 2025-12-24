@@ -501,6 +501,16 @@
     pointer-events: auto !important;
   }
 
+  /* Prevent scroll jump when Radix applies scroll lock */
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  /* Prevent Radix scroll-lock from causing layout shift */
+  body[data-scroll-locked] {
+    margin-right: 0 !important;
+  }
+
   /* Remove any backdrop/overlay effects from toast viewport */
   [data-radix-toast-viewport] {
     background: transparent !important;
