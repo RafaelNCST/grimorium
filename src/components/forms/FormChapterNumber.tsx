@@ -22,7 +22,7 @@ export interface FormChapterNumberProps {
 /**
  * FormChapterNumber - Custom chapter numbering component
  *
- * Allows integers (1, 2, 3) and decimals (1.5, 2.1, 3.75)
+ * Allows integers only (1, 2, 3)
  * Shows suggested next chapter number
  * Includes increment/decrement buttons for quick adjustments
  */
@@ -60,8 +60,8 @@ export const FormChapterNumber = React.forwardRef<
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const inputValue = e.target.value;
 
-      // Allow empty, numbers, and single decimal point
-      if (inputValue === "" || /^\d*\.?\d*$/.test(inputValue)) {
+      // Allow empty and integers only (1, 2, 3)
+      if (inputValue === "" || /^\d+$/.test(inputValue)) {
         onChange(inputValue);
       }
     };
@@ -157,7 +157,7 @@ export const FormChapterNumber = React.forwardRef<
         {/* Examples */}
         {!hasError && !helperText && (
           <p className="text-xs text-muted-foreground text-center">
-            Exemplos: 1, 2, 3.5, 4.1
+            Exemplos: 1, 2, 3, 4 (apenas números inteiros)
           </p>
         )}
       </div>

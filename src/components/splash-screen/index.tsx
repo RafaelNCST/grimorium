@@ -14,6 +14,10 @@ import {
   needsGalleryThumbnailMigration,
   migrateGalleryThumbnails,
 } from "@/lib/db/migrate-gallery-thumbnails";
+import {
+  needsChapterUniqueConstraintRemoval,
+  removeChapterUniqueConstraint,
+} from "@/lib/db/migrate-remove-chapter-unique";
 import { useBookStore } from "@/stores/book-store";
 
 const LOADING_PHRASES = [
@@ -52,6 +56,15 @@ export function SplashScreen({ onLoadingComplete }: SplashScreenProps) {
         const booksFromDB = await getAllBooks();
 
         setBooks(booksFromDB);
+
+        // Run chapter UNIQUE constraint removal migration if needed
+        const needsChapterMigration = await needsChapterUniqueConstraintRemoval();
+
+        if (needsChapterMigration) {
+          console.log('[SplashScreen] Starting chapter UNIQUE constraint removal...');
+          await removeChapterUniqueConstraint();
+          console.log('[SplashScreen] Chapter constraint migration complete!');
+        }
 
         // Run gallery thumbnail migration if needed
         const needsMigration = await needsGalleryThumbnailMigration();

@@ -2,7 +2,7 @@ import { useState, useEffect, useLayoutEffect, useRef, useMemo } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { FileText, Plus, ArrowLeft } from "lucide-react";
+import { FileText, Plus, ArrowLeft, ListOrdered } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntitySearchBar } from "@/components/entity-list";
@@ -13,6 +13,7 @@ import {
 } from "@/components/modals/create-chapter-modal";
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -22,11 +23,21 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   getChapterMetadataByBookId,
   createChapter,
   deleteChapter as deleteChapterFromDB,
+  sortChaptersByNumber,
+  detectChapterOrderIssues,
 } from "@/lib/db/chapters.service";
 import {
   migrateChaptersFromLocalStorage,
@@ -35,6 +46,7 @@ import {
 import { getPlotArcsByBookId, getPlotArcById } from "@/lib/db/plot.service";
 import { checkAndShowArcWarning } from "@/lib/helpers/chapter-arc-warning";
 import { type ChapterData, useChaptersStore } from "@/stores/chapters-store";
+import { useChapterOrderWarningStore } from "@/stores/chapter-order-warning-store";
 import type { IPlotArc } from "@/types/plot-types";
 
 import { ChapterCard } from "./components/chapter-card";
@@ -49,6 +61,7 @@ type ChapterStatus =
 interface Chapter {
   id: string;
   number: number;
+  chapterNumber: string; // String version for validation and sorting
   title: string;
   status: ChapterStatus;
   wordCount: number;
@@ -111,11 +124,20 @@ export function ChaptersPage() {
     (state) => state.removeCachedChapter
   );
 
+  // Chapter order warning store
+  const setShowWarning = useChapterOrderWarningStore(
+    (state) => state.setShowWarning
+  );
+
   const [activeTab, setActiveTab] = useState<ChapterStatus | "all">("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [chapterToDelete, setChapterToDelete] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEnumerateDialog, setShowEnumerateDialog] = useState(false);
+  const [chaptersToReorder, setChaptersToReorder] = useState(0);
+  const [reorderMode, setReorderMode] = useState<"auto" | "push">("auto");
+  const [pushFromChapterId, setPushFromChapterId] = useState<string>("");
   const [plotArcs, setPlotArcs] = useState<IPlotArc[]>([]);
 
   // Inicializar loading com base no cache - se já tem cache, não mostrar loading
@@ -143,6 +165,7 @@ export function ChaptersPage() {
       return {
         id: ch.id,
         number: parseFloat(ch.chapterNumber),
+        chapterNumber: ch.chapterNumber, // Keep string version
         title: ch.title,
         status: ch.status,
         wordCount: ch.wordCount,
@@ -251,6 +274,20 @@ export function ChaptersPage() {
       removeCachedChapter(chapterId); // Remover do cache (UI se atualiza automaticamente)
       setChapterToDelete(null);
       setShowDeleteDialog(false);
+
+      // Check chapter order after deletion
+      const remainingChapters = useChaptersStore.getState().getChaptersSorted();
+      const hasOrderIssues = detectChapterOrderIssues(
+        remainingChapters.map((ch) => ({
+          id: ch.id,
+          chapterNumber: ch.chapterNumber,
+          status: ch.status,
+        }))
+      );
+
+      if (hasOrderIssues) {
+        setShowWarning(true);
+      }
     } catch (error) {
       console.error("[ChaptersPage] Erro ao deletar capítulo:", error);
     }
@@ -291,6 +328,20 @@ export function ChaptersPage() {
 
       setShowCreateModal(false);
 
+      // Check chapter order after creation
+      const allChapters = useChaptersStore.getState().getChaptersSorted();
+      const hasOrderIssues = detectChapterOrderIssues(
+        allChapters.map((ch) => ({
+          id: ch.id,
+          chapterNumber: ch.chapterNumber,
+          status: ch.status,
+        }))
+      );
+
+      if (hasOrderIssues) {
+        setShowWarning(true);
+      }
+
       if (data.plotArcId) {
         try {
           const arc = await getPlotArcById(data.plotArcId);
@@ -324,6 +375,182 @@ export function ChaptersPage() {
 
   const handleBack = () => {
     navigate({ to: "/dashboard/$dashboardId", params: { dashboardId } });
+  };
+
+  // Função para verificar se os capítulos estão fora de ordem
+  const needsReordering = useMemo(() => {
+    if (chapters.length === 0) return false;
+
+    // Use optimized detection function
+    return detectChapterOrderIssues(
+      chapters.map((ch) => ({
+        id: ch.id,
+        chapterNumber: ch.chapterNumber,
+        status: ch.status,
+      }))
+    );
+  }, [chapters]);
+
+  // Calculate push preview - how many chapters will be affected
+  const pushPreview = useMemo(() => {
+    if (reorderMode !== "push" || !pushFromChapterId) return { count: 0, examples: [] };
+
+    // Sort chapters first
+    const sortedChapters = [...chapters].sort((a, b) => a.number - b.number);
+
+    // Find the index of the selected chapter
+    const selectedIndex = sortedChapters.findIndex((ch) => ch.id === pushFromChapterId);
+    if (selectedIndex === -1) return { count: 0, examples: [] };
+
+    // Get all chapters from this position onwards (including the selected one)
+    const affectedChapters = sortedChapters.slice(selectedIndex);
+
+    // Create examples (first 5)
+    const examples = affectedChapters.slice(0, 5).map((ch) => {
+      const oldNum = ch.chapterNumber;
+      const newNum = String(parseInt(oldNum, 10) + 1);
+      return { oldNum, newNum, title: ch.title };
+    });
+
+    return {
+      count: affectedChapters.length,
+      examples,
+      hasMore: affectedChapters.length > 5,
+    };
+  }, [reorderMode, pushFromChapterId, chapters]);
+
+  // Função para reordenar os capítulos automaticamente
+  const handleReorderChapters = async () => {
+    try {
+      const { updateChapter } = await import("@/lib/db/chapters.service");
+      let allUpdates: Array<{ id: string; originalNumber: string; newNumber: string }> = [];
+
+      if (reorderMode === "push") {
+        // MODO PUSH: Empurrar capítulos a partir de um capítulo específico (por ID)
+        // Sort chapters first to find correct position
+        const sortedChapters = [...chapters].sort((a, b) => a.number - b.number);
+
+        // Find the index of the selected chapter
+        const selectedIndex = sortedChapters.findIndex((ch) => ch.id === pushFromChapterId);
+
+        if (selectedIndex === -1) {
+          console.error("Selected chapter not found");
+          return;
+        }
+
+        // Create a Set of IDs that should be pushed (from selected position onwards)
+        const chaptersToPush = new Set(
+          sortedChapters.slice(selectedIndex).map((ch) => ch.id)
+        );
+
+        // Map all chapters and push only those in the set
+        allUpdates = chapters.map((ch) => {
+          if (chaptersToPush.has(ch.id)) {
+            // Empurra +1
+            const chapterNum = parseInt(ch.chapterNumber, 10);
+            return {
+              id: ch.id,
+              originalNumber: ch.chapterNumber,
+              newNumber: String(chapterNum + 1),
+            };
+          }
+
+          // Não muda
+          return {
+            id: ch.id,
+            originalNumber: ch.chapterNumber,
+            newNumber: ch.chapterNumber,
+          };
+        });
+      } else {
+        // MODO AUTO: Reordenação automática (comportamento original)
+        // 1. Sort chapters using sorting logic (integer, status)
+        const sortedChapters = sortChaptersByNumber(
+          chapters.map((ch) => ({
+            id: ch.id,
+            chapterNumber: ch.chapterNumber,
+            status: ch.status,
+          }))
+        );
+
+        // 2. Renumber maintaining duplicates together, removing gaps
+        // Example: [1, 3, 5, 5, 5, 7] → [1, 2, 3, 3, 3, 4]
+        let currentNumber = 1;
+        let previousOriginalNumber: number | null = null;
+
+        allUpdates = sortedChapters.map((chapter) => {
+          const originalNumber = parseInt(chapter.chapterNumber, 10);
+
+          // If this is a different number than previous, increment counter
+          if (previousOriginalNumber !== null && originalNumber !== previousOriginalNumber) {
+            currentNumber++;
+          }
+
+          previousOriginalNumber = originalNumber;
+
+          return {
+            id: chapter.id,
+            originalNumber: chapter.chapterNumber,
+            newNumber: String(currentNumber),
+          };
+        });
+      }
+
+      // 3. Filter only chapters that actually changed
+      // This is crucial for performance with 1000+ chapters!
+      const changedChapters = allUpdates.filter(
+        (update) => update.originalNumber !== update.newNumber
+      );
+
+      console.log(
+        `[Reordenação ${reorderMode}] ${changedChapters.length} de ${allUpdates.length} capítulos precisam ser atualizados`
+      );
+
+      // If no chapters need to be updated, just close the dialog
+      if (changedChapters.length === 0) {
+        setShowEnumerateDialog(false);
+        return;
+      }
+
+      // 4. Update database only for changed chapters
+      for (const update of changedChapters) {
+        await updateChapter(update.id, {
+          chapterNumber: update.newNumber,
+        });
+      }
+
+      // 5. Update cache with all new numbers (even unchanged, for consistency)
+      const currentChapters = useChaptersStore.getState().getAllChapters();
+      const updatedChapters = currentChapters.map((cached) => {
+        const update = allUpdates.find((u) => u.id === cached.id);
+        if (update) {
+          return {
+            ...cached,
+            chapterNumber: update.newNumber,
+          };
+        }
+        return cached;
+      });
+
+      setCachedChapters(updatedChapters);
+      setShowEnumerateDialog(false);
+
+      // Check chapter order after reordering (especially for push mode which creates gaps)
+      const reorderedChapters = sortChaptersByNumber(updatedChapters);
+      const hasOrderIssues = detectChapterOrderIssues(
+        reorderedChapters.map((ch) => ({
+          id: ch.id,
+          chapterNumber: ch.chapterNumber,
+          status: ch.status,
+        }))
+      );
+
+      if (hasOrderIssues) {
+        setShowWarning(true);
+      }
+    } catch (error) {
+      console.error("[ChaptersPage] Erro ao reordenar capítulos:", error);
+    }
   };
 
   // Virtualização - Ref para o container
@@ -485,6 +712,51 @@ export function ChaptersPage() {
         <h1 className="text-xl font-semibold">{t("chapters:page.title")}</h1>
 
         <div className="flex-1" />
+
+        <Button
+          onClick={() => {
+            // Reset to auto mode and set first chapter as default for push
+            setReorderMode("auto");
+            const firstChapter = chapters.length > 0 ? chapters[0].id : "";
+            setPushFromChapterId(firstChapter);
+
+            // Calculate how many chapters need reordering before opening modal
+            const sortedChapters = sortChaptersByNumber(
+              chapters.map((ch) => ({
+                id: ch.id,
+                chapterNumber: ch.chapterNumber,
+                status: ch.status,
+              }))
+            );
+
+            let currentNumber = 1;
+            let previousOriginalNumber: number | null = null;
+            let changedCount = 0;
+
+            for (const chapter of sortedChapters) {
+              const originalNumber = parseInt(chapter.chapterNumber, 10);
+
+              if (previousOriginalNumber !== null && originalNumber !== previousOriginalNumber) {
+                currentNumber++;
+              }
+
+              const newNumber = String(currentNumber);
+              if (chapter.chapterNumber !== newNumber) {
+                changedCount++;
+              }
+
+              previousOriginalNumber = originalNumber;
+            }
+
+            setChaptersToReorder(changedCount);
+            setShowEnumerateDialog(true);
+          }}
+          variant="secondary"
+          className="gap-2"
+        >
+          <ListOrdered className="h-4 w-4" />
+          Reordenar Capítulos
+        </Button>
 
         <Button
           onClick={() => setShowCreateModal(true)}
@@ -664,6 +936,10 @@ export function ChaptersPage() {
       {/* Delete Single Chapter Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent
+          onOverlayClick={() => {
+            setChapterToDelete(null);
+            setShowDeleteDialog(false);
+          }}
           onOpenAutoFocus={(e) => {
             // Prevent auto-focus to avoid scrolling the list when modal opens
             e.preventDefault();
@@ -688,7 +964,7 @@ export function ChaptersPage() {
             >
               {t("chapters:delete.cancel")}
             </AlertDialogCancel>
-            <Button
+            <AlertDialogAction
               variant="destructive"
               className="animate-glow-red"
               onClick={() =>
@@ -696,7 +972,151 @@ export function ChaptersPage() {
               }
             >
               {t("chapters:delete.confirm")}
-            </Button>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Enumerate Chapters Dialog */}
+      <AlertDialog open={showEnumerateDialog} onOpenChange={setShowEnumerateDialog}>
+        <AlertDialogContent
+          onOverlayClick={() => setShowEnumerateDialog(false)}
+          onOpenAutoFocus={(e) => {
+            e.preventDefault();
+          }}
+          onCloseAutoFocus={(e) => {
+            e.preventDefault();
+          }}
+        >
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <div className="rounded-lg bg-yellow-500/10 p-2">
+                <ListOrdered className="h-5 w-5 text-yellow-600 dark:text-yellow-500" />
+              </div>
+              Reordenar Capítulos
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Escolha o tipo de reordenação que deseja aplicar:
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          {/* Mode Selection */}
+          <RadioGroup
+            value={reorderMode}
+            onValueChange={(value) => setReorderMode(value as "auto" | "push")}
+            className="space-y-3"
+          >
+            {/* Auto Mode */}
+            <label
+              htmlFor="mode-auto"
+              className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                reorderMode === "auto"
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-primary/50"
+              }`}
+            >
+              <RadioGroupItem value="auto" id="mode-auto" className="mt-0.5" />
+              <div className="flex-1">
+                <div className="font-semibold text-sm">Reordenar automaticamente</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Remove lacunas e organiza tudo em ordem
+                </div>
+                {reorderMode === "auto" && chaptersToReorder > 0 && (
+                  <div className="text-xs text-primary mt-2">
+                    → {chaptersToReorder} {chaptersToReorder === 1 ? "capítulo será atualizado" : "capítulos serão atualizados"}
+                  </div>
+                )}
+                {reorderMode === "auto" && chaptersToReorder === 0 && (
+                  <div className="text-xs text-green-600 dark:text-green-400 mt-2">
+                    ✓ Todos os capítulos já estão organizados
+                  </div>
+                )}
+              </div>
+            </label>
+
+            {/* Push Mode */}
+            <label
+              htmlFor="mode-push"
+              className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                reorderMode === "push"
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-primary/50"
+              }`}
+            >
+              <RadioGroupItem value="push" id="mode-push" className="mt-0.5" />
+              <div className="flex-1">
+                <div className="font-semibold text-sm">Empurrar capítulos</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Abre espaço para inserir novo capítulo
+                </div>
+
+                {reorderMode === "push" && (
+                  <div className="mt-3 space-y-2">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium">Empurrar a partir do capítulo:</label>
+                      <Select
+                        value={pushFromChapterId}
+                        onValueChange={(value) => setPushFromChapterId(value)}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Selecione um capítulo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {chapters
+                            .sort((a, b) => a.number - b.number)
+                            .map((chapter) => (
+                              <SelectItem
+                                key={chapter.id}
+                                value={chapter.id}
+                              >
+                                {chapter.chapterNumber} - {chapter.title}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {pushPreview.count > 0 && (
+                      <div className="rounded-md bg-muted p-3 space-y-1 text-xs">
+                        <div className="font-medium text-primary">
+                          {pushPreview.count} {pushPreview.count === 1 ? "capítulo será empurrado" : "capítulos serão empurrados"}:
+                        </div>
+                        {pushPreview.examples.map((ex, idx) => (
+                          <div key={idx} className="text-muted-foreground">
+                            • Cap {ex.oldNum} → Cap {ex.newNum}
+                          </div>
+                        ))}
+                        {pushPreview.hasMore && (
+                          <div className="text-muted-foreground italic">
+                            ... e mais {pushPreview.count - 5} capítulos
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {pushPreview.count === 0 && (
+                      <div className="text-xs text-muted-foreground italic">
+                        Nenhum capítulo será afetado
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </label>
+          </RadioGroup>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleReorderChapters}
+              variant="magical"
+              className="animate-glow"
+              disabled={
+                (reorderMode === "auto" && chaptersToReorder === 0) ||
+                (reorderMode === "push" && pushPreview.count === 0)
+              }
+            >
+              Executar
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import type { EntityMention } from "@/components/modals/create-chapter-modal";
+import { sortChaptersByNumber } from "@/lib/db/chapters.service";
 import type { EntityLink } from "@/pages/dashboard/chapters/chapter-editor/types/entity-link";
 
 export type ChapterStatus =
@@ -58,6 +59,7 @@ export interface ChapterNavigationData {
 interface ChaptersState {
   // Cache em memória (não persistido)
   chapters: Record<string, ChapterData>;
+  sortedCache: ChapterData[] | null; // Cache for sorted chapters (performance optimization)
 
   // Ações do store (agora apenas cache local)
   setCachedChapter: (chapter: ChapterData) => void;
@@ -66,6 +68,7 @@ interface ChaptersState {
   updateCachedChapter: (id: string, updates: Partial<ChapterData>) => void;
   removeCachedChapter: (id: string) => void;
   clearCache: () => void;
+  invalidateSortCache: () => void;
 
   // Getters para compatibilidade
   getChapter: (id: string) => ChapterData | undefined;
@@ -82,11 +85,13 @@ interface ChaptersState {
  */
 export const useChaptersStore = create<ChaptersState>()((set, get) => ({
   chapters: {},
+  sortedCache: null,
 
   // Definir um capítulo no cache
   setCachedChapter: (chapter) =>
     set((state) => ({
       chapters: { ...state.chapters, [chapter.id]: chapter },
+      sortedCache: null, // Invalidate cache on update
     })),
 
   // Definir múltiplos capítulos no cache
@@ -98,7 +103,7 @@ export const useChaptersStore = create<ChaptersState>()((set, get) => ({
       },
       {} as Record<string, ChapterData>
     );
-    set({ chapters: chaptersMap });
+    set({ chapters: chaptersMap, sortedCache: null }); // Invalidate cache on update
   },
 
   // Definir dados mínimos de navegação no cache (ultra-leve)
@@ -151,6 +156,7 @@ export const useChaptersStore = create<ChaptersState>()((set, get) => ({
             lastEdited: new Date().toISOString(),
           },
         },
+        sortedCache: null, // Invalidate cache on update
       };
     }),
 
@@ -158,11 +164,14 @@ export const useChaptersStore = create<ChaptersState>()((set, get) => ({
   removeCachedChapter: (id) =>
     set((state) => {
       const { [id]: _, ...rest } = state.chapters;
-      return { chapters: rest };
+      return { chapters: rest, sortedCache: null }; // Invalidate cache on delete
     }),
 
   // Limpar todo o cache
-  clearCache: () => set({ chapters: {} }),
+  clearCache: () => set({ chapters: {}, sortedCache: null }),
+
+  // Invalidar cache de ordenação
+  invalidateSortCache: () => set({ sortedCache: null }),
 
   // Getters
   getChapter: (id) => get().chapters[id],
@@ -170,12 +179,21 @@ export const useChaptersStore = create<ChaptersState>()((set, get) => ({
   getAllChapters: () => Object.values(get().chapters),
 
   getChaptersSorted: () => {
-    const chapters = Object.values(get().chapters);
-    return chapters.sort((a, b) => {
-      const numA = parseFloat(a.chapterNumber) || 0;
-      const numB = parseFloat(b.chapterNumber) || 0;
-      return numA - numB;
-    });
+    const state = get();
+
+    // Return cached result if available
+    if (state.sortedCache) {
+      return state.sortedCache;
+    }
+
+    // Sort and cache
+    const chapters = Object.values(state.chapters);
+    const sorted = sortChaptersByNumber(chapters);
+
+    // Update cache
+    set({ sortedCache: sorted });
+
+    return sorted;
   },
 
   getPreviousChapter: (currentId) => {

@@ -6,6 +6,8 @@ import {
   getChapterById,
   updateChapter as updateChapterInDB,
   getChapterNavigationDataByBookId,
+  getChapterMetadataByBookId,
+  detectChapterOrderIssues,
 } from "@/lib/db/chapters.service";
 import {
   getPlotArcsByBookId,
@@ -15,6 +17,7 @@ import {
 import { checkAndShowArcWarning } from "@/lib/helpers/chapter-arc-warning";
 import { useBookEditorSettingsStore } from "@/stores/book-editor-settings-store";
 import { useChaptersStore } from "@/stores/chapters-store";
+import { useChapterOrderWarningStore } from "@/stores/chapter-order-warning-store";
 import type { IPlotArc } from "@/types/plot-types";
 
 import { AllAnnotationsSidebar } from "./components/AllAnnotationsSidebar";
@@ -50,6 +53,8 @@ function ChapterEditorContent() {
   } = useChaptersStore();
 
   const { getBookSettings, updateBookSettings } = useBookEditorSettingsStore();
+
+  const { setShowWarning } = useChapterOrderWarningStore();
 
   // Load chapter from store or create default
   const initialChapter = getChapter(editorChaptersId) || {
@@ -122,6 +127,9 @@ function ChapterEditorContent() {
     chapterRef.current = chapter;
   }, [chapter]);
 
+  // Track original chapter number to detect changes
+  const originalChapterNumberRef = useRef(chapter.chapterNumber);
+
   // Ref for TextEditor to access undo/redo
   const textEditorRef = useRef<TextEditorRef>(null);
 
@@ -167,6 +175,8 @@ function ChapterEditorContent() {
 
         if (loadedChapter) {
           setChapter(loadedChapter);
+          // Update reference to track original chapter number
+          originalChapterNumberRef.current = loadedChapter.chapterNumber;
         }
         // Editor settings are loaded from book-level store, not from chapter
         // They persist across all chapters of the same book
@@ -227,6 +237,9 @@ function ChapterEditorContent() {
 
     setIsSaving(true);
 
+    // Check if chapter number changed
+    const chapterNumberChanged = currentChapter.chapterNumber !== originalChapterNumberRef.current;
+
     // Calculate stats
     const trimmed = currentChapter.content.trim();
     const words = trimmed.split(/\s+/).filter((word) => word.length > 0).length;
@@ -253,6 +266,26 @@ function ChapterEditorContent() {
       // Update cache
       setCachedChapter(updatedData);
 
+      // Validate chapter order if chapter number changed
+      if (chapterNumberChanged) {
+        // Get all chapters from cache (already updated and sorted)
+        const allChapters = useChaptersStore.getState().getChaptersSorted();
+        const hasOrderIssues = detectChapterOrderIssues(
+          allChapters.map((ch) => ({
+            id: ch.id,
+            chapterNumber: ch.chapterNumber,
+            status: ch.status,
+          }))
+        );
+
+        if (hasOrderIssues) {
+          setShowWarning(true);
+        }
+
+        // Update reference to new chapter number
+        originalChapterNumberRef.current = currentChapter.chapterNumber;
+      }
+
       setTimeout(() => {
         setChapter((prev) => ({
           ...prev,
@@ -267,7 +300,7 @@ function ChapterEditorContent() {
       console.error("[ChapterEditor] Erro ao salvar capítulo:", error);
       setIsSaving(false);
     }
-  }, [setCachedChapter]);
+  }, [setCachedChapter, setShowWarning]);
 
   // Load plot arcs
   useEffect(() => {

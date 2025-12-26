@@ -115,7 +115,13 @@ const createChapterFormSchema = (t: (key: string) => string) =>
       .string()
       .min(1, t("forms:validation.name_required"))
       .max(200, t("forms:validation.name_too_long")),
-    chapterNumber: z.string().min(1, t("forms:validation.name_required")),
+    chapterNumber: z
+      .string()
+      .min(1, t("forms:validation.name_required"))
+      .regex(
+        /^\d+$/,
+        "Número do capítulo inválido. Use apenas números inteiros (1, 2, 3)"
+      ),
     summary: z
       .string()
       .max(500, t("forms:validation.summary_too_long"))

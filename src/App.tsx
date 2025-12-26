@@ -4,6 +4,7 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 import { ResetDatabaseButton } from "@/components/dev-tools/reset-database-button";
 import { InboxInitializer } from "@/components/inbox-initializer";
+import { ChapterOrderWarningModal } from "@/components/modals/chapter-order-warning-modal";
 import { DatabaseErrorModal } from "@/components/modals/database-error-modal";
 import { SplashScreen } from "@/components/splash-screen";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -49,6 +50,8 @@ const App = () => {
             onClose={hideError}
           />
         )}
+
+        <ChapterOrderWarningModal />
       </ChapterArcWarningProvider>
     </TooltipProvider>
   );

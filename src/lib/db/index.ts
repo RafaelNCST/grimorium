@@ -526,8 +526,7 @@ async function runMigrations(database: Database): Promise<void> {
       character_count_with_spaces INTEGER DEFAULT 0,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL,
-      last_edited INTEGER NOT NULL,
-      UNIQUE(book_id, chapter_number)
+      last_edited INTEGER NOT NULL
     );
 
     -- MENÇÕES DE ENTIDADES EM CAPÍTULOS

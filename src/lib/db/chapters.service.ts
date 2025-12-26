@@ -207,7 +207,7 @@ export async function getChapterMetadataByBookId(
   }
 
   // Converter para ChapterMetadata
-  return chapters.map((ch) => {
+  const chapterMetadata = chapters.map((ch) => {
     const chapterMentions = mentionsByChapter.get(ch.id) || {
       characters: [],
       regions: [],
@@ -234,28 +234,49 @@ export async function getChapterMetadataByBookId(
       mentionedRaces: chapterMentions.races,
     };
   });
+
+  // Apply JavaScript sorting for proper order (integer, decimal, status)
+  return sortChaptersByNumber(chapterMetadata);
   }, 'getChapterMetadataByBookId');
 }
 
 // Buscar dados mínimos para navegação (ultra-leve, otimizado para 1000+ capítulos)
-// Retorna apenas id, chapterNumber e title - sem conteúdo, menções ou outros dados pesados
+// Retorna apenas id, chapterNumber, title e status - sem conteúdo, menções ou outros dados pesados
 export async function getChapterNavigationDataByBookId(
   bookId: string
 ): Promise<ChapterNavigationData[]> {
   return safeDBOperation(async () => {
     const db = await getDB();
 
-    // Query extremamente leve - apenas 3 campos
+    // Query leve - apenas 4 campos (added status for proper sorting)
     const chapters = await db.select<
-      Pick<DBChapter, "id" | "chapter_number" | "title">[]
+      Pick<DBChapter, "id" | "chapter_number" | "title" | "status">[]
     >(
-      "SELECT id, chapter_number, title FROM chapters WHERE book_id = $1 ORDER BY CAST(chapter_number AS REAL)",
+      "SELECT id, chapter_number, title, status FROM chapters WHERE book_id = $1 ORDER BY CAST(chapter_number AS REAL)",
       [bookId]
     );
 
-    return chapters.map((ch) => ({
+    const navigationData = chapters.map((ch) => ({
       id: ch.id,
       chapterNumber: ch.chapter_number,
+      title: ch.title,
+    }));
+
+    // Apply JavaScript sorting for proper order (integer, decimal, status)
+    // Note: sortChaptersByNumber needs status field, so we use the chapters array
+    const sorted = sortChaptersByNumber(
+      chapters.map((ch) => ({
+        id: ch.id,
+        chapterNumber: ch.chapter_number,
+        title: ch.title,
+        status: ch.status,
+      }))
+    );
+
+    // Return without status field to match ChapterNavigationData interface
+    return sorted.map((ch) => ({
+      id: ch.id,
+      chapterNumber: ch.chapterNumber,
       title: ch.title,
     }));
   }, 'getChapterNavigationDataByBookId');
@@ -689,7 +710,7 @@ export async function getChaptersByStatus(
     }
   }
 
-  return chapters.map((ch) => {
+  const chapterMetadata = chapters.map((ch) => {
     const chapterMentions = mentionsByChapter.get(ch.id) || {
       characters: [],
       regions: [],
@@ -716,5 +737,105 @@ export async function getChaptersByStatus(
       mentionedRaces: chapterMentions.races,
     };
   });
+
+  // Apply JavaScript sorting for proper order (integer, decimal, status)
+  return sortChaptersByNumber(chapterMetadata);
   }, 'getChaptersByStatus');
+}
+
+/**
+ * Ordering rules for chapter status
+ * Used when chapters have the same number
+ */
+const STATUS_ORDER: Record<ChapterStatus, number> = {
+  draft: 0,
+  "in-progress": 1,
+  review: 2,
+  finished: 3,
+  published: 4,
+};
+
+/**
+ * Compares two chapters for sorting
+ * Returns negative if a < b, positive if a > b, 0 if equal
+ */
+function compareChapters(
+  a: { chapterNumber: string; status: ChapterStatus },
+  b: { chapterNumber: string; status: ChapterStatus }
+): number {
+  // Handle undefined or null chapter numbers
+  if (!a.chapterNumber || !b.chapterNumber) {
+    if (!a.chapterNumber && !b.chapterNumber) return 0;
+    if (!a.chapterNumber) return 1; // Put undefined at the end
+    return -1; // Put undefined at the end
+  }
+
+  // Parse chapter numbers as integers
+  const numA = parseInt(a.chapterNumber, 10);
+  const numB = parseInt(b.chapterNumber, 10);
+
+  // 1. Sort by integer number first
+  if (numA !== numB) return numA - numB;
+
+  // 2. Sort by status for duplicates (draft < in-progress < review < finished < published)
+  return STATUS_ORDER[a.status] - STATUS_ORDER[b.status];
+}
+
+/**
+ * Sorts chapters by number following these rules:
+ * 1. Integer number first (3 < 5 < 10)
+ * 2. Status for duplicates (draft < in-progress < review < finished < published)
+ *
+ * Examples:
+ * - [5, 3, 10, 5, 2] → [2, 3, 5, 5, 10]
+ * - [5(draft), 5(published), 5(in-progress)] → [5(draft), 5(in-progress), 5(published)]
+ */
+export function sortChaptersByNumber<
+  T extends { chapterNumber: string; status: ChapterStatus }
+>(chapters: T[]): T[] {
+  return [...chapters].sort(compareChapters);
+}
+
+/**
+ * Detects if chapters are out of order OR have gaps in numbering
+ * Returns true if:
+ * - Chapters are not in correct sort order
+ * - There are gaps in integer numbering (e.g., 1,2,2,5 - missing 3,4)
+ * Allows duplicates (e.g., 1,2,2,3 is OK)
+ * Optimized with early exit for better performance with large lists
+ */
+export function detectChapterOrderIssues(
+  chapters: { id: string; chapterNumber: string; status: ChapterStatus }[]
+): boolean {
+  if (chapters.length <= 1) return false;
+
+  // First, check if chapters are in correct sort order
+  for (let i = 1; i < chapters.length; i++) {
+    const prev = chapters[i - 1];
+    const curr = chapters[i];
+
+    const comparison = compareChapters(prev, curr);
+
+    // If prev > curr, they are out of order
+    if (comparison > 0) {
+      return true;
+    }
+  }
+
+  // Second, check if there are gaps in numbering (ignoring duplicates)
+  // Example: [1, 2, 2, 3] is OK (no gaps)
+  // Example: [1, 2, 5] has gaps (missing 3, 4)
+  const uniqueNumbers = Array.from(
+    new Set(chapters.map((ch) => parseInt(ch.chapterNumber, 10)))
+  ).sort((a, b) => a - b);
+
+  // Check if unique numbers are sequential starting from 1
+  for (let i = 0; i < uniqueNumbers.length; i++) {
+    const expectedNumber = i + 1;
+    if (uniqueNumbers[i] !== expectedNumber) {
+      return true; // Gap detected
+    }
+  }
+
+  return false;
 }

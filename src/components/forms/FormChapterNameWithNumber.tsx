@@ -34,7 +34,7 @@ export interface FormChapterNameWithNumberProps {
  * FormChapterNameWithNumber - Combined chapter number and name input
  *
  * Layout: [Counter] - [Name of Chapter]
- * Counter is small and focused on integers and decimal increments (0.1, 0.2, etc.)
+ * Counter supports integers only (1, 2, 3)
  */
 export const FormChapterNameWithNumber = React.forwardRef<
   HTMLInputElement,
@@ -78,8 +78,8 @@ export const FormChapterNameWithNumber = React.forwardRef<
 
     const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const inputValue = e.target.value;
-      // Allow empty, numbers, and single decimal point
-      if (inputValue === "" || /^\d*\.?\d*$/.test(inputValue)) {
+      // Allow empty and integers only (1, 2, 3)
+      if (inputValue === "" || /^\d+$/.test(inputValue)) {
         onChapterNumberChange(inputValue);
       }
     };
