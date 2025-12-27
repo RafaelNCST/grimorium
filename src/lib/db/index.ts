@@ -521,6 +521,7 @@ async function runMigrations(database: Database): Promise<void> {
       plot_arc_id TEXT,
       summary TEXT,
       content TEXT,
+      text_alignment TEXT DEFAULT 'left',
       word_count INTEGER DEFAULT 0,
       character_count INTEGER DEFAULT 0,
       character_count_with_spaces INTEGER DEFAULT 0,
@@ -919,6 +920,15 @@ async function runMigrations(database: Database): Promise<void> {
     try {
       await database.execute(
         "ALTER TABLE chapters ADD COLUMN dialogue_count INTEGER DEFAULT 0"
+      );
+    } catch (_error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add text_alignment column to chapters table
+    try {
+      await database.execute(
+        "ALTER TABLE chapters ADD COLUMN text_alignment TEXT DEFAULT 'left'"
       );
     } catch (_error) {
       // Column already exists - safe to ignore

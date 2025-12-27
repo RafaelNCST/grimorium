@@ -103,7 +103,8 @@ export function ChapterCard({
   const handleExportPDF = async (
     config: ExportConfig,
     content: string,
-    pages: PageContent[]
+    pages: PageContent[],
+    textAlignment: "left" | "center" | "right" | "justify"
   ) => {
     try {
       // Generate PDF blob
@@ -112,7 +113,8 @@ export function ChapterCard({
         chapter.title,
         content,
         config,
-        pages
+        pages,
+        textAlignment
       );
 
       // Convert blob to Uint8Array for Tauri
@@ -142,7 +144,8 @@ export function ChapterCard({
   const handleExportWord = async (
     config: ExportConfig,
     content: string,
-    _pages: PageContent[]
+    _pages: PageContent[],
+    textAlignment: "left" | "center" | "right" | "justify"
   ) => {
     try {
       // Generate Word blob
@@ -153,7 +156,8 @@ export function ChapterCard({
         chapter.number.toString(),
         chapter.title,
         content,
-        config
+        config,
+        textAlignment
       );
 
       // Convert blob to Uint8Array for Tauri

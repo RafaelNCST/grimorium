@@ -41,12 +41,13 @@ import type { IPlotArc } from "@/types/plot-types";
 
 import { useFormatState } from "../hooks/useFormatState";
 
-import type { ChapterStatus } from "../types";
+import type { ChapterStatus, TextAlignment } from "../types";
 
 interface FormattingToolbarProps {
   onFormat: (command: string, value?: string) => void;
   status: ChapterStatus;
   onStatusChange: (status: ChapterStatus) => void;
+  textAlignment?: TextAlignment;
   plotArcId?: string;
   availableArcs: IPlotArc[];
   onPlotArcChange: (arcId: string | undefined) => void;
@@ -72,6 +73,7 @@ export function FormattingToolbar({
   onFormat,
   status,
   onStatusChange,
+  textAlignment = "left",
   plotArcId,
   availableArcs,
   onPlotArcChange,
@@ -84,7 +86,7 @@ export function FormattingToolbar({
   const selectedArc = availableArcs.find((arc) => arc.id === plotArcId);
   const [isArcModalOpen, setIsArcModalOpen] = useState(false);
 
-  // Use format state hook to detect active formatting
+  // Use format state hook to detect active formatting (only for bold/italic)
   const formatState = useFormatState();
 
   const handleArcSelect = (arcId: string | undefined) => {
@@ -195,7 +197,7 @@ export function FormattingToolbar({
                   onClick={() => onFormat("justifyLeft")}
                   className={cn(
                     "h-8 w-8 p-0",
-                    formatState.alignLeft && "bg-accent text-accent-foreground"
+                    textAlignment === "left" && "bg-accent text-accent-foreground"
                   )}
                 >
                   <AlignLeft className="h-4 w-4" />
@@ -213,7 +215,7 @@ export function FormattingToolbar({
                   onClick={() => onFormat("justifyCenter")}
                   className={cn(
                     "h-8 w-8 p-0",
-                    formatState.alignCenter &&
+                    textAlignment === "center" &&
                       "bg-accent text-accent-foreground"
                   )}
                 >
@@ -232,7 +234,7 @@ export function FormattingToolbar({
                   onClick={() => onFormat("justifyRight")}
                   className={cn(
                     "h-8 w-8 p-0",
-                    formatState.alignRight && "bg-accent text-accent-foreground"
+                    textAlignment === "right" && "bg-accent text-accent-foreground"
                   )}
                 >
                   <AlignRight className="h-4 w-4" />
@@ -250,7 +252,7 @@ export function FormattingToolbar({
                   onClick={() => onFormat("justifyFull")}
                   className={cn(
                     "h-8 w-8 p-0",
-                    formatState.alignJustify &&
+                    textAlignment === "justify" &&
                       "bg-accent text-accent-foreground"
                   )}
                 >

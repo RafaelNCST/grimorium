@@ -18,7 +18,7 @@ import { CURSOR_COLORS } from "../types/editor-settings";
 import { ContextMenu } from "./ContextMenu";
 import { SearchBar } from "./SearchBar";
 
-import type { Annotation } from "../types";
+import type { Annotation, TextAlignment } from "../types";
 import type { EditorSettings } from "../types/editor-settings";
 
 export interface TextEditorRef {
@@ -31,6 +31,7 @@ export interface TextEditorRef {
 
 interface TextEditorProps {
   content: string;
+  textAlignment?: TextAlignment;
   annotations: Annotation[];
   selectedAnnotationId?: string;
   summarySection?: React.ReactNode;
@@ -53,6 +54,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
   (
     {
       content,
+      textAlignment = "left",
       annotations,
       selectedAnnotationId,
       summarySection,
@@ -795,13 +797,12 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           }
         });
 
-        // Extract plain text content (removes HTML tags) for onChange
-        const newContent = editorRef.current.innerText;
-
         // Get HTML with formatting (for undo/redo) but remove annotation spans
         const contentForHistory = getCleanHtmlContent();
 
-        // Find all annotation spans and recalculate their offsets
+        // Extract plain text content (removes HTML tags) for onChange
+        const newContent = editorRef.current.innerText;
+
         const annotationSpans = editorRef.current.querySelectorAll(
           ".annotation-highlight"
         );
@@ -826,7 +827,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
             return; // Skip this annotation (will be removed from list)
           }
 
-          // Calculate the offset of this span in the full text
+          // Calculate the offset of this span in the PLAIN TEXT
           const range = document.createRange();
           range.selectNodeContents(editorRef.current);
           range.setEnd(span, 0);
@@ -1240,6 +1241,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
                   color: "#000000",
                   minHeight: "calc(100vh - 200px)",
                   caretColor: cursorColor,
+                  textAlign: textAlignment,
                   // Add extra padding at bottom based on auto-scroll mode
                   paddingBottom:
                     settings?.autoScrollMode === "center"

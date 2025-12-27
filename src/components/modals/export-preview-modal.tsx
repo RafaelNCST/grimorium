@@ -83,12 +83,14 @@ interface ExportPreviewModalProps {
   onExportPDF: (
     config: ExportConfig,
     content: string,
-    pages: PageContent[]
+    pages: PageContent[],
+    textAlignment: "left" | "center" | "right" | "justify"
   ) => void;
   onExportWord: (
     config: ExportConfig,
     content: string,
-    pages: PageContent[]
+    pages: PageContent[],
+    textAlignment: "left" | "center" | "right" | "justify"
   ) => void;
 }
 
@@ -103,6 +105,7 @@ export function ExportPreviewModal({
 }: ExportPreviewModalProps) {
   const { t } = useTranslation("export-preview");
   const [content, setContent] = useState<string>("");
+  const [textAlignment, setTextAlignment] = useState<"left" | "center" | "right" | "justify">("left");
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
@@ -133,8 +136,10 @@ export function ExportPreviewModal({
 
         if (chapterData) {
           setContent(chapterData.content || "");
+          setTextAlignment(chapterData.textAlignment || "left");
         } else {
           setContent("");
+          setTextAlignment("left");
         }
       } catch (error) {
         console.error("Error loading chapter content:", error);
@@ -183,7 +188,8 @@ export function ExportPreviewModal({
           chapterTitle,
           content,
           config,
-          [] // Pages array not used anymore
+          [], // Pages array not used anymore
+          textAlignment
         );
 
         if (cancelled) return;
@@ -522,7 +528,7 @@ export function ExportPreviewModal({
             <Button
               variant="magical"
               onClick={() => {
-                onExportWord(config, content, []);
+                onExportWord(config, content, [], textAlignment);
                 onOpenChange(false);
               }}
               disabled={hasError}
@@ -533,7 +539,7 @@ export function ExportPreviewModal({
             <Button
               variant="magical"
               onClick={() => {
-                onExportPDF(config, content, []);
+                onExportPDF(config, content, [], textAlignment);
                 onOpenChange(false);
               }}
               disabled={hasError}

@@ -65,6 +65,7 @@ function ChapterEditorContent() {
     plotArcId: undefined,
     summary: "",
     content: "",
+    textAlignment: "left" as const,
     wordCount: 0,
     characterCount: 0,
     lastEdited: new Date().toISOString(),
@@ -163,12 +164,20 @@ function ChapterEditorContent() {
         // Primeiro tenta do cache
         let loadedChapter = getChapter(editorChaptersId);
 
-        // Se não estiver no cache, busca do banco
-        if (!loadedChapter) {
+        // IMPORTANTE: Se o capítulo está no cache mas sem conteúdo (apenas navegação),
+        // busca do banco para obter o conteúdo completo
+        // Verifica: content vazio OU (content string vazia E wordCount = 0)
+        const isNavigationDataOnly = loadedChapter && (
+          !loadedChapter.content ||
+          (loadedChapter.content === "" && loadedChapter.wordCount === 0)
+        );
+
+        // Se não estiver no cache OU for apenas dados de navegação (sem conteúdo), busca do banco
+        if (!loadedChapter || isNavigationDataOnly) {
           const chapterFromDB = await getChapterById(editorChaptersId);
           if (chapterFromDB) {
             loadedChapter = chapterFromDB;
-            // Salva no cache
+            // Salva no cache com conteúdo completo
             setCachedChapter(chapterFromDB);
           }
         }
@@ -357,6 +366,7 @@ function ChapterEditorContent() {
     chapter.chapterNumber,
     chapter.status,
     chapter.plotArcId,
+    chapter.textAlignment,
     chapter.annotations,
     chapter.mentionedCharacters,
     chapter.mentionedRegions,
@@ -504,17 +514,27 @@ function ChapterEditorContent() {
 
   // Format text command
   const handleFormat = (command: string, value?: string) => {
+    // Handle alignment commands separately - they affect the entire chapter
+    if (command === "justifyLeft") {
+      setChapter((prev) => ({ ...prev, textAlignment: "left" }));
+      return;
+    }
+    if (command === "justifyCenter") {
+      setChapter((prev) => ({ ...prev, textAlignment: "center" }));
+      return;
+    }
+    if (command === "justifyRight") {
+      setChapter((prev) => ({ ...prev, textAlignment: "right" }));
+      return;
+    }
+    if (command === "justifyFull") {
+      setChapter((prev) => ({ ...prev, textAlignment: "justify" }));
+      return;
+    }
+
     // Mark formatting changes as immediate undo points
     // These commands change text appearance and should create separate undo points
-    const formattingCommands = [
-      "bold",
-      "italic",
-      "underline",
-      "justifyLeft",
-      "justifyCenter",
-      "justifyRight",
-      "justifyFull",
-    ];
+    const formattingCommands = ["bold", "italic", "underline"];
 
     if (formattingCommands.includes(command)) {
       textEditorRef.current?.markNextAsImmediate();
@@ -778,6 +798,7 @@ function ChapterEditorContent() {
           onStatusChange={(status) =>
             setChapter((prev) => ({ ...prev, status }))
           }
+          textAlignment={chapter.textAlignment}
           plotArcId={chapter.plotArcId}
           availableArcs={availableArcs}
           onPlotArcChange={(arcId) => {
@@ -795,6 +816,7 @@ function ChapterEditorContent() {
           <TextEditor
             ref={textEditorRef}
             content={chapter.content}
+            textAlignment={chapter.textAlignment}
             annotations={chapter.annotations}
             selectedAnnotationId={selectedAnnotationId || undefined}
             fontSize={editorSettings.fontSize}

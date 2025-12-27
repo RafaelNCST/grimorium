@@ -57,16 +57,26 @@ export async function generateChapterWord(
   chapterNumber: string,
   chapterTitle: string,
   content: string,
-  config: ExportConfig
+  config: ExportConfig,
+  textAlignment: "left" | "center" | "right" | "justify" = "left"
 ): Promise<Blob> {
   const margins = MARGIN_PRESETS[config.margins];
   const titleFont = getFontFamily(config.titleFont);
   const titleSize = getFontSize(config.titleSize);
 
-  // Split content into paragraphs
-  const paragraphs = content
-    .split("\n")
-    .filter((p) => p.trim().length > 0 || p === "");
+  // Map text alignment to Word alignment
+  const getWordAlignment = (align: "left" | "center" | "right" | "justify") => {
+    const alignmentMap = {
+      left: AlignmentType.LEFT,
+      center: AlignmentType.CENTER,
+      right: AlignmentType.RIGHT,
+      justify: AlignmentType.JUSTIFIED,
+    };
+    return alignmentMap[align] || AlignmentType.LEFT;
+  };
+
+  // Split content into lines - each \n is a new line
+  const lines = content.split("\n");
 
   // Create title paragraph
   const titleParagraph = new Paragraph({
@@ -87,21 +97,21 @@ export async function generateChapterWord(
     },
   });
 
-  // Create content paragraphs
-  const contentParagraphs = paragraphs.map(
-    (para) =>
+  // Create content paragraphs - each line becomes a paragraph with no extra spacing
+  const contentParagraphs = lines.map(
+    (line) =>
       new Paragraph({
         children: [
           new TextRun({
-            text: para || " ", // Empty line for spacing
+            text: line.trim().length === 0 ? " " : line,
             font: "Times New Roman",
             size: 24, // 12pt
           }),
         ],
-        alignment: AlignmentType.JUSTIFIED,
+        alignment: getWordAlignment(textAlignment),
         spacing: {
           line: 360, // 1.5 line spacing
-          after: 160, // Space between paragraphs
+          after: 0, // No extra space - spacing comes from line height only
         },
       })
   );

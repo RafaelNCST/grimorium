@@ -51,6 +51,7 @@ interface DBChapter {
   plot_arc_id?: string;
   summary?: string;
   content: string;
+  text_alignment?: string;
   word_count: number;
   character_count: number;
   character_count_with_spaces: number;
@@ -369,6 +370,7 @@ export async function getChapterById(
     plotArcId: chapter.plot_arc_id,
     summary: chapter.summary || "",
     content: chapter.content,
+    textAlignment: (chapter.text_alignment || "left") as "left" | "center" | "right" | "justify",
     wordCount: chapter.word_count,
     characterCount: chapter.character_count,
     characterCountWithSpaces: chapter.character_count_with_spaces,
@@ -521,6 +523,10 @@ export async function updateChapter(
   if (updates.content !== undefined) {
     fields.push(`content = $${paramIndex++}`);
     values.push(updates.content);
+  }
+  if (updates.textAlignment !== undefined) {
+    fields.push(`text_alignment = $${paramIndex++}`);
+    values.push(updates.textAlignment);
   }
   if (updates.wordCount !== undefined) {
     fields.push(`word_count = $${paramIndex++}`);

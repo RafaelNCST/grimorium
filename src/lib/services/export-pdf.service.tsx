@@ -29,7 +29,7 @@ const getFontFamily = (fontValue: string): string => {
   return fontMap[fontValue] || "Times-Roman";
 };
 
-const createStyles = (config: ExportConfig) => {
+const createStyles = (config: ExportConfig, textAlignment: "left" | "center" | "right" | "justify" = "left") => {
   const margins = MARGIN_PRESETS[config.margins];
   const titleFontFamily = getFontFamily(config.titleFont);
 
@@ -54,8 +54,14 @@ const createStyles = (config: ExportConfig) => {
       fontFamily: "Times-Roman",
       fontSize: 12,
       lineHeight: 1.5,
-      textAlign: "justify",
-      marginBottom: 8,
+      textAlign: textAlignment,
+      marginBottom: 0,
+    },
+    emptyLine: {
+      fontFamily: "Times-Roman",
+      fontSize: 12,
+      lineHeight: 1.5,
+      marginBottom: 0,
     },
     pageNumber: {
       position: "absolute",
@@ -74,6 +80,7 @@ interface ChapterPDFProps {
   chapterTitle: string;
   content: string;
   config: ExportConfig;
+  textAlignment?: "left" | "center" | "right" | "justify";
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -82,13 +89,12 @@ const ChapterPDF = ({
   chapterTitle,
   content,
   config,
+  textAlignment = "left",
 }: ChapterPDFProps) => {
-  const styles = createStyles(config);
+  const styles = createStyles(config, textAlignment);
 
-  // Split content into paragraphs for better rendering
-  const paragraphs = content
-    .split("\n")
-    .filter((p) => p.trim().length > 0 || p === "");
+  // Split content into paragraphs - each \n is a new line
+  const lines = content.split("\n");
 
   return (
     <Document>
@@ -101,10 +107,13 @@ const ChapterPDF = ({
           Capítulo {chapterNumber}: {chapterTitle}
         </Text>
 
-        {/* Content - render paragraphs separately for better flow */}
-        {paragraphs.map((paragraph, index) => (
-          <Text key={`paragraph-${index}`} style={styles.paragraph}>
-            {paragraph || " "}
+        {/* Content - render each line separately to match editor behavior */}
+        {lines.map((line, index) => (
+          <Text
+            key={`line-${index}`}
+            style={line.trim().length === 0 ? styles.emptyLine : styles.paragraph}
+          >
+            {line.trim().length === 0 ? " " : line}
           </Text>
         ))}
 
@@ -126,7 +135,8 @@ export async function generateChapterPDF(
   chapterTitle: string,
   content: string,
   config: ExportConfig,
-  _pages: PageContent[]
+  _pages: PageContent[],
+  textAlignment: "left" | "center" | "right" | "justify" = "left"
 ): Promise<Blob> {
   const doc = (
     <ChapterPDF
@@ -134,6 +144,7 @@ export async function generateChapterPDF(
       chapterTitle={chapterTitle}
       content={content}
       config={config}
+      textAlignment={textAlignment}
     />
   );
 
