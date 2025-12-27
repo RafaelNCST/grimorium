@@ -107,7 +107,7 @@ export function ExportPreviewModal({
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [numPages, setNumPages] = useState<number>(0);
-  const [documentHeight, setDocumentHeight] = useState<number>(0);
+  const [hasError, setHasError] = useState(false);
   const scale = 1.0; // Fixed zoom at 100%
   const [config, setConfig] = useState<ExportConfig>({
     pageFormat: "a4",
@@ -149,27 +149,32 @@ export function ExportPreviewModal({
 
   // Calculate fixed container dimensions based on page format
   const containerDimensions = useMemo(() => {
-    const format = PAGE_FORMATS[config.pageFormat];
-
     // Use a reasonable fixed width that fits the modal well
-    // The PDF pages will render at their natural size which is smaller than PAGE_FORMATS values
     const width = 597; // Fixed width that works well for both A4 and Letter
 
-    const pageHeight = format.height * scale;
-    // Height: use locked document height if available, otherwise estimate
-    const estimatedHeight = Math.max(800, pageHeight + 100);
+    // Fixed height for error/loading states
+    const estimatedHeight = 800;
 
     return { width, estimatedHeight };
-  }, [config.pageFormat, scale]);
+  }, []);
 
   // Generate PDF preview when content or config changes
   useEffect(() => {
-    if (!content || !open) return;
+    if (!open) return;
+
+    // Check if content is empty or just whitespace
+    if (!content || content.trim() === "") {
+      setHasError(true);
+      setIsGeneratingPreview(false);
+      setPdfPreviewUrl(null);
+      return;
+    }
 
     let cancelled = false;
 
     const generatePreview = async () => {
       setIsGeneratingPreview(true);
+      setHasError(false); // Reset error state on new generation
 
       try {
         // Generate PDF blob
@@ -196,6 +201,7 @@ export function ExportPreviewModal({
         if (!cancelled) {
           console.error("Error generating PDF preview:", error);
           setPdfPreviewUrl(null);
+          setHasError(true);
         }
       } finally {
         if (!cancelled) {
@@ -214,18 +220,13 @@ export function ExportPreviewModal({
     };
   }, [content, config, open, chapterNumber, chapterTitle]);
 
-  // Reset document height when page format changes
-  useEffect(() => {
-    setDocumentHeight(0);
-  }, [config.pageFormat]);
-
   // Cleanup PDF URL when modal closes
   useEffect(() => {
     if (!open && pdfPreviewUrl) {
       URL.revokeObjectURL(pdfPreviewUrl);
       setPdfPreviewUrl(null);
       setNumPages(0);
-      setDocumentHeight(0);
+      setHasError(false);
     }
   }, [open]);
 
@@ -249,7 +250,7 @@ export function ExportPreviewModal({
         {/* Main content: Settings on left, Preview on right */}
         <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
           {/* Settings Panel - Left Side */}
-          <div className="w-80 flex-shrink-0 overflow-y-auto space-y-6 px-4 border-r relative z-10">
+          <div className={`w-80 flex-shrink-0 overflow-y-auto space-y-6 px-4 border-r relative z-10 ${hasError ? 'opacity-50 pointer-events-none' : ''}`}>
             <div className="space-y-6 py-2">
               {/* Page Format */}
               <div className="space-y-3">
@@ -261,15 +262,16 @@ export function ExportPreviewModal({
                   onValueChange={(value) =>
                     handleConfigChange("pageFormat", value as "a4" | "letter")
                   }
+                  disabled={hasError}
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="a4" id="a4" />
+                    <RadioGroupItem value="a4" id="a4" disabled={hasError} />
                     <Label htmlFor="a4" className="cursor-pointer">
                       {PAGE_FORMATS.a4.label}
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="letter" id="letter" />
+                    <RadioGroupItem value="letter" id="letter" disabled={hasError} />
                     <Label htmlFor="letter" className="cursor-pointer">
                       {PAGE_FORMATS.letter.label}
                     </Label>
@@ -292,8 +294,9 @@ export function ExportPreviewModal({
                       value as keyof typeof MARGIN_PRESETS
                     )
                   }
+                  disabled={hasError}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger disabled={hasError}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -322,8 +325,9 @@ export function ExportPreviewModal({
                       onValueChange={(value) =>
                         handleConfigChange("titleFont", value)
                       }
+                      disabled={hasError}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger disabled={hasError}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -343,8 +347,9 @@ export function ExportPreviewModal({
                       onValueChange={(value) =>
                         handleConfigChange("titleSize", value)
                       }
+                      disabled={hasError}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger disabled={hasError}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -368,15 +373,16 @@ export function ExportPreviewModal({
                         )
                       }
                       className="flex gap-4"
+                      disabled={hasError}
                     >
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="left" id="title-left" />
+                        <RadioGroupItem value="left" id="title-left" disabled={hasError} />
                         <Label htmlFor="title-left" className="cursor-pointer">
                           {t("settings.alignment_left")}
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="center" id="title-center" />
+                        <RadioGroupItem value="center" id="title-center" disabled={hasError} />
                         <Label
                           htmlFor="title-center"
                           className="cursor-pointer"
@@ -406,27 +412,36 @@ export function ExportPreviewModal({
             )}
 
             {/* PDF Preview - with FIXED container to prevent any resizing */}
-            <div className="flex-1 overflow-y-auto bg-muted/20 p-4 flex items-start justify-center">
+            <div
+              className={`bg-muted/20 p-4 flex justify-center ${hasError || isLoading ? 'items-center h-full' : 'flex-1 items-start overflow-y-auto'}`}
+              style={hasError || isLoading ? { height: `${containerDimensions.estimatedHeight}px` } : undefined}
+            >
               {isLoading ? (
-                <div className="flex flex-col items-center gap-4 mt-20">
+                <div className="flex flex-col items-center gap-4">
                   <div className="w-8 h-8 animate-spin rounded-full border-2 border-transparent border-t-primary" />
                   <p className="text-sm text-muted-foreground">
                     {t("preview.loading_content")}
                   </p>
                 </div>
-              ) : (
+              ) : hasError ? (
+                <div className="rounded-lg bg-muted/50 border-2 border-dashed border-border p-8 text-center max-w-md">
+                  <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                  <p className="text-base font-medium text-foreground mb-2">
+                    Este capítulo não tem conteúdo ainda
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Adicione conteúdo ao capítulo para gerar uma pré-visualização
+                  </p>
+                </div>
+              ) : pdfPreviewUrl ? (
                 <div
                   className="relative flex-shrink-0"
                   style={{
                     width: `${containerDimensions.width}px`,
-                    minHeight:
-                      documentHeight > 0
-                        ? `${documentHeight}px`
-                        : `${containerDimensions.estimatedHeight}px`,
                   }}
                 >
                   {/* Loading overlay during regeneration - covers the fixed container */}
-                  {isGeneratingPreview && pdfPreviewUrl && (
+                  {isGeneratingPreview && (
                     <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
                       <div className="flex flex-col items-center gap-4">
                         <div className="w-8 h-8 animate-spin rounded-full border-2 border-transparent border-t-primary" />
@@ -437,34 +452,21 @@ export function ExportPreviewModal({
                     </div>
                   )}
 
-                  {/* PDF Document inside fixed container */}
-                  {pdfPreviewUrl ? (
-                    <div className="flex flex-col gap-6">
+                  {/* PDF Document */}
+                  <div className="flex flex-col gap-6">
                       <Document
                         key="pdf-document"
                         file={pdfPreviewUrl}
                         onLoadSuccess={({ numPages }) => {
                           setNumPages(numPages);
-                          // Calculate and lock document height after first load
-                          setTimeout(() => {
-                            const pageHeight =
-                              PAGE_FORMATS[config.pageFormat].height;
-                            const totalHeight =
-                              pageHeight * scale * numPages + numPages * 80; // 80px gap per page
-                            setDocumentHeight(totalHeight);
-                          }, 100);
+                          setHasError(false);
+                        }}
+                        onLoadError={(error) => {
+                          console.error("Error loading PDF:", error);
+                          setHasError(true);
                         }}
                         loading={
-                          <div
-                            className="flex flex-col items-center gap-4 justify-center"
-                            style={{
-                              width: `${containerDimensions.width}px`,
-                              minHeight:
-                                documentHeight > 0
-                                  ? `${documentHeight}px`
-                                  : `${containerDimensions.estimatedHeight}px`,
-                            }}
-                          >
+                          <div className="flex flex-col items-center gap-4 justify-center py-20">
                             <div className="w-8 h-8 animate-spin rounded-full border-2 border-transparent border-t-primary" />
                             <p className="text-sm text-muted-foreground">
                               {t("preview.loading_pdf")}
@@ -503,38 +505,9 @@ export function ExportPreviewModal({
                           </div>
                         ))}
                       </Document>
-                    </div>
-                  ) : isGeneratingPreview ? (
-                    <div
-                      className="flex flex-col items-center gap-4 justify-center"
-                      style={{
-                        width: `${containerDimensions.width}px`,
-                        minHeight:
-                          documentHeight > 0
-                            ? `${documentHeight}px`
-                            : `${containerDimensions.estimatedHeight}px`,
-                      }}
-                    >
-                      <div className="w-8 h-8 animate-spin rounded-full border-2 border-transparent border-t-primary" />
-                      <p className="text-sm text-muted-foreground">
-                        {t("preview.generating_preview")}
-                      </p>
-                    </div>
-                  ) : (
-                    <div
-                      className="flex flex-col items-center justify-center"
-                      style={{
-                        width: `${containerDimensions.width}px`,
-                        minHeight: `${containerDimensions.estimatedHeight}px`,
-                      }}
-                    >
-                      <p className="text-sm text-muted-foreground">
-                        {t("preview.error_generating")}
-                      </p>
-                    </div>
-                  )}
+                  </div>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
@@ -552,6 +525,7 @@ export function ExportPreviewModal({
                 onExportWord(config, content, []);
                 onOpenChange(false);
               }}
+              disabled={hasError}
             >
               <FileText className="w-4 h-4 mr-2" />
               {t("actions.export_word")}
@@ -562,6 +536,7 @@ export function ExportPreviewModal({
                 onExportPDF(config, content, []);
                 onOpenChange(false);
               }}
+              disabled={hasError}
             >
               <FileText className="w-4 h-4 mr-2" />
               {t("actions.export_pdf")}
