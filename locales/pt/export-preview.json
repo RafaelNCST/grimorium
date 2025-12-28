@@ -17,6 +17,25 @@
     "alignment_left": "Esquerda",
     "alignment_center": "Centro"
   },
+  "singleExport": {
+    "titleFormat": "Formato",
+    "titleFormatNumberColon": "Capítulo 1: Título",
+    "titleFormatNumberDash": "Capítulo 1 - Título",
+    "titleFormatTitleOnly": "Título",
+    "titleFormatNumberOnly": "Capítulo 1",
+    "bold": "Negrito",
+    "titleSpacing": "Espaçamento após título",
+    "contentSettings": "Configurações do Conteúdo",
+    "font": "Fonte",
+    "size": "Tamanho",
+    "alignment": "Alinhamento",
+    "alignmentLeft": "Esquerda",
+    "alignmentCenter": "Centro",
+    "alignmentRight": "Direita",
+    "alignmentJustify": "Justificado",
+    "lineSpacing": "Espaçamento entre linhas",
+    "exporting": "Exportando..."
+  },
   "preview": {
     "page_singular": "página",
     "page_plural": "páginas",
@@ -25,7 +44,9 @@
     "loading_pdf": "Carregando PDF...",
     "page_of": "Página {{current}} de {{total}}",
     "generating_preview": "Gerando pré-visualização...",
-    "error_generating": "Erro ao gerar pré-visualização"
+    "error_generating": "Erro ao gerar pré-visualização",
+    "empty_chapter_title": "Este capítulo não tem conteúdo ainda",
+    "empty_chapter_description": "Adicione conteúdo ao capítulo para gerar uma pré-visualização"
   },
   "actions": {
     "cancel": "Cancelar",

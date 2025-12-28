@@ -2,10 +2,11 @@ import { useState, useEffect, useLayoutEffect, useRef, useMemo } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { FileText, Plus, ArrowLeft, ListOrdered } from "lucide-react";
+import { FileText, Plus, ArrowLeft, ListOrdered, Download } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntitySearchBar } from "@/components/entity-list";
+import { BatchExportModal } from "@/components/modals/batch-export-modal";
 import {
   CreateChapterModal,
   type IChapterFormData,
@@ -139,6 +140,7 @@ export function ChaptersPage() {
   const [reorderMode, setReorderMode] = useState<"auto" | "push">("auto");
   const [pushFromChapterId, setPushFromChapterId] = useState<string>("");
   const [plotArcs, setPlotArcs] = useState<IPlotArc[]>([]);
+  const [showBatchExportModal, setShowBatchExportModal] = useState(false);
 
   // Inicializar loading com base no cache - se já tem cache, não mostrar loading
   const [isLoading, setIsLoading] = useState(() => {
@@ -755,7 +757,16 @@ export function ChaptersPage() {
           className="gap-2"
         >
           <ListOrdered className="h-4 w-4" />
-          Reordenar Capítulos
+          {t("chapters:page.reorder_button")}
+        </Button>
+
+        <Button
+          onClick={() => setShowBatchExportModal(true)}
+          variant="secondary"
+          className="gap-2"
+        >
+          <Download className="h-4 w-4" />
+          {t("chapters:batchExport.button")}
         </Button>
 
         <Button
@@ -933,6 +944,20 @@ export function ChaptersPage() {
         }))}
       />
 
+      {/* Batch Export Modal */}
+      <BatchExportModal
+        open={showBatchExportModal}
+        onOpenChange={setShowBatchExportModal}
+        bookId={dashboardId}
+        chapters={chapters.map((ch) => ({
+          id: ch.id,
+          number: ch.number,
+          title: ch.title,
+          wordCount: ch.wordCount,
+          characterCount: ch.characterCount,
+        }))}
+      />
+
       {/* Delete Single Chapter Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent
@@ -993,10 +1018,10 @@ export function ChaptersPage() {
               <div className="rounded-lg bg-yellow-500/10 p-2">
                 <ListOrdered className="h-5 w-5 text-yellow-600 dark:text-yellow-500" />
               </div>
-              Reordenar Capítulos
+              {t("chapters:reorder.title")}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Escolha o tipo de reordenação que deseja aplicar:
+              {t("chapters:reorder.description")}
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -1017,18 +1042,18 @@ export function ChaptersPage() {
             >
               <RadioGroupItem value="auto" id="mode-auto" className="mt-0.5" />
               <div className="flex-1">
-                <div className="font-semibold text-sm">Reordenar automaticamente</div>
+                <div className="font-semibold text-sm">{t("chapters:reorder.autoMode")}</div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  Remove lacunas e organiza tudo em ordem
+                  {t("chapters:reorder.autoModeDescription")}
                 </div>
                 {reorderMode === "auto" && chaptersToReorder > 0 && (
                   <div className="text-xs text-primary mt-2">
-                    → {chaptersToReorder} {chaptersToReorder === 1 ? "capítulo será atualizado" : "capítulos serão atualizados"}
+                    → {chaptersToReorder} {chaptersToReorder === 1 ? t("chapters:reorder.chapterWillBeUpdated") : t("chapters:reorder.chaptersWillBeUpdated")}
                   </div>
                 )}
                 {reorderMode === "auto" && chaptersToReorder === 0 && (
                   <div className="text-xs text-green-600 dark:text-green-400 mt-2">
-                    ✓ Todos os capítulos já estão organizados
+                    ✓ {t("chapters:reorder.allOrganized")}
                   </div>
                 )}
               </div>
@@ -1045,21 +1070,21 @@ export function ChaptersPage() {
             >
               <RadioGroupItem value="push" id="mode-push" className="mt-0.5" />
               <div className="flex-1">
-                <div className="font-semibold text-sm">Empurrar capítulos</div>
+                <div className="font-semibold text-sm">{t("chapters:reorder.pushMode")}</div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  Abre espaço para inserir novo capítulo
+                  {t("chapters:reorder.pushModeDescription")}
                 </div>
 
                 {reorderMode === "push" && (
                   <div className="mt-3 space-y-2">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-medium">Empurrar a partir do capítulo:</label>
+                      <label className="text-xs font-medium">{t("chapters:reorder.pushFromChapter")}</label>
                       <Select
                         value={pushFromChapterId}
                         onValueChange={(value) => setPushFromChapterId(value)}
                       >
                         <SelectTrigger className="h-9">
-                          <SelectValue placeholder="Selecione um capítulo" />
+                          <SelectValue placeholder={t("chapters:reorder.selectChapter")} />
                         </SelectTrigger>
                         <SelectContent>
                           {chapters
@@ -1079,7 +1104,7 @@ export function ChaptersPage() {
                     {pushPreview.count > 0 && (
                       <div className="rounded-md bg-muted p-3 space-y-1 text-xs">
                         <div className="font-medium text-primary">
-                          {pushPreview.count} {pushPreview.count === 1 ? "capítulo será empurrado" : "capítulos serão empurrados"}:
+                          {pushPreview.count} {pushPreview.count === 1 ? t("chapters:reorder.chapterWillBePushed") : t("chapters:reorder.chaptersWillBePushed")}:
                         </div>
                         {pushPreview.examples.map((ex, idx) => (
                           <div key={idx} className="text-muted-foreground">
@@ -1088,14 +1113,14 @@ export function ChaptersPage() {
                         ))}
                         {pushPreview.hasMore && (
                           <div className="text-muted-foreground italic">
-                            ... e mais {pushPreview.count - 5} capítulos
+                            {t("chapters:reorder.andMoreChapters", { count: pushPreview.count - 5 })}
                           </div>
                         )}
                       </div>
                     )}
                     {pushPreview.count === 0 && (
                       <div className="text-xs text-muted-foreground italic">
-                        Nenhum capítulo será afetado
+                        {t("chapters:reorder.noChaptersAffected")}
                       </div>
                     )}
                   </div>
@@ -1105,7 +1130,7 @@ export function ChaptersPage() {
           </RadioGroup>
 
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t("chapters:reorder.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleReorderChapters}
               variant="magical"
@@ -1115,7 +1140,7 @@ export function ChaptersPage() {
                 (reorderMode === "push" && pushPreview.count === 0)
               }
             >
-              Executar
+              {t("chapters:reorder.save")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

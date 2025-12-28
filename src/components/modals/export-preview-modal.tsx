@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 
-import { FileText, CheckCircle2, XCircle } from "lucide-react";
+import { FileText, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -16,6 +16,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -78,6 +79,7 @@ export interface ExportConfig {
   titleSize: number;
   titleAlignment: "left" | "center";
   titleBold: boolean;
+  titleSpacing: number; // Espaçamento após título em pontos
   showPageNumbers: boolean;
   pageNumberPosition: "left" | "center" | "right";
   // Configurações do corpo do texto
@@ -146,6 +148,7 @@ export function ExportPreviewModal({
     titleSize: TITLE_SIZE_RANGE.default,
     titleAlignment: "center",
     titleBold: true,
+    titleSpacing: 40,
     showPageNumbers: true,
     pageNumberPosition: "center",
     // Configurações do corpo - usar do editor ou padrões editoriais
@@ -446,7 +449,7 @@ export function ExportPreviewModal({
                 <div className="space-y-4">
                   {/* Title Format */}
                   <div className="space-y-2">
-                    <Label>Formato</Label>
+                    <Label>{t("singleExport.titleFormat")}</Label>
                     <Select
                       value={config.titleFormat}
                       onValueChange={(value) =>
@@ -462,16 +465,16 @@ export function ExportPreviewModal({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="number-colon-title">
-                          Capítulo 1: Título
+                          {t("singleExport.titleFormatNumberColon")}
                         </SelectItem>
                         <SelectItem value="number-dash-title">
-                          Capítulo 1 - Título
+                          {t("singleExport.titleFormatNumberDash")}
                         </SelectItem>
                         <SelectItem value="title-only">
-                          Título
+                          {t("singleExport.titleFormatTitleOnly")}
                         </SelectItem>
                         <SelectItem value="number-only">
-                          Capítulo 1
+                          {t("singleExport.titleFormatNumberOnly")}
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -554,6 +557,45 @@ export function ExportPreviewModal({
                       </div>
                     </RadioGroup>
                   </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="titleBold"
+                      checked={config.titleBold}
+                      onCheckedChange={(checked) =>
+                        handleConfigChange("titleBold", checked as boolean)
+                      }
+                      disabled={hasError}
+                    />
+                    <Label htmlFor="titleBold" className="cursor-pointer">
+                      {t("singleExport.bold")}
+                    </Label>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <Label>{t("singleExport.titleSpacing")}</Label>
+                      <span className="text-sm font-medium text-primary">
+                        {config.titleSpacing}pt
+                      </span>
+                    </div>
+                    <Slider
+                      value={[config.titleSpacing]}
+                      onValueChange={([value]) =>
+                        handleConfigChange("titleSpacing", value)
+                      }
+                      min={20}
+                      max={80}
+                      step={5}
+                      disabled={hasError}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>20pt</span>
+                      <span>40pt (padrão)</span>
+                      <span>80pt</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -562,13 +604,13 @@ export function ExportPreviewModal({
               {/* Content Text Settings */}
               <div className="space-y-4">
                 <Label className="text-base font-semibold">
-                  Configurações do Texto
+                  {t("singleExport.contentSettings")}
                 </Label>
 
                 <div className="space-y-4">
                   {/* Content Font */}
                   <div className="space-y-2">
-                    <Label>Fonte do texto</Label>
+                    <Label>{t("singleExport.font")}</Label>
                     <Select
                       value={config.contentFont}
                       onValueChange={(value) =>
@@ -592,7 +634,7 @@ export function ExportPreviewModal({
                   {/* Content Size with Slider */}
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <Label>Tamanho do texto</Label>
+                      <Label>{t("singleExport.size")}</Label>
                       <span className="text-sm font-medium text-primary">
                         {config.contentSize}pt
                       </span>
@@ -618,7 +660,7 @@ export function ExportPreviewModal({
                   {/* Line Spacing with Slider */}
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <Label>Espaçamento entre linhas</Label>
+                      <Label>{t("singleExport.lineSpacing")}</Label>
                       <span className="text-sm font-medium text-primary">
                         {config.contentLineSpacing.toFixed(1)}
                       </span>
@@ -644,7 +686,7 @@ export function ExportPreviewModal({
 
                   {/* Content Alignment */}
                   <div className="space-y-2">
-                    <Label>Alinhamento do texto</Label>
+                    <Label>{t("singleExport.alignment")}</Label>
                     <RadioGroup
                       value={config.contentAlignment}
                       onValueChange={(value) =>
@@ -659,25 +701,25 @@ export function ExportPreviewModal({
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="left" id="content-left" disabled={hasError} />
                         <Label htmlFor="content-left" className="cursor-pointer">
-                          Esquerda
+                          {t("singleExport.alignmentLeft")}
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="center" id="content-center" disabled={hasError} />
                         <Label htmlFor="content-center" className="cursor-pointer">
-                          Centro
+                          {t("singleExport.alignmentCenter")}
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="right" id="content-right" disabled={hasError} />
                         <Label htmlFor="content-right" className="cursor-pointer">
-                          Direita
+                          {t("singleExport.alignmentRight")}
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="justify" id="content-justify" disabled={hasError} />
                         <Label htmlFor="content-justify" className="cursor-pointer">
-                          Justificado
+                          {t("singleExport.alignmentJustify")}
                         </Label>
                       </div>
                     </RadioGroup>
@@ -708,7 +750,7 @@ export function ExportPreviewModal({
             >
               {isLoading || (isGeneratingPreview && !pdfPreviewUrl) ? (
                 <div className="flex flex-col items-center gap-4">
-                  <div className="w-8 h-8 animate-spin rounded-full border-2 border-transparent border-t-primary" />
+                  <Loader2 className="w-8 h-8 animate-spin" />
                   <p className="text-sm text-muted-foreground">
                     {t("preview.loading_content")}
                   </p>
@@ -717,10 +759,10 @@ export function ExportPreviewModal({
                 <div className="rounded-lg bg-muted/50 border-2 border-dashed border-border p-8 text-center max-w-md">
                   <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
                   <p className="text-base font-medium text-foreground mb-2">
-                    Este capítulo não tem conteúdo ainda
+                    {t("preview.empty_chapter_title")}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Adicione conteúdo ao capítulo para gerar uma pré-visualização
+                    {t("preview.empty_chapter_description")}
                   </p>
                 </div>
               ) : pdfPreviewUrl ? (
@@ -734,7 +776,7 @@ export function ExportPreviewModal({
                   {isGeneratingPreview && (
                     <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
                       <div className="flex flex-col items-center gap-4">
-                        <div className="w-8 h-8 animate-spin rounded-full border-2 border-transparent border-t-primary" />
+                        <Loader2 className="w-8 h-8 animate-spin" />
                         <p className="text-sm text-muted-foreground">
                           {t("preview.updating_preview")}
                         </p>
@@ -757,7 +799,7 @@ export function ExportPreviewModal({
                         }}
                         loading={
                           <div className="flex flex-col items-center gap-4 justify-center py-20">
-                            <div className="w-8 h-8 animate-spin rounded-full border-2 border-transparent border-t-primary" />
+                            <Loader2 className="w-8 h-8 animate-spin" />
                             <p className="text-sm text-muted-foreground">
                               {t("preview.loading_pdf")}
                             </p>
@@ -781,7 +823,7 @@ export function ExportPreviewModal({
                                       height: `${PAGE_FORMATS[config.pageFormat].height * scale}px`,
                                     }}
                                   >
-                                    <div className="w-6 h-6 animate-spin rounded-full border-2 border-transparent border-t-primary" />
+                                    <Loader2 className="w-6 h-6 animate-spin" />
                                   </div>
                                 }
                               />
@@ -819,11 +861,11 @@ export function ExportPreviewModal({
               disabled={hasError || isExporting}
             >
               {isExporting ? (
-                <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-white" />
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
                 <FileText className="w-4 h-4 mr-2" />
               )}
-              {isExporting ? "Exportando..." : t("actions.export_word")}
+              {isExporting ? t("singleExport.exporting") : t("actions.export_word")}
             </Button>
             <Button
               variant="magical"
@@ -831,11 +873,11 @@ export function ExportPreviewModal({
               disabled={hasError || isExporting}
             >
               {isExporting ? (
-                <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-white" />
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
                 <FileText className="w-4 h-4 mr-2" />
               )}
-              {isExporting ? "Exportando..." : t("actions.export_pdf")}
+              {isExporting ? t("singleExport.exporting") : t("actions.export_pdf")}
             </Button>
           </div>
         </div>

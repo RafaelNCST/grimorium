@@ -6,9 +6,15 @@ import {
   convertInchesToTwip,
   LineRuleType,
   PageOrientation,
+  PageBreak,
+  HeadingLevel,
+  TableOfContents,
 } from "docx";
 
+import i18n from "@/lib/i18n";
+
 import type { ExportConfig } from "@/components/modals/export-preview-modal";
+import type { BatchExportConfig, ChapterContent } from "./export-pdf.service";
 
 // Page format dimensions in twips (1 inch = 1440 twips)
 const PAGE_FORMATS = {
@@ -65,17 +71,19 @@ function formatChapterTitle(
   chapterNumber: string,
   chapterTitle: string
 ): string {
+  const chapterWord = i18n.t("chapters:export.chapter");
+
   switch (format) {
     case "number-colon-title":
-      return `Capítulo ${chapterNumber}: ${chapterTitle}`;
+      return `${chapterWord} ${chapterNumber}: ${chapterTitle}`;
     case "number-dash-title":
-      return `Capítulo ${chapterNumber} - ${chapterTitle}`;
+      return `${chapterWord} ${chapterNumber} - ${chapterTitle}`;
     case "title-only":
       return chapterTitle;
     case "number-only":
-      return `Capítulo ${chapterNumber}`;
+      return `${chapterWord} ${chapterNumber}`;
     default:
-      return `Capítulo ${chapterNumber}: ${chapterTitle}`;
+      return `${chapterWord} ${chapterNumber}: ${chapterTitle}`;
   }
 }
 
@@ -123,7 +131,7 @@ export async function generateChapterWord(
         ? AlignmentType.CENTER
         : AlignmentType.LEFT,
     spacing: {
-      after: 400, // Space after title
+      after: config.titleSpacing * 20, // Convert points to twips (1pt = 20 twips)
     },
   });
 
@@ -172,6 +180,224 @@ export async function generateChapterWord(
         children: [titleParagraph, ...contentParagraphs],
       },
     ],
+  });
+
+  // Generate blob
+  const { Packer } = await import("docx");
+  const blob = await Packer.toBlob(doc);
+
+  return blob;
+}
+
+export async function generateBatchChaptersWord(
+  chapters: ChapterContent[],
+  config: BatchExportConfig
+): Promise<Blob> {
+  const margins = MARGIN_PRESETS[config.margins];
+  const titleFont = getFontFamily(config.titleFont);
+  const titleSize = getFontSize(config.titleSize);
+  const contentFont = getFontFamily(config.contentFont);
+  const contentSize = getFontSize(config.contentSize);
+  const lineSpacing = getLineSpacing(config.contentLineSpacing);
+
+  // Map text alignment to Word alignment
+  const getWordAlignment = (
+    align: "left" | "center" | "right" | "justify"
+  ): AlignmentType => {
+    const alignmentMap: Record<string, AlignmentType> = {
+      left: AlignmentType.LEFT,
+      center: AlignmentType.CENTER,
+      right: AlignmentType.RIGHT,
+      justify: AlignmentType.JUSTIFIED,
+    };
+    return alignmentMap[align] || AlignmentType.LEFT;
+  };
+
+  const pageFormat = PAGE_FORMATS[config.pageFormat];
+  const sections: any[] = [];
+
+  // Sumário opcional
+  if (config.includeTableOfContents) {
+    sections.push({
+      properties: {
+        page: {
+          size: {
+            width: pageFormat.width,
+            height: pageFormat.height,
+            orientation: PageOrientation.PORTRAIT,
+          },
+          margin: margins,
+        },
+      },
+      children: [
+        new Paragraph({
+          text: i18n.t("chapters:export.tableOfContents"),
+          heading: HeadingLevel.HEADING_1,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
+        }),
+        new TableOfContents(i18n.t("chapters:export.tableOfContents"), {
+          hyperlink: true,
+          headingStyleRange: "1-3",
+        }),
+        new Paragraph({
+          children: [new PageBreak()],
+        }),
+      ],
+    });
+  }
+
+  // Processar cada capítulo
+  if (config.pageBreakBetweenChapters) {
+    // Cada capítulo em sua própria seção (força quebra de página)
+    chapters.forEach((chapter, chapterIndex) => {
+      const children: Paragraph[] = [];
+
+      // Título do capítulo (como Heading para sumário)
+      if (config.showChapterTitles) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: formatChapterTitle(
+                  config.titleFormat,
+                  String(chapter.number ?? chapterIndex + 1),
+                  chapter.title ?? "Sem título"
+                ),
+                font: titleFont,
+                size: titleSize,
+                bold: config.titleBold,
+              }),
+            ],
+            heading: config.includeTableOfContents
+              ? HeadingLevel.HEADING_1
+              : undefined,
+            alignment:
+              config.titleAlignment === "center"
+                ? AlignmentType.CENTER
+                : AlignmentType.LEFT,
+            spacing: { after: config.titleSpacing * 20 }, // Convert points to twips
+          })
+        );
+      }
+
+      // Conteúdo do capítulo
+      const lines = chapter.content.split("\n");
+      lines.forEach((line) => {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: line.trim().length === 0 ? " " : line,
+                font: contentFont,
+                size: contentSize,
+              }),
+            ],
+            alignment: getWordAlignment(config.contentAlignment),
+            spacing: {
+              line: lineSpacing,
+              lineRule: LineRuleType.AUTO,
+              after: 0,
+            },
+          })
+        );
+      });
+
+      sections.push({
+        properties: {
+          page: {
+            size: {
+              width: pageFormat.width,
+              height: pageFormat.height,
+              orientation: PageOrientation.PORTRAIT,
+            },
+            margin: margins,
+          },
+        },
+        children,
+      });
+    });
+  } else {
+    // Todos os capítulos em uma única seção (páginas contínuas)
+    const allChildren: Paragraph[] = [];
+
+    chapters.forEach((chapter, chapterIndex) => {
+      const isLastChapter = chapterIndex === chapters.length - 1;
+
+      // Título do capítulo (como Heading para sumário)
+      if (config.showChapterTitles) {
+        allChildren.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: formatChapterTitle(
+                  config.titleFormat,
+                  String(chapter.number ?? chapterIndex + 1),
+                  chapter.title ?? "Sem título"
+                ),
+                font: titleFont,
+                size: titleSize,
+                bold: config.titleBold,
+              }),
+            ],
+            heading: config.includeTableOfContents
+              ? HeadingLevel.HEADING_1
+              : undefined,
+            alignment:
+              config.titleAlignment === "center"
+                ? AlignmentType.CENTER
+                : AlignmentType.LEFT,
+            spacing: { after: config.titleSpacing * 20 }, // Convert points to twips
+          })
+        );
+      }
+
+      // Conteúdo do capítulo
+      const lines = chapter.content.split("\n");
+      lines.forEach((line, lineIndex) => {
+        const isLastLine = lineIndex === lines.length - 1;
+        // Adiciona espaçamento extra após o último parágrafo do capítulo (exceto no último capítulo)
+        const afterSpacing = isLastLine && !isLastChapter ? config.chapterSpacing * 20 : 0;
+
+        allChildren.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: line.trim().length === 0 ? " " : line,
+                font: contentFont,
+                size: contentSize,
+              }),
+            ],
+            alignment: getWordAlignment(config.contentAlignment),
+            spacing: {
+              line: lineSpacing,
+              lineRule: LineRuleType.AUTO,
+              after: afterSpacing,
+            },
+          })
+        );
+      });
+    });
+
+    // Adicionar uma única seção com todos os capítulos
+    sections.push({
+      properties: {
+        page: {
+          size: {
+            width: pageFormat.width,
+            height: pageFormat.height,
+            orientation: PageOrientation.PORTRAIT,
+          },
+          margin: margins,
+        },
+      },
+      children: allChildren,
+    });
+  }
+
+  // Criar documento
+  const doc = new Document({
+    sections,
   });
 
   // Generate blob

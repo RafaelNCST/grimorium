@@ -17,6 +17,25 @@
     "alignment_left": "Left",
     "alignment_center": "Center"
   },
+  "singleExport": {
+    "titleFormat": "Format",
+    "titleFormatNumberColon": "Chapter 1: Title",
+    "titleFormatNumberDash": "Chapter 1 - Title",
+    "titleFormatTitleOnly": "Title",
+    "titleFormatNumberOnly": "Chapter 1",
+    "bold": "Bold",
+    "titleSpacing": "Title spacing",
+    "contentSettings": "Content Settings",
+    "font": "Font",
+    "size": "Size",
+    "alignment": "Alignment",
+    "alignmentLeft": "Left",
+    "alignmentCenter": "Center",
+    "alignmentRight": "Right",
+    "alignmentJustify": "Justify",
+    "lineSpacing": "Line spacing",
+    "exporting": "Exporting..."
+  },
   "preview": {
     "page_singular": "page",
     "page_plural": "pages",
@@ -25,7 +44,9 @@
     "loading_pdf": "Loading PDF...",
     "page_of": "Page {{current}} of {{total}}",
     "generating_preview": "Generating preview...",
-    "error_generating": "Error generating preview"
+    "error_generating": "Error generating preview",
+    "empty_chapter_title": "This chapter has no content yet",
+    "empty_chapter_description": "Add content to the chapter to generate a preview"
   },
   "actions": {
     "cancel": "Cancel",
