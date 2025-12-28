@@ -1,11 +1,20 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 
-import { FileText } from "lucide-react";
+import { FileText, CheckCircle2, XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
 import { generateChapterPDF } from "@/lib/services/export-pdf.service";
 
 // Configure PDF.js worker - using CDN for compatibility
@@ -55,18 +65,25 @@ const FONT_FAMILIES = [
   { value: "sans-serif", label: "Sans Serif" },
 ] as const;
 
-// Font sizes (múltiplos de 8 para melhor alinhamento)
-const TITLE_SIZES = ["16pt", "24pt", "32pt"] as const;
+// Font sizes - Ranges otimizados para manuscritos editoriais
+const TITLE_SIZE_RANGE = { min: 14, max: 28, default: 24 };
+const CONTENT_SIZE_RANGE = { min: 10, max: 16, default: 12 };
+const LINE_SPACING_RANGE = { min: 1.0, max: 2.5, default: 2.0 };
 
 export interface ExportConfig {
   pageFormat: "a4" | "letter";
   margins: keyof typeof MARGIN_PRESETS;
   titleFont: string;
-  titleSize: string;
+  titleSize: number;
   titleAlignment: "left" | "center";
   titleBold: boolean;
   showPageNumbers: boolean;
   pageNumberPosition: "left" | "center" | "right";
+  // Configurações do corpo do texto
+  contentFont: string;
+  contentSize: number;
+  contentLineSpacing: number;
+  contentAlignment: "left" | "justify";
 }
 
 export interface PageContent {
@@ -83,15 +100,13 @@ interface ExportPreviewModalProps {
   onExportPDF: (
     config: ExportConfig,
     content: string,
-    pages: PageContent[],
-    textAlignment: "left" | "center" | "right" | "justify"
-  ) => void;
+    pages: PageContent[]
+  ) => Promise<boolean>;
   onExportWord: (
     config: ExportConfig,
     content: string,
-    pages: PageContent[],
-    textAlignment: "left" | "center" | "right" | "justify"
-  ) => void;
+    pages: PageContent[]
+  ) => Promise<boolean>;
 }
 
 export function ExportPreviewModal({
@@ -105,22 +120,30 @@ export function ExportPreviewModal({
 }: ExportPreviewModalProps) {
   const { t } = useTranslation("export-preview");
   const [content, setContent] = useState<string>("");
-  const [textAlignment, setTextAlignment] = useState<"left" | "center" | "right" | "justify">("left");
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [numPages, setNumPages] = useState<number>(0);
   const [hasError, setHasError] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<"success" | "error">("success");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
   const scale = 1.0; // Fixed zoom at 100%
   const [config, setConfig] = useState<ExportConfig>({
     pageFormat: "a4",
     margins: "editorial",
     titleFont: "Inter",
-    titleSize: "24pt",
+    titleSize: TITLE_SIZE_RANGE.default,
     titleAlignment: "center",
     titleBold: true,
     showPageNumbers: true,
     pageNumberPosition: "center",
+    // Configurações do corpo - padrões editoriais
+    contentFont: "Times New Roman",
+    contentSize: CONTENT_SIZE_RANGE.default,
+    contentLineSpacing: LINE_SPACING_RANGE.default,
+    contentAlignment: "left",
   });
 
   // Load chapter content when modal opens
@@ -136,10 +159,8 @@ export function ExportPreviewModal({
 
         if (chapterData) {
           setContent(chapterData.content || "");
-          setTextAlignment(chapterData.textAlignment || "left");
         } else {
           setContent("");
-          setTextAlignment("left");
         }
       } catch (error) {
         console.error("Error loading chapter content:", error);
@@ -163,7 +184,7 @@ export function ExportPreviewModal({
     return { width, estimatedHeight };
   }, []);
 
-  // Generate PDF preview when content or config changes
+  // Generate PDF preview when content or config changes (with debounce)
   useEffect(() => {
     if (!open) return;
 
@@ -177,50 +198,53 @@ export function ExportPreviewModal({
 
     let cancelled = false;
 
-    const generatePreview = async () => {
-      setIsGeneratingPreview(true);
-      setHasError(false); // Reset error state on new generation
+    // Debounce: wait 300ms after last change before generating preview
+    const debounceTimer = setTimeout(() => {
+      const generatePreview = async () => {
+        setIsGeneratingPreview(true);
+        setHasError(false); // Reset error state on new generation
 
-      try {
-        // Generate PDF blob
-        const blob = await generateChapterPDF(
-          chapterNumber,
-          chapterTitle,
-          content,
-          config,
-          [], // Pages array not used anymore
-          textAlignment
-        );
+        try {
+          // Generate PDF blob
+          const blob = await generateChapterPDF(
+            chapterNumber,
+            chapterTitle,
+            content,
+            config,
+            [] // Pages array not used anymore
+          );
 
-        if (cancelled) return;
+          if (cancelled) return;
 
-        // Create object URL for preview
-        const newUrl = URL.createObjectURL(blob);
+          // Create object URL for preview
+          const newUrl = URL.createObjectURL(blob);
 
-        // Cleanup old URL before setting new one
-        if (pdfPreviewUrl) {
-          URL.revokeObjectURL(pdfPreviewUrl);
+          // Cleanup old URL before setting new one
+          if (pdfPreviewUrl) {
+            URL.revokeObjectURL(pdfPreviewUrl);
+          }
+
+          setPdfPreviewUrl(newUrl);
+        } catch (error) {
+          if (!cancelled) {
+            console.error("Error generating PDF preview:", error);
+            setPdfPreviewUrl(null);
+            setHasError(true);
+          }
+        } finally {
+          if (!cancelled) {
+            setIsGeneratingPreview(false);
+          }
         }
+      };
 
-        setPdfPreviewUrl(newUrl);
-      } catch (error) {
-        if (!cancelled) {
-          console.error("Error generating PDF preview:", error);
-          setPdfPreviewUrl(null);
-          setHasError(true);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsGeneratingPreview(false);
-        }
-      }
-    };
-
-    generatePreview();
+      generatePreview();
+    }, 300); // 300ms debounce
 
     // Cleanup on unmount or dependency change
     return () => {
       cancelled = true;
+      clearTimeout(debounceTimer);
       // Note: We don't revoke the URL here as it might still be needed
       // URL cleanup happens when setting a new URL or on modal close
     };
@@ -243,7 +267,68 @@ export function ExportPreviewModal({
     setConfig((prev) => ({ ...prev, [key]: value }));
   };
 
+  const handleExport = async (type: "pdf" | "word") => {
+    setIsExporting(true);
+    try {
+      const success =
+        type === "pdf"
+          ? await onExportPDF(config, content, [])
+          : await onExportWord(config, content, []);
+
+      if (success) {
+        // Fechamento controlado: primeiro fecha o modal de exportação
+        onOpenChange(false);
+
+        // Depois mostra feedback de sucesso
+        setFeedbackType("success");
+        setFeedbackMessage(
+          type === "pdf"
+            ? "Capítulo exportado para PDF com sucesso!"
+            : "Capítulo exportado para Word com sucesso!"
+        );
+        setShowFeedback(true);
+      } else {
+        // Se cancelou, não faz nada (mantém modal aberto)
+        setFeedbackType("error");
+        setFeedbackMessage("Exportação cancelada.");
+      }
+    } catch (error) {
+      console.error("Error during export:", error);
+      setFeedbackType("error");
+      setFeedbackMessage(
+        "Erro ao exportar o capítulo. Por favor, tente novamente."
+      );
+      setShowFeedback(true);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
+    <>
+      {/* Feedback Dialog */}
+      <AlertDialog open={showFeedback} onOpenChange={setShowFeedback}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              {feedbackType === "success" ? (
+                <CheckCircle2 className="w-5 h-5 text-green-500" />
+              ) : (
+                <XCircle className="w-5 h-5 text-red-500" />
+              )}
+              {feedbackType === "success"
+                ? "Exportação Concluída"
+                : "Erro na Exportação"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>{feedbackMessage}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction variant="secondary">OK</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Export Preview Modal */}
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[90vw] w-[1400px] max-h-[85vh] flex flex-col">
         <DialogHeader>
@@ -347,25 +432,28 @@ export function ExportPreviewModal({
                   </div>
 
                   <div className="space-y-2">
-                    <Label>{t("settings.size")}</Label>
-                    <Select
-                      value={config.titleSize}
-                      onValueChange={(value) =>
+                    <div className="flex justify-between items-center">
+                      <Label>{t("settings.size")}</Label>
+                      <span className="text-sm font-medium text-primary">
+                        {config.titleSize}pt
+                      </span>
+                    </div>
+                    <Slider
+                      value={[config.titleSize]}
+                      onValueChange={([value]) =>
                         handleConfigChange("titleSize", value)
                       }
+                      min={TITLE_SIZE_RANGE.min}
+                      max={TITLE_SIZE_RANGE.max}
+                      step={2}
                       disabled={hasError}
-                    >
-                      <SelectTrigger disabled={hasError}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {TITLE_SIZES.map((size) => (
-                          <SelectItem key={size} value={size}>
-                            {size}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>{TITLE_SIZE_RANGE.min}pt</span>
+                      <span>{TITLE_SIZE_RANGE.default}pt (padrão)</span>
+                      <span>{TITLE_SIZE_RANGE.max}pt</span>
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -400,6 +488,122 @@ export function ExportPreviewModal({
                   </div>
                 </div>
               </div>
+
+              <Separator />
+
+              {/* Content Text Settings */}
+              <div className="space-y-4">
+                <Label className="text-base font-semibold">
+                  Configurações do Texto
+                </Label>
+
+                <div className="space-y-4">
+                  {/* Content Font */}
+                  <div className="space-y-2">
+                    <Label>Fonte do texto</Label>
+                    <Select
+                      value={config.contentFont}
+                      onValueChange={(value) =>
+                        handleConfigChange("contentFont", value)
+                      }
+                      disabled={hasError}
+                    >
+                      <SelectTrigger disabled={hasError}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {FONT_FAMILIES.map((font) => (
+                          <SelectItem key={font.value} value={font.value}>
+                            {font.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Content Size with Slider */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <Label>Tamanho do texto</Label>
+                      <span className="text-sm font-medium text-primary">
+                        {config.contentSize}pt
+                      </span>
+                    </div>
+                    <Slider
+                      value={[config.contentSize]}
+                      onValueChange={([value]) =>
+                        handleConfigChange("contentSize", value)
+                      }
+                      min={CONTENT_SIZE_RANGE.min}
+                      max={CONTENT_SIZE_RANGE.max}
+                      step={1}
+                      disabled={hasError}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>{CONTENT_SIZE_RANGE.min}pt</span>
+                      <span>{CONTENT_SIZE_RANGE.default}pt (padrão)</span>
+                      <span>{CONTENT_SIZE_RANGE.max}pt</span>
+                    </div>
+                  </div>
+
+                  {/* Line Spacing with Slider */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <Label>Espaçamento entre linhas</Label>
+                      <span className="text-sm font-medium text-primary">
+                        {config.contentLineSpacing.toFixed(1)}
+                      </span>
+                    </div>
+                    <Slider
+                      value={[config.contentLineSpacing]}
+                      onValueChange={([value]) =>
+                        handleConfigChange("contentLineSpacing", value)
+                      }
+                      min={LINE_SPACING_RANGE.min}
+                      max={LINE_SPACING_RANGE.max}
+                      step={0.5}
+                      disabled={hasError}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>1.0 (simples)</span>
+                      <span>1.5</span>
+                      <span>2.0 (duplo)</span>
+                      <span>2.5</span>
+                    </div>
+                  </div>
+
+                  {/* Content Alignment */}
+                  <div className="space-y-2">
+                    <Label>Alinhamento do texto</Label>
+                    <RadioGroup
+                      value={config.contentAlignment}
+                      onValueChange={(value) =>
+                        handleConfigChange(
+                          "contentAlignment",
+                          value as "left" | "justify"
+                        )
+                      }
+                      className="flex gap-4"
+                      disabled={hasError}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="left" id="content-left" disabled={hasError} />
+                        <Label htmlFor="content-left" className="cursor-pointer">
+                          Esquerda
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="justify" id="content-justify" disabled={hasError} />
+                        <Label htmlFor="content-justify" className="cursor-pointer">
+                          Justificado
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -419,10 +623,10 @@ export function ExportPreviewModal({
 
             {/* PDF Preview - with FIXED container to prevent any resizing */}
             <div
-              className={`bg-muted/20 p-4 flex justify-center ${hasError || isLoading ? 'items-center h-full' : 'flex-1 items-start overflow-y-auto'}`}
-              style={hasError || isLoading ? { height: `${containerDimensions.estimatedHeight}px` } : undefined}
+              className={`bg-muted/20 p-4 flex justify-center ${hasError || isLoading || isGeneratingPreview ? 'items-center h-full' : 'flex-1 items-start overflow-y-auto'}`}
+              style={hasError || isLoading || isGeneratingPreview ? { height: `${containerDimensions.estimatedHeight}px` } : undefined}
             >
-              {isLoading ? (
+              {isLoading || (isGeneratingPreview && !pdfPreviewUrl) ? (
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-8 h-8 animate-spin rounded-full border-2 border-transparent border-t-primary" />
                   <p className="text-sm text-muted-foreground">
@@ -520,36 +724,43 @@ export function ExportPreviewModal({
 
         {/* Footer Actions */}
         <div className="flex justify-between items-center pt-4 border-t">
-          <Button variant="secondary" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => onOpenChange(false)}
+            disabled={isExporting}
+          >
             {t("actions.cancel")}
           </Button>
 
           <div className="flex gap-2">
             <Button
               variant="magical"
-              onClick={() => {
-                onExportWord(config, content, [], textAlignment);
-                onOpenChange(false);
-              }}
-              disabled={hasError}
+              onClick={() => handleExport("word")}
+              disabled={hasError || isExporting}
             >
-              <FileText className="w-4 h-4 mr-2" />
-              {t("actions.export_word")}
+              {isExporting ? (
+                <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-white" />
+              ) : (
+                <FileText className="w-4 h-4 mr-2" />
+              )}
+              {isExporting ? "Exportando..." : t("actions.export_word")}
             </Button>
             <Button
               variant="magical"
-              onClick={() => {
-                onExportPDF(config, content, [], textAlignment);
-                onOpenChange(false);
-              }}
-              disabled={hasError}
+              onClick={() => handleExport("pdf")}
+              disabled={hasError || isExporting}
             >
-              <FileText className="w-4 h-4 mr-2" />
-              {t("actions.export_pdf")}
+              {isExporting ? (
+                <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-white" />
+              ) : (
+                <FileText className="w-4 h-4 mr-2" />
+              )}
+              {isExporting ? "Exportando..." : t("actions.export_pdf")}
             </Button>
           </div>
         </div>
       </DialogContent>
     </Dialog>
+    </>
   );
 }

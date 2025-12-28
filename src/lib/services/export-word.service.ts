@@ -4,6 +4,8 @@ import {
   TextRun,
   AlignmentType,
   convertInchesToTwip,
+  LineRuleType,
+  PageOrientation,
 } from "docx";
 
 import type { ExportConfig } from "@/components/modals/export-preview-modal";
@@ -47,22 +49,29 @@ const getFontFamily = (fontValue: string): string => {
   return fontMap[fontValue] || "Times New Roman";
 };
 
-const getFontSize = (sizeValue: string): number => {
+const getFontSize = (sizeValue: number): number => {
   // Convert pt to half-points (Word uses half-points)
-  const size = parseInt(sizeValue);
-  return size * 2;
+  return sizeValue * 2;
+};
+
+const getLineSpacing = (lineSpacing: number): number => {
+  // Word uses a value where 240 = single spacing (1.0)
+  // So we multiply by 240 to get the correct value
+  return Math.round(lineSpacing * 240);
 };
 
 export async function generateChapterWord(
   chapterNumber: string,
   chapterTitle: string,
   content: string,
-  config: ExportConfig,
-  textAlignment: "left" | "center" | "right" | "justify" = "left"
+  config: ExportConfig
 ): Promise<Blob> {
   const margins = MARGIN_PRESETS[config.margins];
   const titleFont = getFontFamily(config.titleFont);
   const titleSize = getFontSize(config.titleSize);
+  const contentFont = getFontFamily(config.contentFont);
+  const contentSize = getFontSize(config.contentSize);
+  const lineSpacing = getLineSpacing(config.contentLineSpacing);
 
   // Map text alignment to Word alignment
   const getWordAlignment = (align: "left" | "center" | "right" | "justify") => {
@@ -104,17 +113,21 @@ export async function generateChapterWord(
         children: [
           new TextRun({
             text: line.trim().length === 0 ? " " : line,
-            font: "Times New Roman",
-            size: 24, // 12pt
+            font: contentFont,
+            size: contentSize,
           }),
         ],
-        alignment: getWordAlignment(textAlignment),
+        alignment: getWordAlignment(config.contentAlignment),
         spacing: {
-          line: 360, // 1.5 line spacing
+          line: lineSpacing,
+          lineRule: LineRuleType.AUTO, // Auto-adjust based on font size
           after: 0, // No extra space - spacing comes from line height only
         },
       })
   );
+
+  // Get page dimensions based on format
+  const pageFormat = PAGE_FORMATS[config.pageFormat];
 
   // Create the document
   const doc = new Document({
@@ -122,6 +135,11 @@ export async function generateChapterWord(
       {
         properties: {
           page: {
+            size: {
+              width: pageFormat.width,
+              height: pageFormat.height,
+              orientation: PageOrientation.PORTRAIT,
+            },
             margin: {
               top: margins.top,
               bottom: margins.bottom,

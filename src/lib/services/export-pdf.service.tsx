@@ -29,9 +29,10 @@ const getFontFamily = (fontValue: string): string => {
   return fontMap[fontValue] || "Times-Roman";
 };
 
-const createStyles = (config: ExportConfig, textAlignment: "left" | "center" | "right" | "justify" = "left") => {
+const createStyles = (config: ExportConfig) => {
   const margins = MARGIN_PRESETS[config.margins];
   const titleFontFamily = getFontFamily(config.titleFont);
+  const contentFontFamily = getFontFamily(config.contentFont);
 
   return StyleSheet.create({
     page: {
@@ -39,28 +40,28 @@ const createStyles = (config: ExportConfig, textAlignment: "left" | "center" | "
       paddingBottom: margins.bottom + 30, // Extra space for page numbers
       paddingLeft: margins.left,
       paddingRight: margins.right,
-      fontFamily: "Times-Roman",
-      fontSize: 12,
-      lineHeight: 1.5,
+      fontFamily: contentFontFamily,
+      fontSize: config.contentSize,
+      lineHeight: config.contentLineSpacing,
     },
     title: {
       fontFamily: titleFontFamily,
-      fontSize: parseInt(config.titleSize),
+      fontSize: config.titleSize,
       fontWeight: config.titleBold ? "bold" : "normal",
       textAlign: config.titleAlignment,
       marginBottom: 40,
     },
     paragraph: {
-      fontFamily: "Times-Roman",
-      fontSize: 12,
-      lineHeight: 1.5,
-      textAlign: textAlignment,
+      fontFamily: contentFontFamily,
+      fontSize: config.contentSize,
+      lineHeight: config.contentLineSpacing,
+      textAlign: config.contentAlignment,
       marginBottom: 0,
     },
     emptyLine: {
-      fontFamily: "Times-Roman",
-      fontSize: 12,
-      lineHeight: 1.5,
+      fontFamily: contentFontFamily,
+      fontSize: config.contentSize,
+      lineHeight: config.contentLineSpacing,
       marginBottom: 0,
     },
     pageNumber: {
@@ -80,7 +81,6 @@ interface ChapterPDFProps {
   chapterTitle: string;
   content: string;
   config: ExportConfig;
-  textAlignment?: "left" | "center" | "right" | "justify";
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -89,9 +89,8 @@ const ChapterPDF = ({
   chapterTitle,
   content,
   config,
-  textAlignment = "left",
 }: ChapterPDFProps) => {
-  const styles = createStyles(config, textAlignment);
+  const styles = createStyles(config);
 
   // Split content into paragraphs - each \n is a new line
   const lines = content.split("\n");
@@ -135,8 +134,7 @@ export async function generateChapterPDF(
   chapterTitle: string,
   content: string,
   config: ExportConfig,
-  _pages: PageContent[],
-  textAlignment: "left" | "center" | "right" | "justify" = "left"
+  _pages: PageContent[]
 ): Promise<Blob> {
   const doc = (
     <ChapterPDF
@@ -144,7 +142,6 @@ export async function generateChapterPDF(
       chapterTitle={chapterTitle}
       content={content}
       config={config}
-      textAlignment={textAlignment}
     />
   );
 

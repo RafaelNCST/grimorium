@@ -103,9 +103,8 @@ export function ChapterCard({
   const handleExportPDF = async (
     config: ExportConfig,
     content: string,
-    pages: PageContent[],
-    textAlignment: "left" | "center" | "right" | "justify"
-  ) => {
+    pages: PageContent[]
+  ): Promise<boolean> => {
     try {
       // Generate PDF blob
       const blob = await generateChapterPDF(
@@ -113,8 +112,7 @@ export function ChapterCard({
         chapter.title,
         content,
         config,
-        pages,
-        textAlignment
+        pages
       );
 
       // Convert blob to Uint8Array for Tauri
@@ -135,18 +133,20 @@ export function ChapterCard({
       if (filePath) {
         // Save file
         await writeFile(filePath, uint8Array);
+        return true; // Success
       }
+      return false; // User cancelled
     } catch (error) {
       console.error("Error exporting PDF:", error);
+      throw error; // Re-throw to let modal handle error feedback
     }
   };
 
   const handleExportWord = async (
     config: ExportConfig,
     content: string,
-    _pages: PageContent[],
-    textAlignment: "left" | "center" | "right" | "justify"
-  ) => {
+    _pages: PageContent[]
+  ): Promise<boolean> => {
     try {
       // Generate Word blob
       const { generateChapterWord } = await import(
@@ -156,8 +156,7 @@ export function ChapterCard({
         chapter.number.toString(),
         chapter.title,
         content,
-        config,
-        textAlignment
+        config
       );
 
       // Convert blob to Uint8Array for Tauri
@@ -178,9 +177,12 @@ export function ChapterCard({
       if (filePath) {
         // Save file
         await writeFile(filePath, uint8Array);
+        return true; // Success
       }
+      return false; // User cancelled
     } catch (error) {
       console.error("Error exporting Word:", error);
+      throw error; // Re-throw to let modal handle error feedback
     }
   };
 
