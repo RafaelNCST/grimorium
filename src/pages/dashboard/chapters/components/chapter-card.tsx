@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useParams } from "@tanstack/react-router";
 import { save } from "@tauri-apps/plugin-dialog";
 import { writeFile } from "@tauri-apps/plugin-fs";
 import {
@@ -33,6 +34,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { generateChapterPDF } from "@/lib/services/export-pdf.service";
+import { useBookEditorSettingsStore } from "@/stores/book-editor-settings-store";
 
 type ChapterStatus =
   | "draft"
@@ -93,8 +95,13 @@ export function ChapterCard({
   showStatus = true,
 }: ChapterCardProps) {
   const { t } = useTranslation("chapter-card");
+  const { dashboardId } = useParams({ strict: false });
+  const getBookSettings = useBookEditorSettingsStore((state) => state.getBookSettings);
   const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+
+  // Buscar configurações do editor para usar como padrões no modal de exportação
+  const editorSettings = dashboardId ? getBookSettings(dashboardId) : null;
 
   const handleExportClick = () => {
     setShowExportModal(true);
@@ -549,6 +556,9 @@ export function ChapterCard({
         chapterNumber={chapter.number.toString()}
         onExportPDF={handleExportPDF}
         onExportWord={handleExportWord}
+        initialContentFont={editorSettings?.fontFamily}
+        initialContentSize={editorSettings?.fontSize}
+        initialContentLineSpacing={editorSettings?.lineHeight}
       />
     </Card>
   );

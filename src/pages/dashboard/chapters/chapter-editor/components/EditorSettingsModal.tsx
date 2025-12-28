@@ -67,12 +67,12 @@ export function EditorSettingsModal({
   ];
 
   const handleFontSizeIncrement = () => {
-    const newSize = Math.min(100, settings.fontSize + 1);
+    const newSize = Math.min(24, settings.fontSize + 1);
     updateSetting("fontSize", newSize);
   };
 
   const handleFontSizeDecrement = () => {
-    const newSize = Math.max(1, settings.fontSize - 1);
+    const newSize = Math.max(8, settings.fontSize - 1);
     updateSetting("fontSize", newSize);
   };
 
@@ -257,12 +257,12 @@ export function EditorSettingsModal({
                       value={settings.fontSize}
                       onChange={(e) => {
                         const value = parseInt(e.target.value);
-                        if (!isNaN(value) && value >= 1 && value <= 100) {
+                        if (!isNaN(value) && value >= 8 && value <= 24) {
                           updateSetting("fontSize", value);
                         }
                       }}
-                      min={1}
-                      max={100}
+                      min={8}
+                      max={24}
                       className="flex-1 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     />
                     <div className="flex flex-col gap-0.5">
@@ -274,7 +274,7 @@ export function EditorSettingsModal({
                             size="sm"
                             onClick={handleFontSizeIncrement}
                             className="h-5 px-2"
-                            disabled={settings.fontSize >= 100}
+                            disabled={settings.fontSize >= 24}
                           >
                             <ChevronUp className="h-3 w-3" />
                           </Button>
@@ -295,7 +295,7 @@ export function EditorSettingsModal({
                             size="sm"
                             onClick={handleFontSizeDecrement}
                             className="h-5 px-2"
-                            disabled={settings.fontSize <= 1}
+                            disabled={settings.fontSize <= 8}
                           >
                             <ChevronDown className="h-3 w-3" />
                           </Button>

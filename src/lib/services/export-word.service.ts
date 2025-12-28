@@ -60,6 +60,25 @@ const getLineSpacing = (lineSpacing: number): number => {
   return Math.round(lineSpacing * 240);
 };
 
+function formatChapterTitle(
+  format: "number-colon-title" | "number-dash-title" | "title-only" | "number-only",
+  chapterNumber: string,
+  chapterTitle: string
+): string {
+  switch (format) {
+    case "number-colon-title":
+      return `Capítulo ${chapterNumber}: ${chapterTitle}`;
+    case "number-dash-title":
+      return `Capítulo ${chapterNumber} - ${chapterTitle}`;
+    case "title-only":
+      return chapterTitle;
+    case "number-only":
+      return `Capítulo ${chapterNumber}`;
+    default:
+      return `Capítulo ${chapterNumber}: ${chapterTitle}`;
+  }
+}
+
 export async function generateChapterWord(
   chapterNumber: string,
   chapterTitle: string,
@@ -74,8 +93,10 @@ export async function generateChapterWord(
   const lineSpacing = getLineSpacing(config.contentLineSpacing);
 
   // Map text alignment to Word alignment
-  const getWordAlignment = (align: "left" | "center" | "right" | "justify") => {
-    const alignmentMap = {
+  const getWordAlignment = (
+    align: "left" | "center" | "right" | "justify"
+  ): AlignmentType => {
+    const alignmentMap: Record<string, AlignmentType> = {
       left: AlignmentType.LEFT,
       center: AlignmentType.CENTER,
       right: AlignmentType.RIGHT,
@@ -91,7 +112,7 @@ export async function generateChapterWord(
   const titleParagraph = new Paragraph({
     children: [
       new TextRun({
-        text: `Capítulo ${chapterNumber}: ${chapterTitle}`,
+        text: formatChapterTitle(config.titleFormat, chapterNumber, chapterTitle),
         font: titleFont,
         size: titleSize,
         bold: config.titleBold,

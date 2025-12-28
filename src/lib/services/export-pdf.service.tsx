@@ -29,6 +29,25 @@ const getFontFamily = (fontValue: string): string => {
   return fontMap[fontValue] || "Times-Roman";
 };
 
+function formatChapterTitle(
+  format: "number-colon-title" | "number-dash-title" | "title-only" | "number-only",
+  chapterNumber: string,
+  chapterTitle: string
+): string {
+  switch (format) {
+    case "number-colon-title":
+      return `Capítulo ${chapterNumber}: ${chapterTitle}`;
+    case "number-dash-title":
+      return `Capítulo ${chapterNumber} - ${chapterTitle}`;
+    case "title-only":
+      return chapterTitle;
+    case "number-only":
+      return `Capítulo ${chapterNumber}`;
+    default:
+      return `Capítulo ${chapterNumber}: ${chapterTitle}`;
+  }
+}
+
 const createStyles = (config: ExportConfig) => {
   const margins = MARGIN_PRESETS[config.margins];
   const titleFontFamily = getFontFamily(config.titleFont);
@@ -103,7 +122,7 @@ const ChapterPDF = ({
       >
         {/* Title - only on first page */}
         <Text style={styles.title}>
-          Capítulo {chapterNumber}: {chapterTitle}
+          {formatChapterTitle(config.titleFormat, chapterNumber, chapterTitle)}
         </Text>
 
         {/* Content - render each line separately to match editor behavior */}

@@ -67,12 +67,13 @@ const FONT_FAMILIES = [
 
 // Font sizes - Ranges otimizados para manuscritos editoriais
 const TITLE_SIZE_RANGE = { min: 14, max: 28, default: 24 };
-const CONTENT_SIZE_RANGE = { min: 10, max: 16, default: 12 };
+const CONTENT_SIZE_RANGE = { min: 8, max: 24, default: 12 }; // Expandido para cobrir range do editor
 const LINE_SPACING_RANGE = { min: 1.0, max: 2.5, default: 2.0 };
 
 export interface ExportConfig {
   pageFormat: "a4" | "letter";
   margins: keyof typeof MARGIN_PRESETS;
+  titleFormat: "number-colon-title" | "number-dash-title" | "title-only" | "number-only";
   titleFont: string;
   titleSize: number;
   titleAlignment: "left" | "center";
@@ -83,7 +84,7 @@ export interface ExportConfig {
   contentFont: string;
   contentSize: number;
   contentLineSpacing: number;
-  contentAlignment: "left" | "justify";
+  contentAlignment: "left" | "center" | "right" | "justify";
 }
 
 export interface PageContent {
@@ -107,6 +108,10 @@ interface ExportPreviewModalProps {
     content: string,
     pages: PageContent[]
   ) => Promise<boolean>;
+  // Configurações iniciais do editor (opcionais)
+  initialContentFont?: string;
+  initialContentSize?: number;
+  initialContentLineSpacing?: number;
 }
 
 export function ExportPreviewModal({
@@ -117,6 +122,9 @@ export function ExportPreviewModal({
   chapterNumber,
   onExportPDF,
   onExportWord,
+  initialContentFont,
+  initialContentSize,
+  initialContentLineSpacing,
 }: ExportPreviewModalProps) {
   const { t } = useTranslation("export-preview");
   const [content, setContent] = useState<string>("");
@@ -133,16 +141,17 @@ export function ExportPreviewModal({
   const [config, setConfig] = useState<ExportConfig>({
     pageFormat: "a4",
     margins: "editorial",
+    titleFormat: "number-colon-title",
     titleFont: "Inter",
     titleSize: TITLE_SIZE_RANGE.default,
     titleAlignment: "center",
     titleBold: true,
     showPageNumbers: true,
     pageNumberPosition: "center",
-    // Configurações do corpo - padrões editoriais
-    contentFont: "Times New Roman",
-    contentSize: CONTENT_SIZE_RANGE.default,
-    contentLineSpacing: LINE_SPACING_RANGE.default,
+    // Configurações do corpo - usar do editor ou padrões editoriais
+    contentFont: initialContentFont || "Times New Roman",
+    contentSize: initialContentSize || CONTENT_SIZE_RANGE.default,
+    contentLineSpacing: initialContentLineSpacing || LINE_SPACING_RANGE.default,
     contentAlignment: "left",
   });
 
@@ -152,6 +161,7 @@ export function ExportPreviewModal({
 
     const loadContent = async () => {
       setIsLoading(true);
+      setHasError(false); // Reset error state when starting to load
       try {
         // Dynamically import to avoid circular dependencies
         const { getChapterById } = await import("@/lib/db/chapters.service");
@@ -173,6 +183,28 @@ export function ExportPreviewModal({
     loadContent();
   }, [open, chapterId]);
 
+  // Reset config with editor settings when modal opens
+  useEffect(() => {
+    if (!open) return;
+
+    setConfig({
+      pageFormat: "a4",
+      margins: "editorial",
+      titleFormat: "number-colon-title",
+      titleFont: "Inter",
+      titleSize: TITLE_SIZE_RANGE.default,
+      titleAlignment: "center",
+      titleBold: true,
+      showPageNumbers: true,
+      pageNumberPosition: "center",
+      // Configurações do corpo - usar do editor ou padrões editoriais
+      contentFont: initialContentFont || "Times New Roman",
+      contentSize: initialContentSize || CONTENT_SIZE_RANGE.default,
+      contentLineSpacing: initialContentLineSpacing || LINE_SPACING_RANGE.default,
+      contentAlignment: "left",
+    });
+  }, [open, initialContentFont, initialContentSize, initialContentLineSpacing]);
+
   // Calculate fixed container dimensions based on page format
   const containerDimensions = useMemo(() => {
     // Use a reasonable fixed width that fits the modal well
@@ -187,6 +219,9 @@ export function ExportPreviewModal({
   // Generate PDF preview when content or config changes (with debounce)
   useEffect(() => {
     if (!open) return;
+
+    // Wait for content to finish loading before checking if it's empty
+    if (isLoading) return;
 
     // Check if content is empty or just whitespace
     if (!content || content.trim() === "") {
@@ -248,7 +283,7 @@ export function ExportPreviewModal({
       // Note: We don't revoke the URL here as it might still be needed
       // URL cleanup happens when setting a new URL or on modal close
     };
-  }, [content, config, open, chapterNumber, chapterTitle]);
+  }, [content, config, open, chapterNumber, chapterTitle, isLoading]);
 
   // Cleanup PDF URL when modal closes
   useEffect(() => {
@@ -409,6 +444,39 @@ export function ExportPreviewModal({
                 </Label>
 
                 <div className="space-y-4">
+                  {/* Title Format */}
+                  <div className="space-y-2">
+                    <Label>Formato</Label>
+                    <Select
+                      value={config.titleFormat}
+                      onValueChange={(value) =>
+                        handleConfigChange(
+                          "titleFormat",
+                          value as "number-colon-title" | "number-dash-title" | "title-only" | "number-only"
+                        )
+                      }
+                      disabled={hasError}
+                    >
+                      <SelectTrigger disabled={hasError}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="number-colon-title">
+                          Capítulo 1: Título
+                        </SelectItem>
+                        <SelectItem value="number-dash-title">
+                          Capítulo 1 - Título
+                        </SelectItem>
+                        <SelectItem value="title-only">
+                          Título
+                        </SelectItem>
+                        <SelectItem value="number-only">
+                          Capítulo 1
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="space-y-2">
                     <Label>{t("settings.font")}</Label>
                     <Select
@@ -562,7 +630,7 @@ export function ExportPreviewModal({
                       }
                       min={LINE_SPACING_RANGE.min}
                       max={LINE_SPACING_RANGE.max}
-                      step={0.5}
+                      step={0.1}
                       disabled={hasError}
                       className="w-full"
                     />
@@ -582,16 +650,28 @@ export function ExportPreviewModal({
                       onValueChange={(value) =>
                         handleConfigChange(
                           "contentAlignment",
-                          value as "left" | "justify"
+                          value as "left" | "center" | "right" | "justify"
                         )
                       }
-                      className="flex gap-4"
+                      className="grid grid-cols-2 gap-3"
                       disabled={hasError}
                     >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="left" id="content-left" disabled={hasError} />
                         <Label htmlFor="content-left" className="cursor-pointer">
                           Esquerda
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="center" id="content-center" disabled={hasError} />
+                        <Label htmlFor="content-center" className="cursor-pointer">
+                          Centro
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="right" id="content-right" disabled={hasError} />
+                        <Label htmlFor="content-right" className="cursor-pointer">
+                          Direita
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
