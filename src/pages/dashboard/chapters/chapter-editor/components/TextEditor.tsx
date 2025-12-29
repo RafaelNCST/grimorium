@@ -85,12 +85,16 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     const isTypingRef = useRef(false);
     const localAnnotationUpdateRef = useRef(false);
     const isImmediateActionRef = useRef(false); // Track if next save should be immediate
+    const justExitedAnnotationRef = useRef(false); // Track if we just exited an annotation with space
+    const lastCursorPositionRef = useRef(0); // Track cursor position to detect moves
+    const lastContentLengthRef = useRef(0); // Track content length to detect action type
+    const lastActionTypeRef = useRef<'insert' | 'delete' | null>(null); // Track last action type
 
     // Undo/Redo functionality
-    // Initialize with empty state (will be populated on first edit)
-    const undoRedo = useUndoRedo("", {
-      maxHistorySize: 100,
-      debounceMs: 500, // 500ms debounce for continuous typing
+    // Initialize with current content and annotations
+    const undoRedo = useUndoRedo(content, annotations, {
+      maxHistorySize: 50, // Limit to 50 actions
+      debounceMs: 200, // 200ms debounce for continuous typing (fast response)
     });
 
     // Search functionality
@@ -115,6 +119,53 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         isImmediateActionRef.current = true;
       },
     }));
+
+    // Reset history when component unmounts (when exiting editor)
+    useEffect(() => {
+      return () => {
+        undoRedo.resetHistory("", []);
+      };
+    }, []);
+
+    // Detect cursor movement and flush pending state (VS Code-like behavior)
+    useEffect(() => {
+      const handleCursorMove = () => {
+        if (!editorRef.current) return;
+
+        const currentPos = getCurrentCursorPosition();
+        const lastPos = lastCursorPositionRef.current;
+
+        // If cursor moved non-adjacently (jumped), flush pending state
+        // Adjacent movement is: current = last + 1 or last - 1 (normal typing/deleting)
+        if (Math.abs(currentPos - lastPos) > 1) {
+          undoRedo.flush();
+        }
+
+        lastCursorPositionRef.current = currentPos;
+      };
+
+      const handleClick = () => {
+        handleCursorMove();
+      };
+
+      const handleKeyUp = (e: KeyboardEvent) => {
+        // Check for arrow keys, home, end, page up/down - these move cursor
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].includes(e.key)) {
+          handleCursorMove();
+        }
+      };
+
+      const editor = editorRef.current;
+      if (editor) {
+        editor.addEventListener('click', handleClick);
+        editor.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+          editor.removeEventListener('click', handleClick);
+          editor.removeEventListener('keyup', handleKeyUp);
+        };
+      }
+    }, [undoRedo]);
 
     // Handle keyboard shortcuts
     useEffect(() => {
@@ -483,22 +534,27 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         return;
       }
 
+      // Flush pending state before undo
+      undoRedo.flush();
+
       const previousState = undoRedo.undo();
       if (previousState && editorRef.current) {
         setIsUndoRedoAction(true);
 
-        // Restore HTML with formatting directly to the editor
-        editorRef.current.innerHTML = previousState.content;
+        // First, restore annotations so they're available when we render
+        onUpdateAnnotations(previousState.annotations);
 
-        // Extract plain text and notify parent
-        const plainText = editorRef.current.innerText;
+        // Then extract plain text and notify parent (this will trigger useEffect)
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = previousState.content;
+        const plainText = tempDiv.innerText;
         onContentChange(plainText);
 
-        // Restore cursor position after content updates
+        // Restore cursor position after React updates
         setTimeout(() => {
           restoreCursorPosition(previousState.cursorPosition);
           setIsUndoRedoAction(false);
-        }, 0);
+        }, 10);
       }
     };
 
@@ -508,22 +564,27 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         return;
       }
 
+      // Flush pending state before redo (just in case)
+      undoRedo.flush();
+
       const nextState = undoRedo.redo();
       if (nextState && editorRef.current) {
         setIsUndoRedoAction(true);
 
-        // Restore HTML with formatting directly to the editor
-        editorRef.current.innerHTML = nextState.content;
+        // First, restore annotations so they're available when we render
+        onUpdateAnnotations(nextState.annotations);
 
-        // Extract plain text and notify parent
-        const plainText = editorRef.current.innerText;
+        // Then extract plain text and notify parent (this will trigger useEffect)
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = nextState.content;
+        const plainText = tempDiv.innerText;
         onContentChange(plainText);
 
-        // Restore cursor position after content updates
+        // Restore cursor position after React updates
         setTimeout(() => {
           restoreCursorPosition(nextState.cursorPosition);
           setIsUndoRedoAction(false);
-        }, 0);
+        }, 10);
       }
     };
 
@@ -770,6 +831,20 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       setContextMenu(null);
 
       if (editorRef.current) {
+        // Detect action type change (VS Code-like behavior)
+        const newContentLength = editorRef.current.innerText.length;
+        const currentActionType: 'insert' | 'delete' = newContentLength > lastContentLengthRef.current ? 'insert' : 'delete';
+
+        // If action type changed (from insert to delete or vice versa), flush pending state
+        if (lastActionTypeRef.current !== null && lastActionTypeRef.current !== currentActionType) {
+          console.log('[UNDO] Action type changed:', lastActionTypeRef.current, '→', currentActionType, '- flushing');
+          undoRedo.flush();
+        }
+
+        // Update refs
+        lastContentLengthRef.current = newContentLength;
+        lastActionTypeRef.current = currentActionType;
+
         // SPECIAL FIX: Move trailing whitespace out of annotation spans
         // This allows users to "exit" annotations by typing space at the end
         const annotationSpansForWhitespace = editorRef.current.querySelectorAll('.annotation-highlight');
@@ -820,7 +895,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           if (!isUndoRedoAction) {
             const contentForHistory = getCleanHtmlContent();
             const cursorPos = getCurrentCursorPosition();
-            undoRedo.pushState(contentForHistory, cursorPos, false);
+            undoRedo.pushState(contentForHistory, cursorPos, annotations, false);
           }
 
           return; // Exit early - don't process annotations again
@@ -991,7 +1066,10 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         if (!isUndoRedoAction) {
           const cursorPos = getCurrentCursorPosition();
           const immediate = isImmediateActionRef.current;
-          undoRedo.pushState(contentForHistory, cursorPos, immediate);
+          undoRedo.pushState(contentForHistory, cursorPos, annotations, immediate);
+
+          // Update cursor position ref for tracking
+          lastCursorPositionRef.current = cursorPos;
 
           // Reset immediate flag after use
           if (immediate) {
