@@ -362,7 +362,13 @@
       "pt": "pt",
       "font_size_description": "Tamanho aplicado a todo o capítulo (1-100pt)",
       "line_height": "Altura da Linha",
-      "line_height_description": "Menor: 1.0 (compacto) - Padrão: 1.6 - Maior: 2.5 (espaçoso)"
+      "line_height_description": "Menor: 1.0 (compacto) - Padrão: 1.6 - Maior: 2.5 (espaçoso)",
+      "text_alignment": "Alinhamento do Texto",
+      "text_alignment_description": "Alinhamento aplicado a todos os capítulos do livro",
+      "align_left": "Esquerda",
+      "align_center": "Centro",
+      "align_right": "Direita",
+      "align_justify": "Justificado"
     },
     "visual_theme": {
       "description": "Ajuste as cores do editor para maior conforto",

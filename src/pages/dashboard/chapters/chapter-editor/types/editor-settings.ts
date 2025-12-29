@@ -8,6 +8,8 @@ export type CursorColor =
   | "purple"
   | "orange";
 
+export type TextAlignment = "left" | "center" | "right" | "justify";
+
 export interface EditorSettings {
   // Auto Scroll
   autoScrollMode: AutoScrollMode;
@@ -16,6 +18,7 @@ export interface EditorSettings {
   lineHeight: number;
   fontSize: number;
   fontFamily: string;
+  textAlignment: TextAlignment;
 
   // Visual Toggles
   showAnnotationHighlights: boolean;
@@ -37,6 +40,7 @@ export const DEFAULT_EDITOR_SETTINGS: EditorSettings = {
   lineHeight: 1.6,
   fontSize: 12,
   fontFamily: "Inter",
+  textAlignment: "left",
   showAnnotationHighlights: true,
   enableSpellCheck: true,
   showSummarySection: true,

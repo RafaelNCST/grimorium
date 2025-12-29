@@ -85,8 +85,6 @@ export interface EntityMention {
   parentName?: string;
 }
 
-export type TextAlignment = "left" | "center" | "right" | "justify";
-
 export interface ChapterData {
   id: string;
   chapterNumber: string;
@@ -95,7 +93,6 @@ export interface ChapterData {
   plotArcId?: string;
   summary: string;
   content: string;
-  textAlignment?: TextAlignment;
   wordCount: number;
   characterCount: number;
   characterCountWithSpaces?: number;

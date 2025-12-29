@@ -1,4 +1,12 @@
-import { Settings, ChevronUp, ChevronDown } from "lucide-react";
+import {
+  Settings,
+  ChevronUp,
+  ChevronDown,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -34,6 +42,7 @@ import type {
   EditorSettings,
   AutoScrollMode,
   CursorColor,
+  TextAlignment,
 } from "../types/editor-settings";
 
 interface EditorSettingsModalProps {
@@ -341,6 +350,88 @@ export function EditorSettingsModal({
               <p className="text-xs text-muted-foreground">
                 {t("editor_settings_modal.typography.line_height_description")}
               </p>
+            </div>
+
+            {/* Text Alignment */}
+            <div className="space-y-3">
+              <div>
+                <Label className="text-base font-semibold">
+                  {t("editor_settings_modal.typography.text_alignment")}
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  {t("editor_settings_modal.typography.text_alignment_description")}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => updateSetting("textAlignment", "left")}
+                  className={`
+                    flex items-center gap-2 p-2.5 rounded-lg border-2 transition-all
+                    ${
+                      settings.textAlignment === "left"
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50 hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <AlignLeft className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-sm font-medium">
+                    {t("editor_settings_modal.typography.align_left")}
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => updateSetting("textAlignment", "center")}
+                  className={`
+                    flex items-center gap-2 p-2.5 rounded-lg border-2 transition-all
+                    ${
+                      settings.textAlignment === "center"
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50 hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <AlignCenter className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-sm font-medium">
+                    {t("editor_settings_modal.typography.align_center")}
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => updateSetting("textAlignment", "right")}
+                  className={`
+                    flex items-center gap-2 p-2.5 rounded-lg border-2 transition-all
+                    ${
+                      settings.textAlignment === "right"
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50 hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <AlignRight className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-sm font-medium">
+                    {t("editor_settings_modal.typography.align_right")}
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => updateSetting("textAlignment", "justify")}
+                  className={`
+                    flex items-center gap-2 p-2.5 rounded-lg border-2 transition-all
+                    ${
+                      settings.textAlignment === "justify"
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50 hover:bg-muted/50"
+                    }
+                  `}
+                >
+                  <AlignJustify className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-sm font-medium">
+                    {t("editor_settings_modal.typography.align_justify")}
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
 

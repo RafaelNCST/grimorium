@@ -3,10 +3,6 @@ import React, { useState } from "react";
 import {
   Bold,
   Italic,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
   Undo,
   Redo,
   Check,
@@ -41,13 +37,12 @@ import type { IPlotArc } from "@/types/plot-types";
 
 import { useFormatState } from "../hooks/useFormatState";
 
-import type { ChapterStatus, TextAlignment } from "../types";
+import type { ChapterStatus } from "../types";
 
 interface FormattingToolbarProps {
   onFormat: (command: string, value?: string) => void;
   status: ChapterStatus;
   onStatusChange: (status: ChapterStatus) => void;
-  textAlignment?: TextAlignment;
   plotArcId?: string;
   availableArcs: IPlotArc[];
   onPlotArcChange: (arcId: string | undefined) => void;
@@ -73,7 +68,6 @@ export function FormattingToolbar({
   onFormat,
   status,
   onStatusChange,
-  textAlignment = "left",
   plotArcId,
   availableArcs,
   onPlotArcChange,
@@ -183,84 +177,6 @@ export function FormattingToolbar({
               </TooltipTrigger>
               <TooltipContent>
                 <p>{t("formatting_tooltips.italic")}</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Separator orientation="vertical" className="h-6 mx-1" />
-
-            {/* Alignment */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onFormat("justifyLeft")}
-                  className={cn(
-                    "h-8 w-8 p-0",
-                    textAlignment === "left" && "bg-accent text-accent-foreground"
-                  )}
-                >
-                  <AlignLeft className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{t("formatting_tooltips.align_left")}</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onFormat("justifyCenter")}
-                  className={cn(
-                    "h-8 w-8 p-0",
-                    textAlignment === "center" &&
-                      "bg-accent text-accent-foreground"
-                  )}
-                >
-                  <AlignCenter className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{t("formatting_tooltips.align_center")}</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onFormat("justifyRight")}
-                  className={cn(
-                    "h-8 w-8 p-0",
-                    textAlignment === "right" && "bg-accent text-accent-foreground"
-                  )}
-                >
-                  <AlignRight className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{t("formatting_tooltips.align_right")}</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onFormat("justifyFull")}
-                  className={cn(
-                    "h-8 w-8 p-0",
-                    textAlignment === "justify" &&
-                      "bg-accent text-accent-foreground"
-                  )}
-                >
-                  <AlignJustify className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{t("formatting_tooltips.justify")}</p>
               </TooltipContent>
             </Tooltip>
 

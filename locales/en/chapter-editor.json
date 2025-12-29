@@ -362,7 +362,13 @@
       "pt": "pt",
       "font_size_description": "Size applied to entire chapter (1-100pt)",
       "line_height": "Line Height",
-      "line_height_description": "Smaller: 1.0 (compact) - Default: 1.6 - Larger: 2.5 (spacious)"
+      "line_height_description": "Smaller: 1.0 (compact) - Default: 1.6 - Larger: 2.5 (spacious)",
+      "text_alignment": "Text Alignment",
+      "text_alignment_description": "Alignment applied to all chapters in the book",
+      "align_left": "Left",
+      "align_center": "Center",
+      "align_right": "Right",
+      "align_justify": "Justify"
     },
     "visual_theme": {
       "description": "Adjust editor colors for greater comfort",

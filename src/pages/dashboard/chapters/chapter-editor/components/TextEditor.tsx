@@ -32,7 +32,6 @@ export interface TextEditorRef {
 
 interface TextEditorProps {
   content: string;
-  textAlignment?: TextAlignment;
   annotations: Annotation[];
   selectedAnnotationId?: string;
   summarySection?: React.ReactNode;
@@ -55,7 +54,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
   (
     {
       content,
-      textAlignment = "left",
       annotations,
       selectedAnnotationId,
       summarySection,
@@ -1295,7 +1293,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
                   color: "#000000",
                   minHeight: "calc(100vh - 200px)",
                   caretColor: cursorColor,
-                  textAlign: textAlignment,
+                  textAlign: settings?.textAlignment || "left",
                   // Add extra padding at bottom based on auto-scroll mode
                   paddingBottom:
                     settings?.autoScrollMode === "center"
