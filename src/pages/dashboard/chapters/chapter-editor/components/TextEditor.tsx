@@ -81,7 +81,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       y: number;
       hasSelection: boolean;
     } | null>(null);
-    const [isUndoRedoAction, setIsUndoRedoAction] = useState(false);
+    const isUndoRedoActionRef = useRef(false); // Use ref instead of state to avoid re-renders
     const isTypingRef = useRef(false);
     const localAnnotationUpdateRef = useRef(false);
     const isImmediateActionRef = useRef(false); // Track if next save should be immediate
@@ -346,6 +346,11 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     useEffect(() => {
       if (!editorRef.current) return;
 
+      // Skip re-rendering during undo/redo (we restore HTML directly)
+      if (isUndoRedoActionRef.current) {
+        return;
+      }
+
       // Skip re-rendering if user is typing (avoid flickering and annotation jumps)
       if (isTypingRef.current) {
         isTypingRef.current = false;
@@ -539,22 +544,27 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
       const previousState = undoRedo.undo();
       if (previousState && editorRef.current) {
-        setIsUndoRedoAction(true);
+        // Set flag to prevent re-renders
+        isUndoRedoActionRef.current = true;
 
-        // First, restore annotations so they're available when we render
+        // Restore HTML content directly to preserve formatting (bold, italic, etc.)
+        editorRef.current.innerHTML = previousState.content;
+
+        // Extract plain text and notify parent (this will trigger useEffect but it will be skipped)
+        const plainText = editorRef.current.innerText;
+
+        // Update annotations and content
         onUpdateAnnotations(previousState.annotations);
-
-        // Then extract plain text and notify parent (this will trigger useEffect)
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = previousState.content;
-        const plainText = tempDiv.innerText;
         onContentChange(plainText);
 
-        // Restore cursor position after React updates
-        setTimeout(() => {
+        // Restore cursor position and reset flag after all renders complete
+        requestAnimationFrame(() => {
           restoreCursorPosition(previousState.cursorPosition);
-          setIsUndoRedoAction(false);
-        }, 10);
+          // Keep flag active a bit longer to ensure all re-renders are skipped
+          requestAnimationFrame(() => {
+            isUndoRedoActionRef.current = false;
+          });
+        });
       }
     };
 
@@ -569,22 +579,27 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
       const nextState = undoRedo.redo();
       if (nextState && editorRef.current) {
-        setIsUndoRedoAction(true);
+        // Set flag to prevent re-renders
+        isUndoRedoActionRef.current = true;
 
-        // First, restore annotations so they're available when we render
+        // Restore HTML content directly to preserve formatting (bold, italic, etc.)
+        editorRef.current.innerHTML = nextState.content;
+
+        // Extract plain text and notify parent (this will trigger useEffect but it will be skipped)
+        const plainText = editorRef.current.innerText;
+
+        // Update annotations and content
         onUpdateAnnotations(nextState.annotations);
-
-        // Then extract plain text and notify parent (this will trigger useEffect)
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = nextState.content;
-        const plainText = tempDiv.innerText;
         onContentChange(plainText);
 
-        // Restore cursor position after React updates
-        setTimeout(() => {
+        // Restore cursor position and reset flag after all renders complete
+        requestAnimationFrame(() => {
           restoreCursorPosition(nextState.cursorPosition);
-          setIsUndoRedoAction(false);
-        }, 10);
+          // Keep flag active a bit longer to ensure all re-renders are skipped
+          requestAnimationFrame(() => {
+            isUndoRedoActionRef.current = false;
+          });
+        });
       }
     };
 
@@ -1063,7 +1078,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
         // Add to undo/redo history (if not currently doing undo/redo)
         // Save HTML with formatting, not just plain text
-        if (!isUndoRedoAction) {
+        if (!isUndoRedoActionRef.current) {
           const cursorPos = getCurrentCursorPosition();
           const immediate = isImmediateActionRef.current;
           undoRedo.pushState(contentForHistory, cursorPos, annotations, immediate);
