@@ -81,20 +81,18 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       y: number;
       hasSelection: boolean;
     } | null>(null);
-    const isUndoRedoActionRef = useRef(false); // Use ref instead of state to avoid re-renders
+    const isUndoRedoActionRef = useRef(false);
     const isTypingRef = useRef(false);
     const localAnnotationUpdateRef = useRef(false);
-    const isImmediateActionRef = useRef(false); // Track if next save should be immediate
-    const justExitedAnnotationRef = useRef(false); // Track if we just exited an annotation with space
-    const lastCursorPositionRef = useRef(0); // Track cursor position to detect moves
-    const lastContentLengthRef = useRef(0); // Track content length to detect action type
-    const lastActionTypeRef = useRef<'insert' | 'delete' | null>(null); // Track last action type
+    const isImmediateActionRef = useRef(false);
+    const justExitedAnnotationRef = useRef(false);
+    const lastCursorPositionRef = useRef(0);
+    const lastContentLengthRef = useRef(0);
+    const lastActionTypeRef = useRef<'insert' | 'delete' | null>(null);
 
-    // Undo/Redo functionality
-    // Initialize with current content and annotations
     const undoRedo = useUndoRedo(content, annotations, {
-      maxHistorySize: 50, // Limit to 50 actions
-      debounceMs: 200, // 200ms debounce for continuous typing (fast response)
+      maxHistorySize: 50,
+      debounceMs: 200,
     });
 
     // Search functionality
@@ -120,14 +118,22 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       },
     }));
 
-    // Reset history when component unmounts (when exiting editor)
+    useEffect(() => {
+      requestAnimationFrame(() => {
+        if (editorRef.current) {
+          const initialHtml = editorRef.current.innerHTML;
+          const cursorPos = editorRef.current.innerText.length;
+          undoRedo.resetHistory(initialHtml, annotations, cursorPos);
+        }
+      });
+    }, []);
+
     useEffect(() => {
       return () => {
         undoRedo.resetHistory("", []);
       };
     }, []);
 
-    // Detect cursor movement and flush pending state (VS Code-like behavior)
     useEffect(() => {
       const handleCursorMove = () => {
         if (!editorRef.current) return;
@@ -135,8 +141,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         const currentPos = getCurrentCursorPosition();
         const lastPos = lastCursorPositionRef.current;
 
-        // If cursor moved non-adjacently (jumped), flush pending state
-        // Adjacent movement is: current = last + 1 or last - 1 (normal typing/deleting)
         if (Math.abs(currentPos - lastPos) > 1) {
           undoRedo.flush();
         }
@@ -149,7 +153,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       };
 
       const handleKeyUp = (e: KeyboardEvent) => {
-        // Check for arrow keys, home, end, page up/down - these move cursor
         if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].includes(e.key)) {
           handleCursorMove();
         }
@@ -167,53 +170,38 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       }
     }, [undoRedo]);
 
-    // Handle keyboard shortcuts
     useEffect(() => {
       const handleKeyDown = (e: KeyboardEvent) => {
-        // Ctrl+B / Cmd+B for bold (mark as immediate)
         if ((e.ctrlKey || e.metaKey) && e.key === "b") {
           isImmediateActionRef.current = true;
-          // Let browser handle the bold command
         }
 
-        // Ctrl+I / Cmd+I for italic (mark as immediate)
         if ((e.ctrlKey || e.metaKey) && e.key === "i") {
           isImmediateActionRef.current = true;
-          // Let browser handle the italic command
         }
 
-        // Ctrl+F / Cmd+F to open search
         if ((e.ctrlKey || e.metaKey) && e.key === "f") {
           e.preventDefault();
-
-          // Get selected text
           const selection = window.getSelection();
           const selectedText = selection?.toString().trim() || "";
           setSelectedSearchText(selectedText);
-
           search.openSearch();
         }
 
-        // Ctrl+M / Cmd+M to create annotation
         if ((e.ctrlKey || e.metaKey) && e.key === "m") {
           e.preventDefault();
-
-          // Get selected text
           const selection = window.getSelection();
           const selectedText = selection?.toString().trim() || "";
-
           if (selectedText) {
             onCreateAnnotation();
           }
         }
 
-        // Ctrl+Z / Cmd+Z to undo
         if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
           e.preventDefault();
           handleUndo();
         }
 
-        // Ctrl+Y / Cmd+Shift+Z to redo
         if (
           ((e.ctrlKey || e.metaKey) && e.key === "y") ||
           ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "z")
@@ -227,14 +215,11 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       return () => window.removeEventListener("keydown", handleKeyDown);
     }, [search, onCreateAnnotation]);
 
-    // Clear selected search text when search closes
     useEffect(() => {
       if (!search.isSearchOpen) {
         setSelectedSearchText("");
       }
     }, [search.isSearchOpen]);
-
-    // Handle replace and update content
     const handleReplaceCurrent = () => {
       const newContent = search.replaceCurrent();
       if (newContent) {
@@ -249,23 +234,18 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       }
     };
 
-    // Escape HTML to prevent XSS
     const escapeHtml = (text: string) => {
       const div = document.createElement("div");
       div.textContent = text;
       return div.innerHTML;
     };
 
-    // Render content with annotations and search highlights
     const renderContentWithAnnotations = (
       annotationsToRender?: Annotation[]
     ) => {
       if (!content) return "";
 
-      // Use provided annotations or default to prop
       const currentAnnotations = annotationsToRender || annotations;
-
-      // Combine annotations and search results
       const allHighlights: Array<{
         start: number;
         end: number;
@@ -283,7 +263,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         });
       });
 
-      // Add search results
       search.results.forEach((result, index) => {
         allHighlights.push({
           start: result.start,
@@ -292,21 +271,16 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         });
       });
 
-      // Sort by start position
       allHighlights.sort((a, b) => a.start - b.start);
 
       let result = "";
       let lastIndex = 0;
 
       allHighlights.forEach((highlight) => {
-        // Skip if this highlight starts before lastIndex (already covered)
         if (highlight.start < lastIndex) return;
 
-        // Add text before highlight
         const beforeText = content.substring(lastIndex, highlight.start);
         result += escapeHtml(beforeText);
-
-        // Add highlighted text with appropriate class
         const highlightedText = content.substring(
           highlight.start,
           highlight.end
@@ -314,10 +288,8 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
         if (highlight.type === "annotation") {
           const isSelected = highlight.id === selectedAnnotationId;
-
-          // Get annotation to access its color
           const annotation = currentAnnotations.find((a) => a.id === highlight.id);
-          const color = annotation?.color || "purple"; // Default to purple
+          const color = annotation?.color || "purple";
           const colorStyle = ANNOTATION_COLORS[color];
           const backgroundColor = isSelected ? colorStyle.strong : colorStyle.weak;
 
@@ -331,33 +303,27 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         lastIndex = highlight.end;
       });
 
-      // Add remaining text after last highlight
       if (lastIndex < content.length) {
         result += escapeHtml(content.substring(lastIndex));
       }
 
-      // Convert newlines to <br> tags for proper display
       result = result.replace(/\n/g, "<br>");
 
       return result;
     };
 
-    // Update editor content when content, annotations, or search results change
     useEffect(() => {
       if (!editorRef.current) return;
 
-      // Skip re-rendering during undo/redo (we restore HTML directly)
       if (isUndoRedoActionRef.current) {
         return;
       }
 
-      // Skip re-rendering if user is typing (avoid flickering and annotation jumps)
       if (isTypingRef.current) {
         isTypingRef.current = false;
         return;
       }
 
-      // Skip re-rendering if annotations were updated locally during typing
       if (localAnnotationUpdateRef.current) {
         localAnnotationUpdateRef.current = false;
         return;
@@ -365,7 +331,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
       const renderedContent = renderContentWithAnnotations();
       if (editorRef.current.innerHTML !== renderedContent) {
-        // Save cursor position
         const selection = window.getSelection();
         let cursorPosition = 0;
 
@@ -376,7 +341,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         ) {
           const range = selection.getRangeAt(0);
 
-          // Calculate cursor position by walking through nodes and counting BRs
           const walker = document.createTreeWalker(
             editorRef.current,
             NodeFilter.SHOW_ALL,
@@ -392,20 +356,16 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
           let node;
           while ((node = walker.nextNode())) {
-            // Check if we've reached the container node
             if (node === range.endContainer) {
-              // We've reached the cursor position
               if (node.nodeType === Node.TEXT_NODE) {
                 cursorPosition += range.endOffset;
               }
               break;
             }
 
-            // Check if the cursor is in a parent element (like the editor div itself)
             if (range.endContainer.nodeType === Node.ELEMENT_NODE) {
               const containerElement = range.endContainer as Element;
               if (node.parentNode === containerElement) {
-                // Check if this node is before the cursor offset
                 const nodeIndex = Array.from(
                   containerElement.childNodes
                 ).indexOf(node as ChildNode);
@@ -415,7 +375,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
               }
             }
 
-            // Count this node
             if (node.nodeName === "BR") {
               cursorPosition += 1;
             } else if (node.nodeType === Node.TEXT_NODE) {
@@ -426,10 +385,8 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
         editorRef.current.innerHTML = renderedContent;
 
-        // Restore cursor position
         if (cursorPosition > 0) {
           try {
-            // Get all nodes including text nodes and BR elements
             const walker = document.createTreeWalker(
               editorRef.current,
               NodeFilter.SHOW_ALL,
@@ -450,10 +407,8 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
             while ((node = walker.nextNode())) {
               if (node.nodeName === "BR") {
-                // BR represents a newline character
                 currentLength += 1;
                 if (currentLength >= cursorPosition) {
-                  // Position cursor after the BR
                   targetNode = node.nextSibling || node;
                   targetOffset = 0;
                   break;
@@ -478,16 +433,13 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
                 range.setStart(targetNode, targetOffset);
                 range.setEnd(targetNode, targetOffset);
               } else {
-                // Position before the node
                 range.setStartBefore(targetNode);
                 range.setEndBefore(targetNode);
               }
               selection?.removeAllRanges();
               selection?.addRange(range);
             }
-          } catch (_e) {
-            // Ignore cursor restoration errors
-          }
+          } catch (_e) {}
         }
       }
     }, [
@@ -506,7 +458,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         );
 
         if (annotationSpan) {
-          // Scroll the container to show the annotation
           annotationSpan.scrollIntoView({
             behavior: "smooth",
             block: "center",
@@ -515,7 +466,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       }
     }, [scrollToAnnotation]);
 
-    // Scroll to current search result
     useEffect(() => {
       if (search.currentResult && editorRef.current && containerRef.current) {
         const searchSpans = editorRef.current.querySelectorAll(
@@ -532,35 +482,26 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       }
     }, [search.currentResult, search.currentIndex]);
 
-    // Undo/Redo handlers
     const handleUndo = () => {
       if (externalOnUndo) {
         externalOnUndo();
         return;
       }
 
-      // Flush pending state before undo
       undoRedo.flush();
 
       const previousState = undoRedo.undo();
       if (previousState && editorRef.current) {
-        // Set flag to prevent re-renders
         isUndoRedoActionRef.current = true;
 
-        // Restore HTML content directly to preserve formatting (bold, italic, etc.)
         editorRef.current.innerHTML = previousState.content;
-
-        // Extract plain text and notify parent (this will trigger useEffect but it will be skipped)
         const plainText = editorRef.current.innerText;
 
-        // Update annotations and content
         onUpdateAnnotations(previousState.annotations);
         onContentChange(plainText);
 
-        // Restore cursor position and reset flag after all renders complete
         requestAnimationFrame(() => {
           restoreCursorPosition(previousState.cursorPosition);
-          // Keep flag active a bit longer to ensure all re-renders are skipped
           requestAnimationFrame(() => {
             isUndoRedoActionRef.current = false;
           });
@@ -574,28 +515,20 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         return;
       }
 
-      // Flush pending state before redo (just in case)
       undoRedo.flush();
 
       const nextState = undoRedo.redo();
       if (nextState && editorRef.current) {
-        // Set flag to prevent re-renders
         isUndoRedoActionRef.current = true;
 
-        // Restore HTML content directly to preserve formatting (bold, italic, etc.)
         editorRef.current.innerHTML = nextState.content;
-
-        // Extract plain text and notify parent (this will trigger useEffect but it will be skipped)
         const plainText = editorRef.current.innerText;
 
-        // Update annotations and content
         onUpdateAnnotations(nextState.annotations);
         onContentChange(plainText);
 
-        // Restore cursor position and reset flag after all renders complete
         requestAnimationFrame(() => {
           restoreCursorPosition(nextState.cursorPosition);
-          // Keep flag active a bit longer to ensure all re-renders are skipped
           requestAnimationFrame(() => {
             isUndoRedoActionRef.current = false;
           });
@@ -603,7 +536,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       }
     };
 
-    // Helper to perform auto-scroll based on settings
     const performAutoScroll = (forceScroll: boolean = false) => {
       if (
         settings?.autoScrollMode === "off" ||
@@ -615,7 +547,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
       const isAtEnd = isCursorAtEnd();
 
-      // Only auto-scroll if cursor is at the end, unless forced
       if (!forceScroll && !isAtEnd) {
         return;
       }
@@ -630,36 +561,27 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         const rect = range.getBoundingClientRect();
 
         if (settings?.autoScrollMode === "center") {
-          // Typewriter mode: keep cursor centered in the viewport
           const STATS_BAR_HEIGHT = 38;
-          const ADJUSTMENT = 20; // Small adjustment to center more accurately
+          const ADJUSTMENT = 20;
 
-          // Calculate center position of viewport (excluding stats bar at bottom)
           const viewportHeight = window.innerHeight;
           const usableHeight = viewportHeight - STATS_BAR_HEIGHT;
           const targetY = usableHeight / 2 + ADJUSTMENT;
 
-          // Get cursor position in viewport
           const cursorY = rect.top;
           const scrollAmount = cursorY - targetY;
 
-          // Always scroll to keep cursor centered (typewriter effect)
           containerRef.current.scrollBy({
             top: scrollAmount,
             behavior: "smooth",
           });
         } else if (settings?.autoScrollMode === "near-end") {
-          // Near-end mode: keep cursor visible just above StatsBar (fixed at bottom)
           const STATS_BAR_HEIGHT = 38;
-          const BUFFER = 20; // Small buffer to keep cursor close to status bar
+          const BUFFER = 20;
 
-          // Calculate threshold: viewport height - stats bar - buffer
           const threshold = window.innerHeight - STATS_BAR_HEIGHT - BUFFER;
-
-          // Use bottom of cursor rect (end of line)
           const cursorBottom = rect.bottom;
 
-          // If cursor bottom is below threshold, scroll to keep it visible
           if (cursorBottom > threshold) {
             const scrollAmount = cursorBottom - threshold;
             containerRef.current.scrollBy({
@@ -671,7 +593,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       }, 20);
     };
 
-    // Helper to restore cursor position
     const restoreCursorPosition = (position: number) => {
       if (!editorRef.current) return;
 
@@ -679,7 +600,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         const selection = window.getSelection();
         if (!selection) return;
 
-        // Get all nodes including text nodes and BR elements
         const walker = document.createTreeWalker(
           editorRef.current,
           NodeFilter.SHOW_ALL,
@@ -700,10 +620,8 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
         while ((node = walker.nextNode())) {
           if (node.nodeName === "BR") {
-            // BR represents a newline character
             currentLength += 1;
             if (currentLength >= position) {
-              // Position cursor after the BR
               targetNode = node.nextSibling || node;
               targetOffset = 0;
               break;
@@ -725,19 +643,15 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
             range.setStart(targetNode, targetOffset);
             range.setEnd(targetNode, targetOffset);
           } else {
-            // Position before the node
             range.setStartBefore(targetNode);
             range.setEndBefore(targetNode);
           }
           selection.removeAllRanges();
           selection.addRange(range);
         }
-      } catch (_e) {
-        // Ignore cursor restoration errors
-      }
+      } catch (_e) {}
     };
 
-    // Get current cursor position
     const getCurrentCursorPosition = (): number => {
       if (!editorRef.current) return 0;
 
@@ -747,7 +661,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
         const range = selection.getRangeAt(0);
 
-        // Calculate cursor position by walking through nodes and counting BRs
         const walker = document.createTreeWalker(
           editorRef.current,
           NodeFilter.SHOW_ALL,
@@ -765,20 +678,16 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         let node;
 
         while ((node = walker.nextNode())) {
-          // Check if we've reached the container node
           if (node === range.endContainer) {
-            // We've reached the cursor position
             if (node.nodeType === Node.TEXT_NODE) {
               cursorPosition += range.endOffset;
             }
             break;
           }
 
-          // Check if the cursor is in a parent element (like the editor div itself)
           if (range.endContainer.nodeType === Node.ELEMENT_NODE) {
             const containerElement = range.endContainer as Element;
             if (node.parentNode === containerElement) {
-              // Check if this node is before the cursor offset
               const nodeIndex = Array.from(containerElement.childNodes).indexOf(
                 node as ChildNode
               );
@@ -788,7 +697,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
             }
           }
 
-          // Count this node
           if (node.nodeName === "BR") {
             cursorPosition += 1;
           } else if (node.nodeType === Node.TEXT_NODE) {
@@ -802,7 +710,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       }
     };
 
-    // Check if cursor is at the end of the content (last position)
     const isCursorAtEnd = (): boolean => {
       if (!editorRef.current) return false;
 
@@ -810,28 +717,23 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         const currentPosition = getCurrentCursorPosition();
         const totalLength = editorRef.current.innerText.length;
 
-        // Cursor is at the end if position equals total length, or 1 character before
-        // (happens during typing when content updates before cursor position)
         return totalLength - currentPosition <= 1;
       } catch (_e) {
         return false;
       }
     };
 
-    // Get HTML content with formatting but without annotation/search highlights
     const getCleanHtmlContent = (): string => {
       if (!editorRef.current) return "";
 
       const clone = editorRef.current.cloneNode(true) as HTMLElement;
 
-      // Remove annotation highlights
       const annotationSpans = clone.querySelectorAll(".annotation-highlight");
       annotationSpans.forEach((span) => {
         const textNode = document.createTextNode(span.textContent || "");
         span.parentNode?.replaceChild(textNode, span);
       });
 
-      // Remove search highlights
       const searchSpans = clone.querySelectorAll(".search-highlight");
       searchSpans.forEach((span) => {
         const textNode = document.createTextNode(span.textContent || "");
@@ -846,17 +748,13 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       setContextMenu(null);
 
       if (editorRef.current) {
-        // Detect action type change (VS Code-like behavior)
         const newContentLength = editorRef.current.innerText.length;
         const currentActionType: 'insert' | 'delete' = newContentLength > lastContentLengthRef.current ? 'insert' : 'delete';
 
-        // If action type changed (from insert to delete or vice versa), flush pending state
         if (lastActionTypeRef.current !== null && lastActionTypeRef.current !== currentActionType) {
-          console.log('[UNDO] Action type changed:', lastActionTypeRef.current, '→', currentActionType, '- flushing');
           undoRedo.flush();
         }
 
-        // Update refs
         lastContentLengthRef.current = newContentLength;
         lastActionTypeRef.current = currentActionType;
 
@@ -907,8 +805,9 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           isTypingRef.current = true;
 
           // Add to undo/redo history
-          if (!isUndoRedoAction) {
-            const contentForHistory = getCleanHtmlContent();
+          if (!isUndoRedoActionRef.current) {
+            // Save full HTML with formatting AND annotations
+            const contentForHistory = editorRef.current.innerHTML;
             const cursorPos = getCurrentCursorPosition();
             undoRedo.pushState(contentForHistory, cursorPos, annotations, false);
           }
@@ -945,8 +844,8 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           }
         });
 
-        // Get HTML with formatting (for undo/redo) but remove annotation spans
-        const contentForHistory = getCleanHtmlContent();
+        // Get full HTML with formatting AND annotations for undo/redo
+        const contentForHistory = editorRef.current.innerHTML;
 
         // Extract plain text content (removes HTML tags) for onChange
         const newContent = editorRef.current.innerText;
