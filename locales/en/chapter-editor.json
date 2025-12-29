@@ -55,7 +55,19 @@
     "all_annotations_title": "All Annotations",
     "no_annotations": "No annotations yet",
     "navigate_to_text": "Navigate to text",
-    "selected_text": "Selected text"
+    "selected_text": "Selected text",
+    "color_label": "Highlight color:",
+    "choose_color": "Choose",
+    "close_picker": "Close",
+    "color_tone_tooltip": "Weak and strong tone of {{color}}"
+  },
+  "annotation_colors": {
+    "purple": "Purple",
+    "blue": "Blue",
+    "green": "Green",
+    "yellow": "Yellow",
+    "orange": "Orange",
+    "pink": "Pink"
   },
   "stats": {
     "words": "words",

@@ -31,6 +31,19 @@ export function AllAnnotationsSidebar({
     onNavigateToAnnotation(annotationId);
   };
 
+  // Sort annotations: those with important notes first, then by creation date (newest first)
+  const sortedAnnotations = [...annotations].sort((a, b) => {
+    const aHasImportant = a.notes.some((n) => n.isImportant);
+    const bHasImportant = b.notes.some((n) => n.isImportant);
+
+    // Annotations with important notes come first
+    if (aHasImportant && !bHasImportant) return -1;
+    if (!aHasImportant && bHasImportant) return 1;
+
+    // If both have important notes or both don't, sort by creation date (newest first)
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
   return (
     <TooltipProvider delayDuration={300}>
       <div
@@ -72,10 +85,17 @@ export function AllAnnotationsSidebar({
         ) : (
           <ScrollArea className="flex-1">
             <div className="p-4 space-y-3">
-              {annotations.map((annotation) => {
+              {sortedAnnotations.map((annotation) => {
                 const hasImportantNotes = annotation.notes.some(
                   (n) => n.isImportant
                 );
+
+                // Sort notes for preview: important first
+                const sortedNotes = [...annotation.notes].sort((a, b) => {
+                  if (a.isImportant && !b.isImportant) return -1;
+                  if (!a.isImportant && b.isImportant) return 1;
+                  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+                });
 
                 return (
                   <Card
@@ -102,12 +122,12 @@ export function AllAnnotationsSidebar({
                     </div>
 
                     {/* Notes count and preview */}
-                    {annotation.notes.length > 0 ? (
+                    {sortedNotes.length > 0 ? (
                       <div className="space-y-2">
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span className="font-medium">
-                            {annotation.notes.length}{" "}
-                            {annotation.notes.length === 1
+                            {sortedNotes.length}{" "}
+                            {sortedNotes.length === 1
                               ? t("chapter-editor:annotations_sidebar.note")
                               : t("chapter-editor:annotations_sidebar.notes")}
                           </span>
@@ -129,7 +149,7 @@ export function AllAnnotationsSidebar({
 
                         {/* Notes preview */}
                         <div className="space-y-1.5">
-                          {annotation.notes.slice(0, 3).map((note) => (
+                          {sortedNotes.slice(0, 3).map((note) => (
                             <div
                               key={note.id}
                               className={cn(
@@ -149,9 +169,9 @@ export function AllAnnotationsSidebar({
                               </div>
                             </div>
                           ))}
-                          {annotation.notes.length > 3 && (
+                          {sortedNotes.length > 3 && (
                             <p className="text-xs text-muted-foreground text-center pt-1">
-                              +{annotation.notes.length - 3} mais...
+                              +{sortedNotes.length - 3} mais...
                             </p>
                           )}
                         </div>

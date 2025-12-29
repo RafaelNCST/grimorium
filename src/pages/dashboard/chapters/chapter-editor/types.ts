@@ -5,6 +5,43 @@ export type ChapterStatus =
   | "finished"
   | "published";
 
+export type AnnotationColor = "purple" | "blue" | "green" | "yellow" | "orange" | "pink";
+
+// Annotation color styles with weak (default) and strong (selected) tones
+// Color names are localized via i18n: annotation_colors.{colorKey}
+export const ANNOTATION_COLORS: Record<
+  AnnotationColor,
+  {
+    weak: string; // Background when annotation exists but is not selected
+    strong: string; // Background when annotation is selected
+  }
+> = {
+  purple: {
+    weak: "rgba(147, 51, 234, 0.15)", // purple-600 with 15% opacity
+    strong: "rgba(147, 51, 234, 0.40)", // purple-600 with 40% opacity
+  },
+  blue: {
+    weak: "rgba(59, 130, 246, 0.15)", // blue-500 with 15% opacity
+    strong: "rgba(59, 130, 246, 0.40)", // blue-500 with 40% opacity
+  },
+  green: {
+    weak: "rgba(34, 197, 94, 0.15)", // green-500 with 15% opacity
+    strong: "rgba(34, 197, 94, 0.40)", // green-500 with 40% opacity
+  },
+  yellow: {
+    weak: "rgba(234, 179, 8, 0.15)", // yellow-500 with 15% opacity
+    strong: "rgba(234, 179, 8, 0.40)", // yellow-500 with 40% opacity
+  },
+  orange: {
+    weak: "rgba(249, 115, 22, 0.15)", // orange-500 with 15% opacity
+    strong: "rgba(249, 115, 22, 0.40)", // orange-500 with 40% opacity
+  },
+  pink: {
+    weak: "rgba(236, 72, 153, 0.15)", // pink-500 with 15% opacity
+    strong: "rgba(236, 72, 153, 0.40)", // pink-500 with 40% opacity
+  },
+};
+
 export interface Annotation {
   id: string;
   startOffset: number;
@@ -12,6 +49,7 @@ export interface Annotation {
   text: string;
   notes: AnnotationNote[];
   createdAt: string;
+  color?: AnnotationColor; // Default: purple
 }
 
 export interface AnnotationNote {

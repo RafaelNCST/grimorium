@@ -55,7 +55,19 @@
     "all_annotations_title": "Todas as Anotações",
     "no_annotations": "Nenhuma anotação ainda",
     "navigate_to_text": "Navegar para o texto",
-    "selected_text": "Texto selecionado"
+    "selected_text": "Texto selecionado",
+    "color_label": "Cor da marcação:",
+    "choose_color": "Escolher",
+    "close_picker": "Fechar",
+    "color_tone_tooltip": "Tom fraco e forte de {{color}}"
+  },
+  "annotation_colors": {
+    "purple": "Roxo",
+    "blue": "Azul",
+    "green": "Verde",
+    "yellow": "Amarelo",
+    "orange": "Laranja",
+    "pink": "Rosa"
   },
   "stats": {
     "words": "palavras",

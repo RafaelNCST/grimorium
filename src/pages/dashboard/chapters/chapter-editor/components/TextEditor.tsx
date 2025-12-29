@@ -19,6 +19,7 @@ import { ContextMenu } from "./ContextMenu";
 import { SearchBar } from "./SearchBar";
 
 import type { Annotation, TextAlignment } from "../types";
+import { ANNOTATION_COLORS } from "../types";
 import type { EditorSettings } from "../types/editor-settings";
 
 export interface TextEditorRef {
@@ -264,11 +265,14 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
         if (highlight.type === "annotation") {
           const isSelected = highlight.id === selectedAnnotationId;
-          const className = isSelected
-            ? "annotation-highlight annotation-selected"
-            : "annotation-highlight";
 
-          result += `<span class="${className}" data-annotation-id="${highlight.id}">${escapeHtml(highlightedText)}</span>`;
+          // Get annotation to access its color
+          const annotation = currentAnnotations.find((a) => a.id === highlight.id);
+          const color = annotation?.color || "purple"; // Default to purple
+          const colorStyle = ANNOTATION_COLORS[color];
+          const backgroundColor = isSelected ? colorStyle.strong : colorStyle.weak;
+
+          result += `<span class="annotation-highlight" data-annotation-id="${highlight.id}" style="background-color: ${backgroundColor}; transition: background-color 0.2s;">${escapeHtml(highlightedText)}</span>`;
         } else if (highlight.type === "search-current") {
           result += `<span class="search-highlight search-current" data-search-result="true">${escapeHtml(highlightedText)}</span>`;
         } else {
@@ -1275,15 +1279,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
                 settings?.sepiaMode
                   ? "bg-[#faf6ed] border-[#e5dcc8] dark:bg-[#2a2520] dark:border-[#3a352f]"
                   : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800",
-                // Annotation styles (conditional)
-                settings?.showAnnotationHighlights !== false && [
-                  "[&_.annotation-highlight]:bg-primary/10",
-                  "[&_.annotation-highlight]:cursor-pointer [&_.annotation-highlight]:transition-colors",
-                  "[&_.annotation-highlight:hover]:bg-primary/20",
-                  "[&_.annotation-selected]:bg-primary/35 [&_.annotation-selected]:dark:bg-primary/40",
-                  "[&_.annotation-selected]:font-medium",
-                  "[&_.annotation-selected:hover]:bg-primary/40 [&_.annotation-selected:hover]:dark:bg-primary/45",
-                ],
                 // Search highlight styles
                 "[&_.search-highlight]:bg-yellow-200 [&_.search-highlight]:dark:bg-yellow-500/30",
                 "[&_.search-highlight]:rounded-sm",

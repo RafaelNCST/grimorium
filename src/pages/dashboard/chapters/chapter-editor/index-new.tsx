@@ -496,6 +496,7 @@ function ChapterEditorContent() {
       text: selectedText,
       notes: mergedNotes,
       createdAt: new Date().toISOString(),
+      color: "purple", // Default color
     };
 
     setChapter((prev) => ({
@@ -674,6 +675,18 @@ function ChapterEditorContent() {
                   : note
               ),
             }
+          : ann
+      ),
+    }));
+  };
+
+  // Change annotation color
+  const handleColorChange = (annotationId: string, color: import("./types").AnnotationColor) => {
+    setChapter((prev) => ({
+      ...prev,
+      annotations: prev.annotations.map((ann) =>
+        ann.id === annotationId
+          ? { ...ann, color }
           : ann
       ),
     }));
@@ -895,6 +908,7 @@ function ChapterEditorContent() {
           onDeleteNote={handleDeleteNote}
           onToggleImportant={handleToggleImportant}
           onNavigateToAnnotation={handleNavigateToAnnotation}
+          onColorChange={handleColorChange}
         />
       )}
 
