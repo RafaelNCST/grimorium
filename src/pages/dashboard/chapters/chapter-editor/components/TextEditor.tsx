@@ -768,6 +768,62 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       setContextMenu(null);
 
       if (editorRef.current) {
+        // SPECIAL FIX: Move trailing whitespace out of annotation spans
+        // This allows users to "exit" annotations by typing space at the end
+        const annotationSpansForWhitespace = editorRef.current.querySelectorAll('.annotation-highlight');
+        let movedWhitespace = false;
+
+        annotationSpansForWhitespace.forEach((span) => {
+          const spanText = span.textContent || "";
+
+          // Check if span ends with whitespace
+          const trailingWhitespaceMatch = spanText.match(/\s+$/);
+
+          if (trailingWhitespaceMatch) {
+            movedWhitespace = true;
+
+            // Extract the whitespace
+            const whitespace = trailingWhitespaceMatch[0];
+
+            // Remove whitespace from span
+            const textWithoutWhitespace = spanText.slice(0, -whitespace.length);
+            span.textContent = textWithoutWhitespace;
+
+            // Insert whitespace as a text node AFTER the span
+            const whitespaceNode = document.createTextNode(whitespace);
+            span.parentNode?.insertBefore(whitespaceNode, span.nextSibling);
+
+            // Move cursor after the whitespace
+            const selection = window.getSelection();
+            if (selection) {
+              const newRange = document.createRange();
+              newRange.setStartAfter(whitespaceNode);
+              newRange.setEndAfter(whitespaceNode);
+              selection.removeAllRanges();
+              selection.addRange(newRange);
+            }
+          }
+        });
+
+        // If we moved whitespace, update content and return early
+        // This prevents re-render from undoing our whitespace fix
+        if (movedWhitespace) {
+          const newContent = editorRef.current.innerText;
+          onContentChange(newContent);
+
+          // Mark as typing to prevent useEffect re-render
+          isTypingRef.current = true;
+
+          // Add to undo/redo history
+          if (!isUndoRedoAction) {
+            const contentForHistory = getCleanHtmlContent();
+            const cursorPos = getCurrentCursorPosition();
+            undoRedo.pushState(contentForHistory, cursorPos, false);
+          }
+
+          return; // Exit early - don't process annotations again
+        }
+
         // CRITICAL: Remove ghost spans with inline background-color that browser creates
         // This happens when user deletes annotation content and types in the same location
         const ghostSpans = editorRef.current.querySelectorAll(
@@ -821,7 +877,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           // Get the text content of the span
           const spanText = span.textContent || "";
 
-          // RULE 2: Delete annotation if all content is removed
+          // RULE 1: Delete annotation if all content is removed
           if (spanText.length === 0) {
             needsForceRerender = true;
             return; // Skip this annotation (will be removed from list)
@@ -833,21 +889,11 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           range.setEnd(span, 0);
           const startOffset = range.toString().length;
 
-          // RULE 1: Annotation is fixed and can only shrink, never grow
-          // Calculate the maximum allowed length based on original annotation
-          const originalLength =
-            originalAnnotation.endOffset - originalAnnotation.startOffset;
-          const actualSpanLength = spanText.length;
+          // RULE 2: Annotations expand and shrink dynamically with the span
+          // Simple rule: just follow what's in the span
 
-          // Cap the annotation to its original length
-          const finalLength = Math.min(actualSpanLength, originalLength);
-          const finalText = spanText.substring(0, finalLength);
-          const finalEndOffset = startOffset + finalLength;
-
-          // Check if annotation was capped (grew beyond original size)
-          if (actualSpanLength > originalLength) {
-            needsForceRerender = true;
-          }
+          const finalText = spanText;
+          const finalEndOffset = startOffset + spanText.length;
 
           updatedAnnotations.push({
             ...originalAnnotation,
@@ -902,9 +948,22 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
             );
           });
 
+        // Special handling if we just exited annotation with space
+        if (justExitedAnnotationRef.current) {
+          // We manually inserted space outside the span
+          // Force re-render to ensure clean state
+          isTypingRef.current = false;
+          localAnnotationUpdateRef.current = false;
+          justExitedAnnotationRef.current = false; // Reset flag
+
+          // Update annotations if they changed
+          if (hasAnnotationChanges) {
+            onUpdateAnnotations(updatedAnnotations);
+          }
+        }
         // Handle force rerender separately - even if annotations didn't "change" in data,
         // we need to re-render the DOM to fix visual issues (capped spans, deleted annotations)
-        if (needsForceRerender) {
+        else if (needsForceRerender) {
           // CRITICAL: Reset typing flag to ensure useEffect will re-render
           isTypingRef.current = false;
           localAnnotationUpdateRef.current = false;
