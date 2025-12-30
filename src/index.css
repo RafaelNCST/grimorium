@@ -502,14 +502,16 @@
   }
 
   /* Prevent scroll jump when Radix applies scroll lock */
-  html {
+  /* Commented out to avoid black line on right side of screen */
+  /* html {
     scrollbar-gutter: stable;
-  }
+  } */
 
   /* Prevent Radix scroll-lock from causing layout shift */
-  body[data-scroll-locked] {
+  /* body[data-scroll-locked] {
     margin-right: 0 !important;
-  }
+    padding-right: 0 !important;
+  } */
 
   /* Remove any backdrop/overlay effects from toast viewport */
   [data-radix-toast-viewport] {
