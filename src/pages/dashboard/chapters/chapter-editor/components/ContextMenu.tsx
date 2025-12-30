@@ -35,6 +35,8 @@ interface ContextMenuProps {
   onViewAnnotation?: () => void;
   onLinkToEntity?: () => void;
   onUnlinkEntity?: () => void;
+  // Feature toggles
+  annotationHighlightsEnabled?: boolean;
 }
 
 export function ContextMenu({
@@ -55,6 +57,7 @@ export function ContextMenu({
   onViewAnnotation,
   onLinkToEntity,
   onUnlinkEntity,
+  annotationHighlightsEnabled = true,
 }: ContextMenuProps) {
   const { t } = useTranslation(["chapter-editor"]);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -158,8 +161,13 @@ export function ContextMenu({
 
           {/* Editor actions */}
           <button
-            onClick={() => handleAction(onAnnotate)}
-            className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
+            onClick={() => annotationHighlightsEnabled && handleAction(onAnnotate)}
+            disabled={!annotationHighlightsEnabled}
+            className={`w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors ${
+              annotationHighlightsEnabled
+                ? "hover:bg-muted"
+                : "opacity-50"
+            }`}
           >
             <MessageSquare className="h-4 w-4" />
             {t("context_menu.create_annotation")}

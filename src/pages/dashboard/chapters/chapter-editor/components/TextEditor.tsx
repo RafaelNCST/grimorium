@@ -89,6 +89,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     const lastCursorPositionRef = useRef(0);
     const lastContentLengthRef = useRef(0);
     const lastActionTypeRef = useRef<'insert' | 'delete' | null>(null);
+    const lastShowAnnotationHighlightsRef = useRef(settings?.showAnnotationHighlights);
 
     const undoRedo = useUndoRedo(content, annotations, {
       maxHistorySize: 50,
@@ -190,10 +191,13 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
         if ((e.ctrlKey || e.metaKey) && e.key === "m") {
           e.preventDefault();
-          const selection = window.getSelection();
-          const selectedText = selection?.toString().trim() || "";
-          if (selectedText) {
-            onCreateAnnotation();
+          // Only allow annotation creation if annotation highlights are enabled
+          if (settings?.showAnnotationHighlights !== false) {
+            const selection = window.getSelection();
+            const selectedText = selection?.toString().trim() || "";
+            if (selectedText) {
+              onCreateAnnotation();
+            }
           }
         }
 
@@ -213,7 +217,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
       window.addEventListener("keydown", handleKeyDown);
       return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [search, onCreateAnnotation]);
+    }, [search, onCreateAnnotation, settings?.showAnnotationHighlights]);
 
     useEffect(() => {
       if (!search.isSearchOpen) {
@@ -293,7 +297,17 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           const colorStyle = ANNOTATION_COLORS[color];
           const backgroundColor = isSelected ? colorStyle.strong : colorStyle.weak;
 
-          result += `<span class="annotation-highlight" data-annotation-id="${highlight.id}" style="background-color: ${backgroundColor}; transition: background-color 0.2s;">${escapeHtml(highlightedText)}</span>`;
+          // Apply transparency when annotation highlights are disabled
+          const finalBackgroundColor = settings?.showAnnotationHighlights === false
+            ? "transparent"
+            : backgroundColor;
+
+          // Add a data attribute to mark invisible annotations (for CSS styling if needed)
+          const dataInvisible = settings?.showAnnotationHighlights === false
+            ? ' data-invisible="true"'
+            : '';
+
+          result += `<span class="annotation-highlight" data-annotation-id="${highlight.id}"${dataInvisible} style="background-color: ${finalBackgroundColor}; transition: background-color 0.2s;">${escapeHtml(highlightedText)}</span>`;
         } else if (highlight.type === "search-current") {
           result += `<span class="search-highlight search-current" data-search-result="true">${escapeHtml(highlightedText)}</span>`;
         } else {
@@ -315,16 +329,29 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     useEffect(() => {
       if (!editorRef.current) return;
 
+      // CRITICAL: Detect if showAnnotationHighlights changed
+      // If it did, force re-render regardless of refs
+      const showAnnotationHighlightsChanged =
+        lastShowAnnotationHighlightsRef.current !== settings?.showAnnotationHighlights;
+
+      if (showAnnotationHighlightsChanged) {
+        lastShowAnnotationHighlightsRef.current = settings?.showAnnotationHighlights;
+        // Reset all blocking refs to allow re-render
+        isTypingRef.current = false;
+        localAnnotationUpdateRef.current = false;
+        // Don't reset isUndoRedoActionRef as undo/redo should still be blocked
+      }
+
       if (isUndoRedoActionRef.current) {
         return;
       }
 
-      if (isTypingRef.current) {
+      if (!showAnnotationHighlightsChanged && isTypingRef.current) {
         isTypingRef.current = false;
         return;
       }
 
-      if (localAnnotationUpdateRef.current) {
+      if (!showAnnotationHighlightsChanged && localAnnotationUpdateRef.current) {
         localAnnotationUpdateRef.current = false;
         return;
       }
@@ -448,6 +475,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       selectedAnnotationId,
       search.results,
       search.currentIndex,
+      settings?.showAnnotationHighlights,
     ]);
 
     // Scroll to annotation when requested
@@ -494,7 +522,44 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       if (previousState && editorRef.current) {
         isUndoRedoActionRef.current = true;
 
-        editorRef.current.innerHTML = previousState.content;
+        // CRITICAL: Adjust HTML colors BEFORE inserting into DOM to prevent flash
+        // Always reconstruct colors based on CURRENT settings, not saved HTML state
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = previousState.content;
+        const annotationSpans = tempDiv.querySelectorAll('.annotation-highlight');
+
+        annotationSpans.forEach((span) => {
+          const htmlSpan = span as HTMLElement;
+          const annotationId = htmlSpan.getAttribute('data-annotation-id');
+          if (!annotationId) return;
+
+          // Find the annotation in the saved state
+          const annotation = previousState.annotations.find((a) => a.id === annotationId);
+          if (!annotation) return;
+
+          // Reconstruct the correct color based on CURRENT settings
+          const color = annotation.color || "purple";
+          const colorStyle = ANNOTATION_COLORS[color];
+          const isSelected = annotationId === selectedAnnotationId;
+          const backgroundColor = isSelected ? colorStyle.strong : colorStyle.weak;
+
+          // Apply transparent or actual color based on current settings
+          const finalBackgroundColor = settings?.showAnnotationHighlights === false
+            ? 'transparent'
+            : backgroundColor;
+
+          // Replace background-color in style attribute
+          const currentStyle = htmlSpan.getAttribute('style') || '';
+          const newStyle = currentStyle.replace(
+            /background-color:\s*[^;]+;?/,
+            `background-color: ${finalBackgroundColor};`
+          );
+          htmlSpan.setAttribute('style', newStyle);
+        });
+
+        const htmlToRestore = tempDiv.innerHTML;
+
+        editorRef.current.innerHTML = htmlToRestore;
         const plainText = editorRef.current.innerText;
 
         onUpdateAnnotations(previousState.annotations);
@@ -521,7 +586,44 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       if (nextState && editorRef.current) {
         isUndoRedoActionRef.current = true;
 
-        editorRef.current.innerHTML = nextState.content;
+        // CRITICAL: Adjust HTML colors BEFORE inserting into DOM to prevent flash
+        // Always reconstruct colors based on CURRENT settings, not saved HTML state
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = nextState.content;
+        const annotationSpans = tempDiv.querySelectorAll('.annotation-highlight');
+
+        annotationSpans.forEach((span) => {
+          const htmlSpan = span as HTMLElement;
+          const annotationId = htmlSpan.getAttribute('data-annotation-id');
+          if (!annotationId) return;
+
+          // Find the annotation in the saved state
+          const annotation = nextState.annotations.find((a) => a.id === annotationId);
+          if (!annotation) return;
+
+          // Reconstruct the correct color based on CURRENT settings
+          const color = annotation.color || "purple";
+          const colorStyle = ANNOTATION_COLORS[color];
+          const isSelected = annotationId === selectedAnnotationId;
+          const backgroundColor = isSelected ? colorStyle.strong : colorStyle.weak;
+
+          // Apply transparent or actual color based on current settings
+          const finalBackgroundColor = settings?.showAnnotationHighlights === false
+            ? 'transparent'
+            : backgroundColor;
+
+          // Replace background-color in style attribute
+          const currentStyle = htmlSpan.getAttribute('style') || '';
+          const newStyle = currentStyle.replace(
+            /background-color:\s*[^;]+;?/,
+            `background-color: ${finalBackgroundColor};`
+          );
+          htmlSpan.setAttribute('style', newStyle);
+        });
+
+        const htmlToRestore = tempDiv.innerHTML;
+
+        editorRef.current.innerHTML = htmlToRestore;
         const plainText = editorRef.current.innerText;
 
         onUpdateAnnotations(nextState.annotations);
@@ -853,46 +955,87 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         const annotationSpans = editorRef.current.querySelectorAll(
           ".annotation-highlight"
         );
-        const updatedAnnotations: Annotation[] = [];
+        let updatedAnnotations: Annotation[] = [];
         let needsForceRerender = hasGhostSpans; // Force rerender if we found ghost spans
 
-        annotationSpans.forEach((span) => {
-          const annotationId = span.getAttribute("data-annotation-id");
-          if (!annotationId) return;
+        // CRITICAL: When annotation highlights are disabled, still track annotations via DOM spans
+        // But process them the same way - the spans are rendered transparently but still exist
+        if (settings?.showAnnotationHighlights === false) {
+          // Even when disabled, process annotations normally to keep offsets in sync
+          // The spans are rendered with transparent background but still exist in DOM
+          annotationSpans.forEach((span) => {
+            const annotationId = span.getAttribute("data-annotation-id");
+            if (!annotationId) return;
 
-          const originalAnnotation = annotations.find(
-            (a) => a.id === annotationId
-          );
-          if (!originalAnnotation) return;
+            const originalAnnotation = annotations.find(
+              (a) => a.id === annotationId
+            );
+            if (!originalAnnotation) return;
 
-          // Get the text content of the span
-          const spanText = span.textContent || "";
+            const spanText = span.textContent || "";
 
-          // RULE 1: Delete annotation if all content is removed
-          if (spanText.length === 0) {
-            needsForceRerender = true;
-            return; // Skip this annotation (will be removed from list)
-          }
+            // Delete annotation if all content is removed
+            if (spanText.length === 0) {
+              needsForceRerender = true;
+              return;
+            }
 
-          // Calculate the offset of this span in the PLAIN TEXT
-          const range = document.createRange();
-          range.selectNodeContents(editorRef.current);
-          range.setEnd(span, 0);
-          const startOffset = range.toString().length;
+            // Calculate the offset of this span in the PLAIN TEXT
+            const range = document.createRange();
+            range.selectNodeContents(editorRef.current);
+            range.setEnd(span, 0);
+            const startOffset = range.toString().length;
 
-          // RULE 2: Annotations expand and shrink dynamically with the span
-          // Simple rule: just follow what's in the span
+            const finalText = spanText;
+            const finalEndOffset = startOffset + spanText.length;
 
-          const finalText = spanText;
-          const finalEndOffset = startOffset + spanText.length;
-
-          updatedAnnotations.push({
-            ...originalAnnotation,
-            text: finalText,
-            startOffset,
-            endOffset: finalEndOffset,
+            updatedAnnotations.push({
+              ...originalAnnotation,
+              text: finalText,
+              startOffset,
+              endOffset: finalEndOffset,
+            });
           });
-        });
+        } else {
+          // Normal behavior: recalculate annotations from DOM spans
+          annotationSpans.forEach((span) => {
+            const annotationId = span.getAttribute("data-annotation-id");
+            if (!annotationId) return;
+
+            const originalAnnotation = annotations.find(
+              (a) => a.id === annotationId
+            );
+            if (!originalAnnotation) return;
+
+            // Get the text content of the span
+            const spanText = span.textContent || "";
+
+            // RULE 1: Delete annotation if all content is removed
+            if (spanText.length === 0) {
+              needsForceRerender = true;
+              return; // Skip this annotation (will be removed from list)
+            }
+
+            // Calculate the offset of this span in the PLAIN TEXT
+            const range = document.createRange();
+            range.selectNodeContents(editorRef.current);
+            range.setEnd(span, 0);
+            const startOffset = range.toString().length;
+
+            // RULE 2: Annotations expand and shrink dynamically with the span
+            // Simple rule: just follow what's in the span
+
+            const finalText = spanText;
+            const finalEndOffset = startOffset + spanText.length;
+
+            updatedAnnotations.push({
+              ...originalAnnotation,
+              text: finalText,
+              startOffset,
+              endOffset: finalEndOffset,
+            });
+          });
+        }
 
         // Check if annotations were removed (deleted)
         if (updatedAnnotations.length < annotations.length) {
@@ -1151,7 +1294,8 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       const annotationSpan = target.closest(".annotation-highlight");
       if (annotationSpan) {
         const annotationId = annotationSpan.getAttribute("data-annotation-id");
-        if (annotationId) {
+        // Only handle click if annotation highlights are enabled
+        if (annotationId && settings?.showAnnotationHighlights !== false) {
           e.preventDefault();
           onAnnotationClick(annotationId);
         }
@@ -1336,6 +1480,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
             onSearch={handleSearchFromContextMenu}
             onBold={handleBold}
             onItalic={handleItalic}
+            annotationHighlightsEnabled={settings?.showAnnotationHighlights !== false}
           />
         )}
       </>
