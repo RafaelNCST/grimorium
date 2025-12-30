@@ -123,7 +123,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     useEffect(() => {
       requestAnimationFrame(() => {
         if (editorRef.current) {
-          const initialHtml = editorRef.current.innerHTML;
+          const initialHtml = removeSearchHighlights(editorRef.current.innerHTML);
           const cursorPos = editorRef.current.innerText.length;
           undoRedo.resetHistory(initialHtml, annotations, cursorPos);
         }
@@ -151,7 +151,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       if (annotationsChanged && editorRef.current) {
         // Annotations changed externally (e.g., color change from sidebar)
         // Add current state to history
-        const currentHtml = editorRef.current.innerHTML;
+        const currentHtml = removeSearchHighlights(editorRef.current.innerHTML);
         const cursorPos = getCurrentCursorPosition();
 
         // Use immediate = true so this creates a distinct undo point
@@ -270,82 +270,168 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       return div.innerHTML;
     };
 
+    // Remove search highlight spans from HTML before saving to undo/redo history
+    const removeSearchHighlights = (html: string): string => {
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = html;
+
+      // Remove all search highlight spans but keep their content
+      const searchSpans = tempDiv.querySelectorAll('span.search-highlight');
+      searchSpans.forEach((span) => {
+        const textNode = document.createTextNode(span.textContent || '');
+        span.replaceWith(textNode);
+      });
+
+      return tempDiv.innerHTML;
+    };
+
     const renderContentWithAnnotations = (
       annotationsToRender?: Annotation[]
     ) => {
       if (!content) return "";
 
       const currentAnnotations = annotationsToRender || annotations;
-      const allHighlights: Array<{
+
+      // Separate annotations and search results for proper overlap handling
+      const annotationHighlights: Array<{
         start: number;
         end: number;
-        type: "annotation" | "search" | "search-current";
-        id?: string;
-      }> = [];
+        type: "annotation";
+        id: string;
+        annotation: Annotation;
+      }> = currentAnnotations.map((annotation) => ({
+        start: annotation.startOffset,
+        end: annotation.endOffset,
+        type: "annotation",
+        id: annotation.id,
+        annotation,
+      }));
 
-      // Add annotations
-      currentAnnotations.forEach((annotation) => {
-        allHighlights.push({
-          start: annotation.startOffset,
-          end: annotation.endOffset,
-          type: "annotation",
-          id: annotation.id,
-        });
+      const searchHighlights: Array<{
+        start: number;
+        end: number;
+        type: "search" | "search-current";
+      }> = search.results.map((result, index) => ({
+        start: result.start,
+        end: result.end,
+        type: index === search.currentIndex ? "search-current" : "search",
+      }));
+
+      // Create segments with all ranges
+      interface Segment {
+        start: number;
+        end: number;
+        annotation?: {
+          id: string;
+          annotation: Annotation;
+        };
+        search?: "search" | "search-current";
+      }
+
+      const segments: Segment[] = [];
+      const points = new Set<number>();
+
+      // Collect all start and end points
+      points.add(0);
+      points.add(content.length);
+
+      annotationHighlights.forEach((h) => {
+        points.add(h.start);
+        points.add(h.end);
       });
 
-      search.results.forEach((result, index) => {
-        allHighlights.push({
-          start: result.start,
-          end: result.end,
-          type: index === search.currentIndex ? "search-current" : "search",
-        });
+      searchHighlights.forEach((h) => {
+        points.add(h.start);
+        points.add(h.end);
       });
 
-      allHighlights.sort((a, b) => a.start - b.start);
+      const sortedPoints = Array.from(points).sort((a, b) => a - b);
 
-      let result = "";
-      let lastIndex = 0;
+      // Create segments between consecutive points
+      for (let i = 0; i < sortedPoints.length - 1; i++) {
+        const start = sortedPoints[i];
+        const end = sortedPoints[i + 1];
 
-      allHighlights.forEach((highlight) => {
-        if (highlight.start < lastIndex) return;
+        if (start === end) continue;
 
-        const beforeText = content.substring(lastIndex, highlight.start);
-        result += escapeHtml(beforeText);
-        const highlightedText = content.substring(
-          highlight.start,
-          highlight.end
+        const segment: Segment = { start, end };
+
+        // Check if this segment is within an annotation
+        const matchingAnnotation = annotationHighlights.find(
+          (h) => h.start <= start && end <= h.end
         );
+        if (matchingAnnotation) {
+          segment.annotation = {
+            id: matchingAnnotation.id,
+            annotation: matchingAnnotation.annotation,
+          };
+        }
 
-        if (highlight.type === "annotation") {
-          const isSelected = highlight.id === selectedAnnotationId;
-          const annotation = currentAnnotations.find((a) => a.id === highlight.id);
-          const color = annotation?.color || "purple";
+        // Check if this segment is within a search result
+        const matchingSearch = searchHighlights.find(
+          (h) => h.start <= start && end <= h.end
+        );
+        if (matchingSearch) {
+          segment.search = matchingSearch.type;
+        }
+
+        segments.push(segment);
+      }
+
+      // Render segments
+      let result = "";
+
+      segments.forEach((segment) => {
+        const text = content.substring(segment.start, segment.end);
+        const escapedText = escapeHtml(text);
+
+        // Both annotation and search
+        if (segment.annotation && segment.search) {
+          const isSelected = segment.annotation.id === selectedAnnotationId;
+          const color = segment.annotation.annotation.color || "purple";
           const colorStyle = ANNOTATION_COLORS[color];
           const backgroundColor = isSelected ? colorStyle.strong : colorStyle.weak;
-
-          // Apply transparency when annotation highlights are disabled
           const finalBackgroundColor = settings?.showAnnotationHighlights === false
             ? "transparent"
             : backgroundColor;
-
-          // Add a data attribute to mark invisible annotations (for CSS styling if needed)
           const dataInvisible = settings?.showAnnotationHighlights === false
             ? ' data-invisible="true"'
             : '';
 
-          result += `<span class="annotation-highlight" data-annotation-id="${highlight.id}"${dataInvisible} style="background-color: ${finalBackgroundColor}; transition: background-color 0.2s;">${escapeHtml(highlightedText)}</span>`;
-        } else if (highlight.type === "search-current") {
-          result += `<span class="search-highlight search-current" data-search-result="true">${escapeHtml(highlightedText)}</span>`;
-        } else {
-          result += `<span class="search-highlight" data-search-result="true">${escapeHtml(highlightedText)}</span>`;
+          const searchClass = segment.search === "search-current"
+            ? "search-highlight search-current"
+            : "search-highlight";
+
+          // Nest search inside annotation
+          result += `<span class="annotation-highlight" data-annotation-id="${segment.annotation.id}"${dataInvisible} style="background-color: ${finalBackgroundColor}; transition: background-color 0.2s;"><span class="${searchClass}" data-search-result="true">${escapedText}</span></span>`;
         }
+        // Only annotation
+        else if (segment.annotation) {
+          const isSelected = segment.annotation.id === selectedAnnotationId;
+          const color = segment.annotation.annotation.color || "purple";
+          const colorStyle = ANNOTATION_COLORS[color];
+          const backgroundColor = isSelected ? colorStyle.strong : colorStyle.weak;
+          const finalBackgroundColor = settings?.showAnnotationHighlights === false
+            ? "transparent"
+            : backgroundColor;
+          const dataInvisible = settings?.showAnnotationHighlights === false
+            ? ' data-invisible="true"'
+            : '';
 
-        lastIndex = highlight.end;
+          result += `<span class="annotation-highlight" data-annotation-id="${segment.annotation.id}"${dataInvisible} style="background-color: ${finalBackgroundColor}; transition: background-color 0.2s;">${escapedText}</span>`;
+        }
+        // Only search
+        else if (segment.search) {
+          const searchClass = segment.search === "search-current"
+            ? "search-highlight search-current"
+            : "search-highlight";
+          result += `<span class="${searchClass}" data-search-result="true">${escapedText}</span>`;
+        }
+        // Plain text
+        else {
+          result += escapedText;
+        }
       });
-
-      if (lastIndex < content.length) {
-        result += escapeHtml(content.substring(lastIndex));
-      }
 
       result = result.replace(/\n/g, "<br>");
 
@@ -935,7 +1021,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           // Add to undo/redo history
           if (!isUndoRedoActionRef.current) {
             // Save full HTML with formatting AND annotations
-            const contentForHistory = editorRef.current.innerHTML;
+            const contentForHistory = removeSearchHighlights(editorRef.current.innerHTML);
             const cursorPos = getCurrentCursorPosition();
             undoRedo.pushState(contentForHistory, cursorPos, annotations, false);
           }
@@ -973,7 +1059,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         });
 
         // Get full HTML with formatting AND annotations for undo/redo
-        const contentForHistory = editorRef.current.innerHTML;
+        const contentForHistory = removeSearchHighlights(editorRef.current.innerHTML);
 
         // Extract plain text content (removes HTML tags) for onChange
         const newContent = editorRef.current.innerText;
