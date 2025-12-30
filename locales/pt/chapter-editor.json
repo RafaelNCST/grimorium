@@ -59,7 +59,9 @@
     "color_label": "Cor da marcação:",
     "choose_color": "Escolher",
     "close_picker": "Fechar",
-    "color_tone_tooltip": "Tom fraco e forte de {{color}}"
+    "color_tone_tooltip": "Tom fraco e forte de {{color}}",
+    "show_all": "Mostrar tudo",
+    "hide_details": "Esconder detalhes"
   },
   "annotation_colors": {
     "purple": "Roxo",

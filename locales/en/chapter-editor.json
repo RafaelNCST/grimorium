@@ -59,7 +59,9 @@
     "color_label": "Highlight color:",
     "choose_color": "Choose",
     "close_picker": "Close",
-    "color_tone_tooltip": "Weak and strong tone of {{color}}"
+    "color_tone_tooltip": "Weak and strong tone of {{color}}",
+    "show_all": "Show all",
+    "hide_details": "Hide details"
   },
   "annotation_colors": {
     "purple": "Purple",

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { X, Star, Trash2, Edit, Save, Plus, MapPin, Palette } from "lucide-react";
+import { X, Star, Trash2, Edit, Save, Plus, MapPin, Palette, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -43,6 +43,7 @@ export function AnnotationsSidebar({
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editingNoteText, setEditingNoteText] = useState("");
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [isSimplifiedMode, setIsSimplifiedMode] = useState(false);
 
   if (!annotation) return null;
 
@@ -95,53 +96,80 @@ export function AnnotationsSidebar({
         {/* Header */}
         <div className="p-4 border-b border-border flex items-center justify-between">
           <h3 className="font-semibold text-lg">{t("annotations.create")}</h3>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="w-5 h-5" />
-          </Button>
+          <div className="flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsSimplifiedMode(!isSimplifiedMode)}
+                >
+                  {isSimplifiedMode ? (
+                    <Eye className="w-5 h-5" />
+                  ) : (
+                    <EyeOff className="w-5 h-5" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {isSimplifiedMode
+                    ? t("annotations.show_all")
+                    : t("annotations.hide_details")}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
 
         {/* Selected Text */}
-        <div className="p-4 bg-muted/30 border-b border-border">
-          <p className="text-sm text-muted-foreground mb-1">
-            {t("annotations.selected_text")}:
-          </p>
-          <button
-            onClick={() => onNavigateToAnnotation?.(annotation.id)}
-            className="text-sm font-medium italic text-left w-full hover:text-primary transition-colors cursor-pointer flex items-start gap-2 group"
-          >
-            <MapPin className="w-4 h-4 mt-0.5 shrink-0 group-hover:text-primary transition-colors" />
-            <span className="flex-1">&quot;{annotation.text}&quot;</span>
-          </button>
-        </div>
+        {!isSimplifiedMode && (
+          <div className="p-4 bg-muted/30 border-b border-border">
+            <p className="text-sm text-muted-foreground mb-1">
+              {t("annotations.selected_text")}:
+            </p>
+            <button
+              onClick={() => onNavigateToAnnotation?.(annotation.id)}
+              className="text-sm font-medium italic text-left w-full hover:text-primary transition-colors cursor-pointer flex items-start gap-2 group"
+            >
+              <MapPin className="w-4 h-4 mt-0.5 shrink-0 group-hover:text-primary transition-colors" />
+              <span className="flex-1 max-h-32 overflow-y-auto pr-1 custom-scrollbar">
+                &quot;{annotation.text}&quot;
+              </span>
+            </button>
+          </div>
+        )}
 
         {/* Color Picker */}
-        <div className="p-4 border-b border-border">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-muted-foreground">
+        {!isSimplifiedMode && (
+          <div className="p-4 border-b border-border">
+          {/* Color selection in one line */}
+          <div className="flex items-center gap-2">
+            <p className="text-sm text-muted-foreground whitespace-nowrap">
               {t("annotations.color_label")}
             </p>
+            <span className="text-sm font-medium">
+              {t(`annotation_colors.${currentColor}`)}
+            </span>
+            <div
+              className="w-5 h-5 rounded border border-border shrink-0"
+              style={{ backgroundColor: ANNOTATION_COLORS[currentColor].weak }}
+            />
+            <div className="flex-1" />
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowColorPicker(!showColorPicker)}
-              className="h-7 px-2"
+              className="h-7 px-2 shrink-0"
             >
               <Palette className="w-4 h-4 mr-1" />
               {showColorPicker
                 ? t("annotations.close_picker")
                 : t("annotations.choose_color")}
             </Button>
-          </div>
-
-          {/* Current Color Preview */}
-          <div className="flex items-center gap-2 mb-2">
-            <div
-              className="w-6 h-6 rounded border border-border"
-              style={{ backgroundColor: ANNOTATION_COLORS[currentColor].weak }}
-            />
-            <span className="text-sm font-medium">
-              {t(`annotation_colors.${currentColor}`)}
-            </span>
           </div>
 
           {/* Color Options */}
@@ -197,7 +225,8 @@ export function AnnotationsSidebar({
               )}
             </div>
           )}
-        </div>
+          </div>
+        )}
 
         {/* Notes List */}
         <div
@@ -217,16 +246,16 @@ export function AnnotationsSidebar({
               <Card
                 key={note.id}
                 className={cn(
-                  "p-3",
+                  "p-0 overflow-hidden",
                   note.isImportant && "border-2 border-amber-500 bg-amber-500/5"
                 )}
               >
                 {editingNoteId === note.id ? (
-                  <div className="space-y-2">
+                  <div className="space-y-2 p-3">
                     <Textarea
                       value={editingNoteText}
                       onChange={(e) => setEditingNoteText(e.target.value)}
-                      className="min-h-[80px]"
+                      className="h-48 resize-none"
                       autoFocus
                     />
                     <div className="flex gap-2">
@@ -248,9 +277,17 @@ export function AnnotationsSidebar({
                     </div>
                   </div>
                 ) : (
-                  <>
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <p className="text-sm flex-1">{note.text}</p>
+                  <div className="flex flex-col">
+                    {/* Header - Date/Time and Action Buttons */}
+                    <div className="flex items-center justify-between pb-2 border-b border-border px-3 pt-3">
+                      {/* Timestamp */}
+                      <p className="text-xs text-muted-foreground">
+                        {note.updatedAt
+                          ? new Date(note.updatedAt).toLocaleString()
+                          : ""}
+                      </p>
+
+                      {/* Action buttons */}
                       <div className="flex gap-1 shrink-0">
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -308,12 +345,12 @@ export function AnnotationsSidebar({
                         </Tooltip>
                       </div>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      {note.updatedAt
-                        ? new Date(note.updatedAt).toLocaleString()
-                        : ""}
+
+                    {/* Note text - scrollable content */}
+                    <p className="text-sm max-h-48 overflow-y-auto custom-scrollbar px-3 pt-2 pb-3">
+                      {note.text}
                     </p>
-                  </>
+                  </div>
                 )}
               </Card>
             ))
@@ -321,25 +358,27 @@ export function AnnotationsSidebar({
         </div>
 
         {/* Add Note */}
-        <div className="p-4 border-t border-border space-y-2">
-          <Textarea
-            value={newNoteText}
-            onChange={(e) => setNewNoteText(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={t("annotations.annotation_text")}
-            rows={3}
-            className="resize-none"
-          />
-          <Button
-            onClick={handleAddNote}
-            disabled={!newNoteText.trim()}
-            className="w-full"
-            variant="magical"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            {t("annotations.add_annotation")}
-          </Button>
-        </div>
+        {!isSimplifiedMode && (
+          <div className="p-4 border-t border-border space-y-2">
+            <Textarea
+              value={newNoteText}
+              onChange={(e) => setNewNoteText(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={t("annotations.annotation_text")}
+              rows={3}
+              className="resize-none"
+            />
+            <Button
+              onClick={handleAddNote}
+              disabled={!newNoteText.trim()}
+              className="w-full"
+              variant="magical"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              {t("annotations.add_annotation")}
+            </Button>
+          </div>
+        )}
       </div>
     </TooltipProvider>
   );
