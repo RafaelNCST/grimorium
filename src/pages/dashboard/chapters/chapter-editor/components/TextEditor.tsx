@@ -90,6 +90,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     const lastContentLengthRef = useRef(0);
     const lastActionTypeRef = useRef<'insert' | 'delete' | null>(null);
     const lastShowAnnotationHighlightsRef = useRef(settings?.showAnnotationHighlights);
+    const lastAnnotationsRef = useRef<Annotation[]>(annotations);
 
     const undoRedo = useUndoRedo(content, annotations, {
       maxHistorySize: 50,
@@ -134,6 +135,31 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         undoRedo.resetHistory("", []);
       };
     }, []);
+
+    // CRITICAL: Detect external annotation changes (like color changes from sidebar)
+    // and add to undo/redo history
+    useEffect(() => {
+      // Skip if this is the initial render or if we're in the middle of undo/redo
+      if (isUndoRedoActionRef.current || localAnnotationUpdateRef.current) {
+        lastAnnotationsRef.current = annotations;
+        return;
+      }
+
+      // Check if annotations changed externally (not from handleInput)
+      const annotationsChanged = JSON.stringify(lastAnnotationsRef.current) !== JSON.stringify(annotations);
+
+      if (annotationsChanged && editorRef.current) {
+        // Annotations changed externally (e.g., color change from sidebar)
+        // Add current state to history
+        const currentHtml = editorRef.current.innerHTML;
+        const cursorPos = getCurrentCursorPosition();
+
+        // Use immediate = true so this creates a distinct undo point
+        undoRedo.pushState(currentHtml, cursorPos, annotations, true);
+
+        lastAnnotationsRef.current = annotations;
+      }
+    }, [annotations]);
 
     useEffect(() => {
       const handleCursorMove = () => {
@@ -1123,7 +1149,8 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         if (!isUndoRedoActionRef.current) {
           const cursorPos = getCurrentCursorPosition();
           const immediate = isImmediateActionRef.current;
-          undoRedo.pushState(contentForHistory, cursorPos, annotations, immediate);
+          // CRITICAL: Use updatedAnnotations to ensure latest annotation state (including color changes) is saved
+          undoRedo.pushState(contentForHistory, cursorPos, updatedAnnotations, immediate);
 
           // Update cursor position ref for tracking
           lastCursorPositionRef.current = cursorPos;
