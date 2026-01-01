@@ -22,17 +22,6 @@ export interface ICharacterRelationship {
   description?: string; // Optional description (max 200 characters)
 }
 
-export interface ICharacterFamily {
-  grandparents: string[]; // Avós
-  parents: string[]; // Pais (substitui father/mother)
-  spouses: string[]; // Cônjuges (substitui spouse)
-  unclesAunts: string[]; // Tios
-  cousins: string[]; // Primos
-  children: string[]; // Filhos
-  siblings: string[]; // Irmãos
-  halfSiblings: string[]; // Meio-irmãos
-}
-
 export interface ICharacter {
   id: string;
   name: string;
@@ -76,9 +65,6 @@ export interface ICharacter {
 
   // Relationships
   relationships?: ICharacterRelationship[];
-
-  // Family
-  family?: ICharacterFamily;
 
   // Legacy fields (for backward compatibility)
   appearance?: string;

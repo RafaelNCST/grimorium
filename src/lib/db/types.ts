@@ -94,14 +94,6 @@ export interface DBRelationship {
   created_at: number;
 }
 
-export interface DBFamilyRelation {
-  id: string;
-  character_id: string;
-  related_character_id: string;
-  relation_type: string;
-  created_at: number;
-}
-
 export interface DBItem {
   id: string;
   book_id: string;
@@ -406,5 +398,4 @@ export interface DBGalleryLink {
 // Helper types for queries
 export interface CharacterWithRelationships extends DBCharacter {
   relationships?: DBRelationship[];
-  family_relations?: DBFamilyRelation[];
 }

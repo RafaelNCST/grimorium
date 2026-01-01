@@ -15,6 +15,7 @@ import { useCharactersStore } from "@/stores/characters-store";
 import { useFactionsStore } from "@/stores/factions-store";
 import { useItemsStore } from "@/stores/items-store";
 import { useRacesStore } from "@/stores/races-store";
+import { useRegionsStore } from "@/stores/regions-store";
 import { type IFaction, type IFactionUIState } from "@/types/faction-types";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
@@ -35,9 +36,15 @@ export function FactionDetail() {
     (state) => state.deleteFactionFromCache
   );
   const factionsCache = useFactionsStore((state) => state.cache);
+  const fetchFactions = useFactionsStore((state) => state.fetchFactions);
   const racesCache = useRacesStore((state) => state.cache);
+  const fetchRaces = useRacesStore((state) => state.fetchRaces);
   const charactersCache = useCharactersStore((state) => state.cache);
+  const fetchCharacters = useCharactersStore((state) => state.fetchCharacters);
   const itemsCache = useItemsStore((state) => state.cache);
+  const fetchItems = useItemsStore((state) => state.fetchItems);
+  const regionsCache = useRegionsStore((state) => state.cache);
+  const fetchRegions = useRegionsStore((state) => state.fetchRegions);
 
   const emptyFaction: IFaction = {
     id: "",
@@ -170,6 +177,20 @@ export function FactionDetail() {
     return dataChanged || uiStateChanged;
   }, [isEditing, faction, editData, uiState.sectionVisibility, originalUiState.sectionVisibility]);
 
+  // Load all entity caches
+  useEffect(() => {
+    if (!dashboardId) return;
+
+    // Fetch all entities in parallel to populate caches
+    Promise.all([
+      fetchFactions(dashboardId),
+      fetchCharacters(dashboardId),
+      fetchRaces(dashboardId),
+      fetchItems(dashboardId),
+      fetchRegions(dashboardId),
+    ]);
+  }, [dashboardId, fetchFactions, fetchCharacters, fetchRaces, fetchItems, fetchRegions]);
+
   // Load faction from database
   useEffect(() => {
     const loadFaction = async () => {
@@ -213,6 +234,7 @@ export function FactionDetail() {
     return bookRaces.map((race) => ({
       id: race.id,
       name: race.name,
+      image: race.image,
     }));
   }, [dashboardId, racesCache]);
 
@@ -223,6 +245,7 @@ export function FactionDetail() {
     return bookCharacters.map((char) => ({
       id: char.id,
       name: char.name,
+      image: char.image,
     }));
   }, [dashboardId, charactersCache]);
 
@@ -247,6 +270,17 @@ export function FactionDetail() {
       image: item.image,
     }));
   }, [dashboardId, itemsCache]);
+
+  // Get regions for the current book
+  const regions = useMemo(() => {
+    if (!dashboardId) return [];
+    const bookRegions = regionsCache[dashboardId]?.regions || [];
+    return bookRegions.map((region) => ({
+      id: region.id,
+      name: region.name,
+      image: region.image,
+    }));
+  }, [dashboardId, regionsCache]);
 
   // Get current status, type, influence, reputation
   const currentStatus = useMemo(
@@ -557,6 +591,7 @@ export function FactionDetail() {
         mockCharacters={characters}
         mockFactions={factions}
         mockItems={items}
+        mockRegions={regions}
         statuses={FACTION_STATUS_CONSTANT}
         types={FACTION_TYPES_CONSTANT}
         currentStatus={currentStatus}

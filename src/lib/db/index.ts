@@ -117,16 +117,6 @@ async function runMigrations(database: Database): Promise<void> {
       UNIQUE(character_id, related_character_id, type)
     );
 
-    -- RELAÇÕES FAMILIARES
-    CREATE TABLE IF NOT EXISTS family_relations (
-      id TEXT PRIMARY KEY,
-      character_id TEXT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
-      related_character_id TEXT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
-      relation_type TEXT NOT NULL,
-      created_at INTEGER NOT NULL,
-      UNIQUE(character_id, related_character_id, relation_type)
-    );
-
     -- ITENS
     CREATE TABLE IF NOT EXISTS items (
       id TEXT PRIMARY KEY,
@@ -408,8 +398,6 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_characters_book_id ON characters(book_id);
     CREATE INDEX IF NOT EXISTS idx_relationships_character ON relationships(character_id);
     CREATE INDEX IF NOT EXISTS idx_relationships_related ON relationships(related_character_id);
-    CREATE INDEX IF NOT EXISTS idx_family_character ON family_relations(character_id);
-    CREATE INDEX IF NOT EXISTS idx_family_related ON family_relations(related_character_id);
     CREATE INDEX IF NOT EXISTS idx_books_last_opened ON books(last_opened_at DESC);
     CREATE INDEX IF NOT EXISTS idx_items_book_id ON items(book_id);
     CREATE INDEX IF NOT EXISTS idx_race_groups_book_id ON race_groups(book_id);

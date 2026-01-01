@@ -140,7 +140,7 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
       ? safeJSONParse(dbFaction.dominated_areas, locationArraySchema, [])
       : undefined,
     mainBase: dbFaction.main_base
-      ? safeJSONParse(dbFaction.main_base, unknownObjectSchema, {})
+      ? safeJSONParse(dbFaction.main_base, locationArraySchema, [])
       : undefined,
     areasOfInterest: dbFaction.areas_of_interest
       ? safeJSONParse(dbFaction.areas_of_interest, locationArraySchema, [])

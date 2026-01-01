@@ -14,8 +14,13 @@ import {
   Package,
   X,
   Save,
+  User,
+  Shield,
+  Dna,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import {
@@ -59,6 +64,11 @@ interface PropsFactionTimeline {
   isCreateEraDialogOpen?: boolean;
   /** Callback when the create era dialog open state changes */
   onCreateEraDialogOpenChange?: (open: boolean) => void;
+  /** Entities for display */
+  mockCharacters?: Array<{ id: string; name: string; image?: string }>;
+  mockFactions?: Array<{ id: string; name: string; image?: string }>;
+  mockRaces?: Array<{ id: string; name: string; image?: string }>;
+  mockItems?: Array<{ id: string; name: string; image?: string }>;
 }
 
 export function FactionTimeline({
@@ -68,6 +78,10 @@ export function FactionTimeline({
   onTimelineChange,
   isCreateEraDialogOpen: controlledIsCreateEraDialogOpen,
   onCreateEraDialogOpenChange,
+  mockCharacters = [],
+  mockFactions = [],
+  mockRaces = [],
+  mockItems = [],
 }: PropsFactionTimeline) {
   const { t } = useTranslation("faction-detail");
   const [selectedEvent, setSelectedEvent] =
@@ -287,12 +301,23 @@ export function FactionTimeline({
     setShowEventModal(false);
   };
 
-  // TODO: Implement proper entity name fetching
-  // For now, we display IDs as entity data is not available in this component
-  const getCharacterName = (id: string) => id;
-  const getFactionName = (id: string) => id;
-  const getRaceName = (id: string) => id;
-  const getItemName = (id: string) => id;
+  // Entity name getters
+  const getCharacterName = (id: string) => {
+    const character = mockCharacters.find((c) => c.id === id);
+    return character?.name || id;
+  };
+  const getFactionName = (id: string) => {
+    const faction = mockFactions.find((f) => f.id === id);
+    return faction?.name || id;
+  };
+  const getRaceName = (id: string) => {
+    const race = mockRaces.find((r) => r.id === id);
+    return race?.name || id;
+  };
+  const getItemName = (id: string) => {
+    const item = mockItems.find((i) => i.id === id);
+    return item?.name || id;
+  };
 
   // Detectar se há scroll no modal de criar era
   useEffect(() => {
@@ -560,66 +585,141 @@ export function FactionTimeline({
                                         event.factionsInvolved.length > 0 ||
                                         event.racesInvolved.length > 0 ||
                                         event.itemsInvolved.length > 0) && (
-                                        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/30 flex-wrap">
-                                          {event.charactersInvolved.length >
-                                            0 && (
-                                            <div className="flex items-center gap-1">
-                                              <Users className="w-3 h-3 text-muted-foreground" />
-                                              <span className="text-xs text-muted-foreground">
-                                                {
-                                                  event.charactersInvolved
-                                                    .length
-                                                }{" "}
-                                                {event.charactersInvolved
-                                                  .length !== 1
-                                                  ? t(
-                                                      "timeline.characters_plural"
-                                                    )
-                                                  : t(
-                                                      "timeline.character_singular"
-                                                    )}
-                                              </span>
+                                        <div className="mt-3 pt-3 border-t border-border/30 space-y-2">
+                                          {event.charactersInvolved.length > 0 && (
+                                            <div>
+                                              <div className="flex items-center gap-1 mb-1.5">
+                                                <Users className="w-3 h-3 text-muted-foreground" />
+                                                <span className="text-xs font-medium text-muted-foreground">
+                                                  {t("timeline.characters_involved")}
+                                                </span>
+                                              </div>
+                                              <div className="flex flex-wrap gap-1.5">
+                                                {event.charactersInvolved.map((id) => {
+                                                  const character = mockCharacters.find((c) => c.id === id);
+                                                  return (
+                                                    <div
+                                                      key={id}
+                                                      className="flex items-center gap-1.5 px-2 py-1 rounded border border-border/50 bg-muted/30"
+                                                    >
+                                                      {character?.image ? (
+                                                        <Avatar className="w-4 h-4 rounded-full">
+                                                          <AvatarImage src={character.image} alt={character.name} />
+                                                        </Avatar>
+                                                      ) : (
+                                                        <div className="w-4 h-4 rounded-full bg-purple-950/40 flex items-center justify-center">
+                                                          <User className="w-2.5 h-2.5 text-purple-400" />
+                                                        </div>
+                                                      )}
+                                                      <span className="text-xs">
+                                                        {character?.name || id}
+                                                      </span>
+                                                    </div>
+                                                  );
+                                                })}
+                                              </div>
                                             </div>
                                           )}
-                                          {event.factionsInvolved.length >
-                                            0 && (
-                                            <div className="flex items-center gap-1">
-                                              <Building className="w-3 h-3 text-muted-foreground" />
-                                              <span className="text-xs text-muted-foreground">
-                                                {event.factionsInvolved.length}{" "}
-                                                {event.factionsInvolved
-                                                  .length !== 1
-                                                  ? t(
-                                                      "timeline.factions_plural"
-                                                    )
-                                                  : t(
-                                                      "timeline.faction_singular"
-                                                    )}
-                                              </span>
+                                          {event.factionsInvolved.length > 0 && (
+                                            <div>
+                                              <div className="flex items-center gap-1 mb-1.5">
+                                                <Building className="w-3 h-3 text-muted-foreground" />
+                                                <span className="text-xs font-medium text-muted-foreground">
+                                                  {t("timeline.factions_involved")}
+                                                </span>
+                                              </div>
+                                              <div className="flex flex-wrap gap-1.5">
+                                                {event.factionsInvolved.map((id) => {
+                                                  const faction = mockFactions.find((f) => f.id === id);
+                                                  return (
+                                                    <div
+                                                      key={id}
+                                                      className="flex items-center gap-1.5 px-2 py-1 rounded border border-border/50 bg-muted/30"
+                                                    >
+                                                      {faction?.image ? (
+                                                        <Avatar className="w-4 h-4 rounded-sm">
+                                                          <AvatarImage src={faction.image} alt={faction.name} />
+                                                        </Avatar>
+                                                      ) : (
+                                                        <div className="w-4 h-4 rounded-sm bg-purple-950/40 flex items-center justify-center">
+                                                          <Shield className="w-2.5 h-2.5 text-purple-400" />
+                                                        </div>
+                                                      )}
+                                                      <span className="text-xs">
+                                                        {faction?.name || id}
+                                                      </span>
+                                                    </div>
+                                                  );
+                                                })}
+                                              </div>
                                             </div>
                                           )}
                                           {event.racesInvolved.length > 0 && (
-                                            <div className="flex items-center gap-1">
-                                              <Swords className="w-3 h-3 text-muted-foreground" />
-                                              <span className="text-xs text-muted-foreground">
-                                                {event.racesInvolved.length}{" "}
-                                                {event.racesInvolved.length !==
-                                                1
-                                                  ? t("timeline.races_plural")
-                                                  : t("timeline.race_singular")}
-                                              </span>
+                                            <div>
+                                              <div className="flex items-center gap-1 mb-1.5">
+                                                <Swords className="w-3 h-3 text-muted-foreground" />
+                                                <span className="text-xs font-medium text-muted-foreground">
+                                                  {t("timeline.races_involved")}
+                                                </span>
+                                              </div>
+                                              <div className="flex flex-wrap gap-1.5">
+                                                {event.racesInvolved.map((id) => {
+                                                  const race = mockRaces.find((r) => r.id === id);
+                                                  return (
+                                                    <div
+                                                      key={id}
+                                                      className="flex items-center gap-1.5 px-2 py-1 rounded border border-border/50 bg-muted/30"
+                                                    >
+                                                      {race?.image ? (
+                                                        <Avatar className="w-4 h-4 rounded-sm">
+                                                          <AvatarImage src={race.image} alt={race.name} />
+                                                        </Avatar>
+                                                      ) : (
+                                                        <div className="w-4 h-4 rounded-sm bg-purple-950/40 flex items-center justify-center">
+                                                          <Dna className="w-2.5 h-2.5 text-purple-400" />
+                                                        </div>
+                                                      )}
+                                                      <span className="text-xs">
+                                                        {race?.name || id}
+                                                      </span>
+                                                    </div>
+                                                  );
+                                                })}
+                                              </div>
                                             </div>
                                           )}
                                           {event.itemsInvolved.length > 0 && (
-                                            <div className="flex items-center gap-1">
-                                              <Package className="w-3 h-3 text-muted-foreground" />
-                                              <span className="text-xs text-muted-foreground">
-                                                {event.itemsInvolved.length}{" "}
-                                                {event.itemsInvolved.length !==
-                                                1
-                                                  ? t("timeline.items_plural")
-                                                  : t("timeline.item_singular")}
-                                              </span>
+                                            <div>
+                                              <div className="flex items-center gap-1 mb-1.5">
+                                                <Package className="w-3 h-3 text-muted-foreground" />
+                                                <span className="text-xs font-medium text-muted-foreground">
+                                                  {t("timeline.items_involved")}
+                                                </span>
+                                              </div>
+                                              <div className="flex flex-wrap gap-1.5">
+                                                {event.itemsInvolved.map((id) => {
+                                                  const item = mockItems.find((i) => i.id === id);
+                                                  return (
+                                                    <div
+                                                      key={id}
+                                                      className="flex items-center gap-1.5 px-2 py-1 rounded border border-border/50 bg-muted/30"
+                                                    >
+                                                      {item?.image ? (
+                                                        <Avatar className="w-4 h-4 rounded-sm">
+                                                          <AvatarImage src={item.image} alt={item.name} />
+                                                        </Avatar>
+                                                      ) : (
+                                                        <div className="w-4 h-4 rounded-sm bg-purple-950/40 flex items-center justify-center">
+                                                          <Package className="w-2.5 h-2.5 text-purple-400" />
+                                                        </div>
+                                                      )}
+                                                      <span className="text-xs">
+                                                        {item?.name || id}
+                                                      </span>
+                                                    </div>
+                                                  );
+                                                })}
+                                              </div>
                                             </div>
                                           )}
                                         </div>
@@ -950,12 +1050,29 @@ export function FactionTimeline({
                       <Users className="w-4 h-4" />
                       {t("timeline.characters_involved")}
                     </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedEvent.charactersInvolved.map((id) => (
-                        <Badge key={id} variant="secondary">
-                          {getCharacterName(id)}
-                        </Badge>
-                      ))}
+                    <div className="flex flex-wrap gap-3">
+                      {selectedEvent.charactersInvolved.map((id) => {
+                        const character = mockCharacters.find((c) => c.id === id);
+                        return (
+                          <div
+                            key={id}
+                            className="flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card"
+                          >
+                            {character?.image ? (
+                              <Avatar className="w-8 h-8 rounded-full">
+                                <AvatarImage src={character.image} alt={character.name} />
+                              </Avatar>
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-purple-950/40 flex items-center justify-center">
+                                <User className="w-4 h-4 text-purple-400" />
+                              </div>
+                            )}
+                            <span className="text-sm font-medium">
+                              {character?.name || id}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -966,12 +1083,29 @@ export function FactionTimeline({
                       <Building className="w-4 h-4" />
                       {t("timeline.factions_involved")}
                     </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedEvent.factionsInvolved.map((id) => (
-                        <Badge key={id} variant="secondary">
-                          {getFactionName(id)}
-                        </Badge>
-                      ))}
+                    <div className="flex flex-wrap gap-3">
+                      {selectedEvent.factionsInvolved.map((id) => {
+                        const faction = mockFactions.find((f) => f.id === id);
+                        return (
+                          <div
+                            key={id}
+                            className="flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card"
+                          >
+                            {faction?.image ? (
+                              <Avatar className="w-8 h-8 rounded-sm">
+                                <AvatarImage src={faction.image} alt={faction.name} />
+                              </Avatar>
+                            ) : (
+                              <div className="w-8 h-8 rounded-sm bg-purple-950/40 flex items-center justify-center">
+                                <Shield className="w-4 h-4 text-purple-400" />
+                              </div>
+                            )}
+                            <span className="text-sm font-medium">
+                              {faction?.name || id}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -982,12 +1116,29 @@ export function FactionTimeline({
                       <Swords className="w-4 h-4" />
                       {t("timeline.races_involved")}
                     </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedEvent.racesInvolved.map((id) => (
-                        <Badge key={id} variant="secondary">
-                          {getRaceName(id)}
-                        </Badge>
-                      ))}
+                    <div className="flex flex-wrap gap-3">
+                      {selectedEvent.racesInvolved.map((id) => {
+                        const race = mockRaces.find((r) => r.id === id);
+                        return (
+                          <div
+                            key={id}
+                            className="flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card"
+                          >
+                            {race?.image ? (
+                              <Avatar className="w-8 h-8 rounded-sm">
+                                <AvatarImage src={race.image} alt={race.name} />
+                              </Avatar>
+                            ) : (
+                              <div className="w-8 h-8 rounded-sm bg-purple-950/40 flex items-center justify-center">
+                                <Dna className="w-4 h-4 text-purple-400" />
+                              </div>
+                            )}
+                            <span className="text-sm font-medium">
+                              {race?.name || id}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -998,12 +1149,29 @@ export function FactionTimeline({
                       <Package className="w-4 h-4" />
                       {t("timeline.items_involved")}
                     </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedEvent.itemsInvolved.map((id) => (
-                        <Badge key={id} variant="secondary">
-                          {getItemName(id)}
-                        </Badge>
-                      ))}
+                    <div className="flex flex-wrap gap-3">
+                      {selectedEvent.itemsInvolved.map((id) => {
+                        const item = mockItems.find((i) => i.id === id);
+                        return (
+                          <div
+                            key={id}
+                            className="flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card"
+                          >
+                            {item?.image ? (
+                              <Avatar className="w-8 h-8 rounded-sm">
+                                <AvatarImage src={item.image} alt={item.name} />
+                              </Avatar>
+                            ) : (
+                              <div className="w-8 h-8 rounded-sm bg-purple-950/40 flex items-center justify-center">
+                                <Package className="w-4 h-4 text-purple-400" />
+                              </div>
+                            )}
+                            <span className="text-sm font-medium">
+                              {item?.name || id}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

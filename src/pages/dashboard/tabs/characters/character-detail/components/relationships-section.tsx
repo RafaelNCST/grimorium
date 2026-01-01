@@ -476,11 +476,6 @@ export function RelationshipsSection({
                             <p className="font-semibold text-base truncate">
                               {character.name}
                             </p>
-                            {character.role && (
-                              <p className="text-sm text-muted-foreground truncate">
-                                {character.role}
-                              </p>
-                            )}
                           </div>
                         </div>
                       </Card>
@@ -529,11 +524,6 @@ export function RelationshipsSection({
                           <p className="font-semibold text-base truncate">
                             {getCharacterById(selectedCharacterId)?.name}
                           </p>
-                          {getCharacterById(selectedCharacterId)?.role && (
-                            <p className="text-sm text-muted-foreground truncate">
-                              {getCharacterById(selectedCharacterId)?.role}
-                            </p>
-                          )}
                         </div>
                       </div>
                     </Card>
@@ -695,11 +685,6 @@ export function RelationshipsSection({
                           <p className="font-semibold text-base truncate">
                             {getCharacterById(editingRelationship.characterId)?.name}
                           </p>
-                          {getCharacterById(editingRelationship.characterId)?.role && (
-                            <p className="text-sm text-muted-foreground truncate">
-                              {getCharacterById(editingRelationship.characterId)?.role}
-                            </p>
-                          )}
                         </div>
                       </div>
                     </Card>

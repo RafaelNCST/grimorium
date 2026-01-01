@@ -79,16 +79,6 @@ CREATE TABLE IF NOT EXISTS relationships (
   UNIQUE(character_id, related_character_id, type)
 );
 
--- RELAÇÕES FAMILIARES
-CREATE TABLE IF NOT EXISTS family_relations (
-  id TEXT PRIMARY KEY,
-  character_id TEXT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
-  related_character_id TEXT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
-  relation_type TEXT NOT NULL,
-  created_at INTEGER NOT NULL,
-  UNIQUE(character_id, related_character_id, relation_type)
-);
-
 -- REGIÕES (MUNDO)
 CREATE TABLE IF NOT EXISTS regions (
   id TEXT PRIMARY KEY,
@@ -137,8 +127,6 @@ CREATE TABLE IF NOT EXISTS regions (
 CREATE INDEX IF NOT EXISTS idx_characters_book_id ON characters(book_id);
 CREATE INDEX IF NOT EXISTS idx_relationships_character ON relationships(character_id);
 CREATE INDEX IF NOT EXISTS idx_relationships_related ON relationships(related_character_id);
-CREATE INDEX IF NOT EXISTS idx_family_character ON family_relations(character_id);
-CREATE INDEX IF NOT EXISTS idx_family_related ON family_relations(related_character_id);
 CREATE INDEX IF NOT EXISTS idx_books_last_opened ON books(last_opened_at DESC);
 CREATE INDEX IF NOT EXISTS idx_regions_book_id ON regions(book_id);
 CREATE INDEX IF NOT EXISTS idx_regions_parent_id ON regions(parent_id);

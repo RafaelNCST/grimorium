@@ -69,6 +69,7 @@ interface FactionDetailViewProps {
   mockRaces: Array<{ id: string; name: string; image?: string }>;
   mockFactions: Array<{ id: string; name: string; image?: string }>;
   mockItems: Array<{ id: string; name: string; image?: string }>;
+  mockRegions: Array<{ id: string; name: string; image?: string }>;
   statuses: typeof FACTION_STATUS_CONSTANT;
   types: typeof FACTION_TYPES_CONSTANT;
   currentStatus: (typeof FACTION_STATUS_CONSTANT)[0] | undefined;
@@ -114,6 +115,7 @@ export function FactionDetailView({
   mockRaces,
   mockFactions,
   mockItems,
+  mockRegions,
   currentStatus,
   currentType,
   StatusIcon,
@@ -586,11 +588,13 @@ export function FactionDetailView({
             <DisplayEntityList
               label={t("faction-detail:fields.dominated_areas")}
               entities={(() => {
-                const regions = Array.isArray(faction.dominatedAreas) ? faction.dominatedAreas : [];
-                return regions.map((regionId: string) => ({
-                  id: regionId,
-                  name: regionId,
-                })) as DisplayEntityItem[];
+                const regionIds = Array.isArray(faction.dominatedAreas) ? faction.dominatedAreas : [];
+                return regionIds.map((regionId: string) => {
+                  const region = mockRegions.find((r) => r.id === regionId);
+                  return region
+                    ? { id: region.id, name: region.name, image: region.image }
+                    : null;
+                }).filter(Boolean) as DisplayEntityItem[];
               })()}
             />
           )}
@@ -616,11 +620,13 @@ export function FactionDetailView({
             <DisplayEntityList
               label={t("faction-detail:fields.main_base")}
               entities={(() => {
-                const regions = Array.isArray(faction.mainBase) ? faction.mainBase : [];
-                return regions.map((regionId: string) => ({
-                  id: regionId,
-                  name: regionId,
-                })) as DisplayEntityItem[];
+                const regionIds = Array.isArray(faction.mainBase) ? faction.mainBase : [];
+                return regionIds.map((regionId: string) => {
+                  const region = mockRegions.find((r) => r.id === regionId);
+                  return region
+                    ? { id: region.id, name: region.name, image: region.image }
+                    : null;
+                }).filter(Boolean) as DisplayEntityItem[];
               })()}
             />
           )}
@@ -647,11 +653,13 @@ export function FactionDetailView({
             <DisplayEntityList
               label={t("faction-detail:fields.areas_of_interest")}
               entities={(() => {
-                const regions = Array.isArray(faction.areasOfInterest) ? faction.areasOfInterest : [];
-                return regions.map((regionId: string) => ({
-                  id: regionId,
-                  name: regionId,
-                })) as DisplayEntityItem[];
+                const regionIds = Array.isArray(faction.areasOfInterest) ? faction.areasOfInterest : [];
+                return regionIds.map((regionId: string) => {
+                  const region = mockRegions.find((r) => r.id === regionId);
+                  return region
+                    ? { id: region.id, name: region.name, image: region.image }
+                    : null;
+                }).filter(Boolean) as DisplayEntityItem[];
               })()}
             />
           )}
@@ -901,23 +909,18 @@ export function FactionDetailView({
 
           {/* Founders */}
           {isEditing ? (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-primary">
-                {t("faction-detail:fields.founders")}
-              </Label>
-              <FormEntityMultiSelectAuto
-                entityType="character"
-                bookId={bookId}
-                label={t("faction-detail:fields.founders")}
-                placeholder={t("create-faction:modal.founders_placeholder")}
-                emptyText={t("create-faction:modal.no_characters_warning")}
-                noSelectionText={t("create-faction:modal.no_founders_selected")}
-                searchPlaceholder={t("create-faction:modal.search_characters")}
-                value={editData.founders || []}
-                onChange={(value) => onEditDataChange("founders", value)}
-                labelClassName="text-sm font-medium text-primary"
-              />
-            </div>
+            <FormEntityMultiSelectAuto
+              entityType="character"
+              bookId={bookId}
+              label={t("faction-detail:fields.founders")}
+              placeholder={t("create-faction:modal.founders_placeholder")}
+              emptyText={t("create-faction:modal.no_characters_warning")}
+              noSelectionText={t("create-faction:modal.no_founders_selected")}
+              searchPlaceholder={t("create-faction:modal.search_characters")}
+              value={editData.founders || []}
+              onChange={(value) => onEditDataChange("founders", value)}
+              labelClassName="text-sm font-medium text-primary"
+            />
           ) : (
             <DisplayEntityList
               label={t("faction-detail:fields.founders")}
@@ -1227,6 +1230,10 @@ export function FactionDetailView({
           }
           isCreateEraDialogOpen={isCreateEraDialogOpen}
           onCreateEraDialogOpenChange={setIsCreateEraDialogOpen}
+          mockCharacters={mockCharacters}
+          mockFactions={mockFactions}
+          mockRaces={mockRaces}
+          mockItems={mockItems}
         />
       ),
       isCollapsible: true,

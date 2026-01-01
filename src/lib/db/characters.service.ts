@@ -1,13 +1,11 @@
 import {
   ICharacter,
   ICharacterRelationship,
-  ICharacterFamily,
 } from "@/types/character-types";
 
 import {
   DBCharacter,
   DBRelationship,
-  DBFamilyRelation,
 } from "./types";
 
 import { getDB } from "./index";
@@ -346,7 +344,7 @@ export async function deleteCharacter(id: string): Promise<void> {
       "charactersInvolved",
     ]);
 
-    // 7. Finally, delete the character (CASCADE will handle versions, relationships, family_relations, power_character_links)
+    // 7. Finally, delete the character (CASCADE will handle versions, relationships, power_character_links)
     await db.execute("DELETE FROM characters WHERE id = $1", [id]);
   }, 'deleteCharacter');
 }
@@ -401,111 +399,3 @@ export async function saveCharacterRelationships(
     }
   }, 'saveCharacterRelationships');
 }
-
-// Family Relations
-export async function getCharacterFamily(
-  characterId: string
-): Promise<ICharacterFamily> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    const result = await db.select<DBFamilyRelation[]>(
-      "SELECT * FROM family_relations WHERE character_id = $1",
-      [characterId]
-    );
-
-    const family: ICharacterFamily = {
-      grandparents: [],
-      parents: [],
-      spouses: [],
-      unclesAunts: [],
-      cousins: [],
-      children: [],
-      siblings: [],
-      halfSiblings: [],
-    };
-
-    for (const rel of result) {
-      const relatedId = rel.related_character_id;
-      switch (rel.relation_type) {
-        // Map both "father" and "mother" to parents array
-        case "father":
-        case "mother":
-        case "parent":
-          family.parents.push(relatedId);
-          break;
-        // Map "spouse" to spouses array
-        case "spouse":
-          family.spouses.push(relatedId);
-          break;
-        case "child":
-          family.children.push(relatedId);
-          break;
-        case "sibling":
-          family.siblings.push(relatedId);
-          break;
-        case "half_sibling":
-          family.halfSiblings.push(relatedId);
-          break;
-        case "grandparent":
-          family.grandparents.push(relatedId);
-          break;
-        case "uncle_aunt":
-          family.unclesAunts.push(relatedId);
-          break;
-        case "cousin":
-          family.cousins.push(relatedId);
-          break;
-      }
-    }
-
-    return family;
-  }, 'getCharacterFamily');
-}
-
-export async function saveCharacterFamily(
-  characterId: string,
-  family: ICharacterFamily
-): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-
-    // Delete existing family relations
-    await db.execute("DELETE FROM family_relations WHERE character_id = $1", [
-      characterId,
-    ]);
-
-    const now = Date.now();
-    const relations: Array<{ type: string; id: string }> = [];
-
-    // Map parents array to "parent" relation type
-    family.parents.forEach((id) => relations.push({ type: "parent", id }));
-
-    // Map spouses array to "spouse" relation type
-    family.spouses.forEach((id) => relations.push({ type: "spouse", id }));
-
-    // Map other family members
-    family.children.forEach((id) => relations.push({ type: "child", id }));
-    family.siblings.forEach((id) => relations.push({ type: "sibling", id }));
-    family.halfSiblings.forEach((id) =>
-      relations.push({ type: "half_sibling", id })
-    );
-    family.grandparents.forEach((id) =>
-      relations.push({ type: "grandparent", id })
-    );
-    family.unclesAunts.forEach((id) =>
-      relations.push({ type: "uncle_aunt", id })
-    );
-    family.cousins.forEach((id) => relations.push({ type: "cousin", id }));
-
-    // Insert new family relations
-    for (const rel of relations) {
-      const relId = `${characterId}-${rel.id}-${rel.type}-${now}`;
-      await db.execute(
-        `INSERT INTO family_relations (id, character_id, related_character_id, relation_type, created_at)
-         VALUES ($1, $2, $3, $4, $5)`,
-        [relId, characterId, rel.id, rel.type, now]
-      );
-    }
-  }, 'saveCharacterFamily');
-}
-

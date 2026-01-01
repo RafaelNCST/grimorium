@@ -58,7 +58,6 @@ import { type ICharacterFormData } from "@/types/character-types";
 
 import { AlignmentMatrix } from "./components/alignment-matrix";
 import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
-import { FamilySection } from "./components/family-section";
 import { RelationshipsSection } from "./components/relationships-section";
 import { type IAlignment } from "./constants/alignments-constant";
 import { type IRelationshipType } from "./constants/relationship-types-constant";
@@ -1087,76 +1086,6 @@ export function CharacterDetailView({
       onAddClick: () => {
         setIsAddRelationshipDialogOpen(true);
       },
-      blockedEntityName: "characters",
-    },
-    {
-      id: "family",
-      title: t("character-detail:sections.family"),
-      content: (
-        <FamilySection
-          family={
-            (isEditing ? editData.family : character.family) || {
-              grandparents: [],
-              parents: [],
-              spouses: [],
-              unclesAunts: [],
-              cousins: [],
-              children: [],
-              siblings: [],
-              halfSiblings: [],
-            }
-          }
-          allCharacters={mockCharacters}
-          currentCharacterId={character.id}
-          bookId={bookId}
-          isEditMode={isEditing}
-          onFamilyChange={(family) => onEditDataChange("family", family)}
-        />
-      ),
-      isCollapsible: true,
-      defaultOpen: false,
-      isVisible: sectionVisibility.family !== false,
-      onVisibilityToggle: () => onSectionVisibilityToggle("family"),
-      // Empty states
-      emptyState: (() => {
-        const family = (isEditing ? editData.family : character.family) || {
-          grandparents: [],
-          parents: [],
-          spouses: [],
-          unclesAunts: [],
-          cousins: [],
-          children: [],
-          siblings: [],
-          halfSiblings: [],
-        };
-        const hasFamilyMembers =
-          (family.grandparents && family.grandparents.length > 0) ||
-          (family.parents && family.parents.length > 0) ||
-          (family.spouses && family.spouses.length > 0) ||
-          (family.unclesAunts && family.unclesAunts.length > 0) ||
-          (family.cousins && family.cousins.length > 0) ||
-          (family.children && family.children.length > 0) ||
-          (family.siblings && family.siblings.length > 0) ||
-          (family.halfSiblings && family.halfSiblings.length > 0);
-
-        // Estado 3: Bloqueado - não há personagens suficientes
-        if (mockCharacters.length <= 1 && isEditing) {
-          return "blocked-no-data";
-        }
-
-        // Estado 1: Vazio em visualização
-        if (!hasFamilyMembers && !isEditing) {
-          return "empty-view";
-        }
-
-        // Estado 2: Vazio em edição (não usamos porque a FamilySection sempre mostra campos)
-        // A seção de família sempre mostra os campos mesmo vazios
-
-        return null;
-      })(),
-      emptyIcon: Heart,
-      emptyTitle: tEmpty("relationships.no_family_relation_defined"),
-      emptyDescription: tEmpty("relationships.use_edit_mode_to_add_family"),
       blockedEntityName: "characters",
     },
   ];

@@ -60,9 +60,7 @@
   },
   "relationships": {
     "no_relationship_defined": "Nenhum relacionamento definido",
-    "use_edit_mode_to_add_relationships": "Use o modo de edição para adicionar relacionamentos",
-    "no_family_relation_defined": "Nenhuma relação familiar definida",
-    "use_edit_mode_to_add_family": "Use o modo de edição para adicionar familiares"
+    "use_edit_mode_to_add_relationships": "Use o modo de edição para adicionar relacionamentos"
   },
   "diplomacy": {
     "no_diplomatic_relation_defined": "Nenhuma relação diplomática definida",

@@ -12,8 +12,6 @@ import {
   getCharactersByBookId,
   getCharacterRelationships,
   saveCharacterRelationships,
-  getCharacterFamily,
-  saveCharacterFamily,
 } from "@/lib/db/characters.service";
 import {
   getPowerLinksWithTitlesByCharacterId,
@@ -72,16 +70,6 @@ export function CharacterDetail() {
     birthPlace: [],
     qualities: [],
     relationships: [],
-    family: {
-      grandparents: [],
-      parents: [],
-      spouses: [],
-      unclesAunts: [],
-      cousins: [],
-      children: [],
-      siblings: [],
-      halfSiblings: [],
-    },
     createdAt: new Date().toISOString(),
   };
 
@@ -312,9 +300,6 @@ export function CharacterDetail() {
     )
       return true;
 
-    // Compare family
-    if (JSON.stringify(character.family) !== JSON.stringify(editData.family))
-      return true;
     return false;
   }, [
     character,
@@ -334,7 +319,6 @@ export function CharacterDetail() {
         const [
           characterFromDB,
           relationships,
-          family,
           allCharsFromBook,
           powerLinks,
           regionsFromDB,
@@ -342,7 +326,6 @@ export function CharacterDetail() {
         ] = await Promise.all([
           getCharacterById(characterId),
           getCharacterRelationships(characterId),
-          getCharacterFamily(characterId),
           dashboardId
             ? getCharactersByBookId(dashboardId)
             : Promise.resolve([]),
@@ -359,12 +342,10 @@ export function CharacterDetail() {
           setCharacter({
             ...characterFromDB,
             relationships,
-            family,
           });
           setEditData({
             ...characterFromDB,
             relationships,
-            family,
           });
           setImagePreview(characterFromDB.image || "");
 
@@ -478,11 +459,6 @@ export function CharacterDetail() {
         );
       }
 
-      // Save family
-      if (updatedCharacter.family) {
-        await saveCharacterFamily(characterId, updatedCharacter.family);
-      }
-
       // Atualizar no store (que também salva no DB)
       await updateCharacterInStore(characterId, updatedCharacter);
 
@@ -573,70 +549,6 @@ export function CharacterDetail() {
       qualities: prev.qualities.filter((q) => q !== qualityToRemove),
     }));
   }, []);
-
-  const _handleFamilyRelationChange = useCallback(
-    (relationType: string, characterId: string | null) => {
-      setEditData((prev) => {
-        const newFamily = { ...prev.family };
-
-        Object.keys(newFamily).forEach((key) => {
-          if (Array.isArray(newFamily[key])) {
-            newFamily[key] = newFamily[key].filter(
-              (id: string) => id !== characterId
-            );
-          } else if (newFamily[key] === characterId) {
-            newFamily[key] = null;
-          }
-        });
-
-        if (characterId && characterId !== "none") {
-          switch (relationType) {
-            case "father":
-            case "mother":
-            case "spouse":
-              newFamily[relationType] = characterId;
-              break;
-            case "child":
-              if (!newFamily.children.includes(characterId)) {
-                newFamily.children.push(characterId);
-              }
-              break;
-            case "sibling":
-              if (!newFamily.siblings.includes(characterId)) {
-                newFamily.siblings.push(characterId);
-              }
-              break;
-            case "halfSibling":
-              if (!newFamily.halfSiblings.includes(characterId)) {
-                newFamily.halfSiblings.push(characterId);
-              }
-              break;
-            case "uncleAunt":
-              if (!newFamily.unclesAunts.includes(characterId)) {
-                newFamily.unclesAunts.push(characterId);
-              }
-              break;
-            case "grandparent":
-              if (!newFamily.grandparents.includes(characterId)) {
-                newFamily.grandparents.push(characterId);
-              }
-              break;
-            case "cousin":
-              if (!newFamily.cousins.includes(characterId)) {
-                newFamily.cousins.push(characterId);
-              }
-              break;
-          }
-        }
-
-        return {
-          ...prev,
-          family: newFamily,
-        };
-      });
-    },
-    []
-  );
 
   const handleImageFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -10,6 +10,7 @@ import {
   DisplayImage,
   DisplayTextarea,
   DisplaySelectGrid,
+  DisplayStringList,
   type DisplaySelectGridOption,
 } from "@/components/displays";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
@@ -35,7 +36,6 @@ import { type ItemFormSchema } from "@/components/modals/create-item-modal/hooks
 import { CreateItemModal } from "@/components/modals/create-item-modal/index";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -150,18 +150,6 @@ export const ItemDetailView = React.memo(
 
     // Navigation for entity notes
     const navigate = useNavigate();
-
-    // Alternative names with unique IDs for stable keys
-    const alternativeNamesWithIds = useMemo(
-      () =>
-        (isEditing ? editData.alternativeNames : item.alternativeNames)?.map(
-          (name, index) => ({
-            id: `${name}-${index}`,
-            name,
-          })
-        ) || [],
-      [isEditing ? editData.alternativeNames : item.alternativeNames, isEditing]
-    );
 
     // Get current status icon for badge display
     const statusData = ITEM_STATUSES_CONSTANT.find(
@@ -378,13 +366,6 @@ export const ItemDetailView = React.memo(
               <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed select-text">
                 {item.basicDescription}
               </p>
-
-              {/* Alternative names */}
-              {item.alternativeNames && item.alternativeNames.length > 0 && (
-                <p className="text-xs text-muted-foreground select-text">
-                  {t("item-detail:fields.also_known_as")}: {item.alternativeNames.join(", ")}
-                </p>
-              )}
             </div>
           </>
         )}
@@ -498,7 +479,7 @@ export const ItemDetailView = React.memo(
             {/* Alternative Names */}
             <FieldWithVisibilityToggle
               fieldName="alternativeNames"
-              label={t("item-detail:fields.alternative_names")}
+              label=""
               isOptional
               fieldVisibility={fieldVisibility}
               isEditing={isEditing}
@@ -510,24 +491,17 @@ export const ItemDetailView = React.memo(
                   onChange={(names) =>
                     onEditDataChange("alternativeNames", names)
                   }
-                  label=""
+                  label={t("item-detail:fields.alternative_names")}
                   placeholder={t("item-detail:placeholders.alternative_name")}
                   buttonText={t("item-detail:buttons.add_alternative_name")}
                   maxLength={100}
                   inputSize="small"
                 />
-              ) : alternativeNamesWithIds.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {alternativeNamesWithIds.map((item) => (
-                    <EntityTagBadge key={item.id} variant="outline">
-                      {item.name}
-                    </EntityTagBadge>
-                  ))}
-                </div>
               ) : (
-                <span className="italic text-muted-foreground/60">
-                  {t("item-detail:fields.no_data")}
-                </span>
+                <DisplayStringList
+                  label={t("item-detail:fields.alternative_names")}
+                  items={item.alternativeNames}
+                />
               )}
             </FieldWithVisibilityToggle>
           </div>

@@ -23,7 +23,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { Separator } from "@/components/ui/separator";
 import { AlignmentMatrix } from "@/pages/dashboard/tabs/characters/character-detail/components/alignment-matrix";
-import { FamilySection } from "@/pages/dashboard/tabs/characters/character-detail/components/family-section";
 import { RelationshipsSection } from "@/pages/dashboard/tabs/characters/character-detail/components/relationships-section";
 import type { ICharacter } from "@/types/character-types";
 
@@ -544,37 +543,6 @@ export function CharacterSuperView({
           onRelationshipsChange={() => {}}
           isAddDialogOpen={false}
           onAddDialogOpenChange={() => {}}
-        />
-      </div>
-
-      <Separator />
-
-      {/* FAMÍLIA Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("character-detail:sections.family")}
-        </h4>
-
-        <FamilySection
-          family={
-            character.family || {
-              grandparents: [],
-              parents: [],
-              spouses: [],
-              unclesAunts: [],
-              cousins: [],
-              children: [],
-              siblings: [],
-              halfSiblings: [],
-            }
-          }
-          allCharacters={mockCharacters}
-          currentCharacterId={character.id}
-          bookId={bookId}
-          isEditMode={false}
-          fieldVisibility={fieldVisibility}
-          onFamilyChange={() => {}}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
         />
       </div>
     </div>

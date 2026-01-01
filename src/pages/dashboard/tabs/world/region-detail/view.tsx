@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { convertFileSrc } from "@tauri-apps/api/core";
 import {
   AlertCircle,
   Trash2,
@@ -656,9 +655,7 @@ export function RegionDetailView({
                           ? {
                               id: faction.id,
                               name: faction.name,
-                              image: faction.image
-                                ? convertFileSrc(faction.image)
-                                : undefined,
+                              image: faction.image,
                             }
                           : null;
                       })
@@ -715,9 +712,7 @@ export function RegionDetailView({
                           ? {
                               id: faction.id,
                               name: faction.name,
-                              image: faction.image
-                                ? convertFileSrc(faction.image)
-                                : undefined,
+                              image: faction.image,
                             }
                           : null;
                       })
@@ -777,9 +772,7 @@ export function RegionDetailView({
                             ? {
                                 id: character.id,
                                 name: character.name,
-                                image: character.image
-                                  ? convertFileSrc(character.image)
-                                  : undefined,
+                                image: character.image,
                               }
                             : null;
                         }
@@ -830,9 +823,7 @@ export function RegionDetailView({
                           ? {
                               id: race.id,
                               name: race.name,
-                              image: race.image
-                                ? convertFileSrc(race.image)
-                                : undefined,
+                              image: race.image,
                             }
                           : null;
                       })
@@ -882,9 +873,7 @@ export function RegionDetailView({
                           ? {
                               id: item.id,
                               name: item.name,
-                              image: item.image
-                                ? convertFileSrc(item.image)
-                                : undefined,
+                              image: item.image,
                             }
                           : null;
                       })
@@ -1235,6 +1224,10 @@ export function RegionDetailView({
                     onTimelineChange={onTimelineChange}
                     isCreateEraDialogOpen={isCreateEraDialogOpen}
                     onCreateEraDialogOpenChange={setIsCreateEraDialogOpen}
+                    mockCharacters={characters}
+                    mockFactions={factions}
+                    mockRaces={races}
+                    mockItems={items}
                   />
                 ),
                 isCollapsible: true,
