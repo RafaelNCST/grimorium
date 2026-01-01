@@ -586,7 +586,7 @@ export function FactionDetailView({
             <DisplayEntityList
               label={t("faction-detail:fields.dominated_areas")}
               entities={(() => {
-                const regions = faction.dominatedAreas || [];
+                const regions = Array.isArray(faction.dominatedAreas) ? faction.dominatedAreas : [];
                 return regions.map((regionId: string) => ({
                   id: regionId,
                   name: regionId,
@@ -616,7 +616,7 @@ export function FactionDetailView({
             <DisplayEntityList
               label={t("faction-detail:fields.main_base")}
               entities={(() => {
-                const regions = faction.mainBase || [];
+                const regions = Array.isArray(faction.mainBase) ? faction.mainBase : [];
                 return regions.map((regionId: string) => ({
                   id: regionId,
                   name: regionId,
@@ -647,7 +647,7 @@ export function FactionDetailView({
             <DisplayEntityList
               label={t("faction-detail:fields.areas_of_interest")}
               entities={(() => {
-                const regions = faction.areasOfInterest || [];
+                const regions = Array.isArray(faction.areasOfInterest) ? faction.areasOfInterest : [];
                 return regions.map((regionId: string) => ({
                   id: regionId,
                   name: regionId,
@@ -819,7 +819,7 @@ export function FactionDetailView({
             <DisplayEntityList
               label={t("faction-detail:fields.races")}
               entities={(() => {
-                const raceIds = faction.races || [];
+                const raceIds = Array.isArray(faction.races) ? faction.races : [];
                 return raceIds.map((raceId: string) => {
                   const race = mockRaces.find((r) => r.id === raceId);
                   return race
@@ -922,7 +922,7 @@ export function FactionDetailView({
             <DisplayEntityList
               label={t("faction-detail:fields.founders")}
               entities={(() => {
-                const founderIds = faction.founders || [];
+                const founderIds = Array.isArray(faction.founders) ? faction.founders : [];
                 return founderIds.map((founderId: string) => {
                   const character = mockCharacters.find(
                     (c) => c.id === founderId

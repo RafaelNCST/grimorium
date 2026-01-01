@@ -9,6 +9,7 @@ import { getItemsByBookId } from "@/lib/db/items.service";
 import { getPlotArcsByBookId, getPlotArcById } from "@/lib/db/plot.service";
 import { getRegionsByBookId } from "@/lib/db/regions.service";
 import { canFinishArc } from "@/lib/utils/arc-validation";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { usePlotStore } from "@/stores/plot-store";
 import type { IPlotArc, IPlotEvent } from "@/types/plot-types";
 
@@ -529,9 +530,13 @@ export function PlotArcDetail() {
     setShowFinishWarningDialog(open);
   }, []);
 
-  // Show nothing while loading to avoid flash
+  // Show loading spinner while loading
   if (isLoading) {
-    return null;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <LoadingSpinner size="xl" />
+      </div>
+    );
   }
 
   if (!arc) {

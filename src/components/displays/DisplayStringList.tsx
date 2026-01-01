@@ -76,8 +76,9 @@ export function DisplayStringList({
   className,
 }: DisplayStringListProps) {
   const { t } = useTranslation("common");
-  const hasItems = items && items.length > 0;
-  const itemCount = items?.length || 0;
+  const safeItems = Array.isArray(items) ? items : [];
+  const hasItems = safeItems.length > 0;
+  const itemCount = safeItems.length;
 
   return (
     <Collapsible
@@ -108,7 +109,7 @@ export function DisplayStringList({
       <CollapsibleContent className="mt-2">
         {hasItems ? (
           <ul className="list-disc list-inside space-y-1">
-            {items.map((item, index) => (
+            {safeItems.map((item, index) => (
               <li key={`${item}-${index}`} className="text-sm">
                 {item}
               </li>

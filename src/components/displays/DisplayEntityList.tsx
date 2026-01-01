@@ -97,13 +97,14 @@ export function DisplayEntityList({
   className,
 }: DisplayEntityListProps) {
   const { t } = useTranslation("common");
-  const hasEntities = entities && entities.length > 0;
-  const entityCount = entities?.length || 0;
+  const safeEntities = Array.isArray(entities) ? entities : [];
+  const hasEntities = safeEntities.length > 0;
+  const entityCount = safeEntities.length;
 
   // Simple list without collapsible when no label is provided
   const entityListContent = hasEntities ? (
     <div className="flex flex-col gap-2">
-      {entities.map((entity) => (
+      {safeEntities.map((entity) => (
         <div
           key={entity.id}
           className="flex items-center gap-2 p-2 bg-muted rounded-lg"

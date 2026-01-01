@@ -15,6 +15,7 @@ import {
   type IItem,
 } from "@/lib/db/items.service";
 import { ItemSchema, ItemSchemaBase } from "@/lib/validation/item-schema";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useItemsStore } from "@/stores/items-store";
 import { type IFieldVisibility } from "@/types/character-types";
 
@@ -56,7 +57,7 @@ export default function ItemDetail() {
   const [isEditing, setIsEditing] = useState(false);
   const [item, setItem] = useState<IItem>(emptyItem);
   const [editData, setEditData] = useState<IItem>(emptyItem);
-  const [_imagePreview, _setImagePreview] = useState("");
+  const [imagePreview, setImagePreview] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] =
     useState(false);
@@ -84,7 +85,7 @@ export default function ItemDetail() {
     useState<IFieldVisibility>({});
   const [originalSectionVisibility, setOriginalSectionVisibility] =
     useState<Record<string, boolean>>({});
-  const [_isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [allItems, setAllItems] = useState<IItem[]>([]);
 
   // Keep ref synced with state
@@ -107,6 +108,7 @@ export default function ItemDetail() {
         if (itemFromDB) {
           setItem(itemFromDB);
           setEditData(itemFromDB);
+          setImagePreview(itemFromDB.image || "");
           setFieldVisibility(itemFromDB.fieldVisibility || {});
           setOriginalFieldVisibility(itemFromDB.fieldVisibility || {});
 
@@ -347,6 +349,7 @@ export default function ItemDetail() {
         sectionVisibility: currentSectionVisibility,
       };
       setItem(updatedItem);
+      setImagePreview(updatedItem.image || "");
 
       // Salvar no banco de dados
       await updateItem(itemId, updatedItem);
@@ -405,6 +408,7 @@ export default function ItemDetail() {
 
     // If no changes, cancel immediately
     setEditData(item);
+    setImagePreview(item.image || "");
     setFieldVisibility(originalFieldVisibility);
     setSectionVisibility(originalSectionVisibility);
     setErrors({});
@@ -413,6 +417,7 @@ export default function ItemDetail() {
 
   const handleConfirmCancel = useCallback(() => {
     setEditData(item);
+    setImagePreview(item.image || "");
     setFieldVisibility(originalFieldVisibility);
     setSectionVisibility(originalSectionVisibility);
     setErrors({});
@@ -459,6 +464,11 @@ export default function ItemDetail() {
 
   const handleEditDataChange = useCallback((field: string, value: unknown) => {
     setEditData((prev) => ({ ...prev, [field]: value }));
+
+    // Update image preview when image field changes
+    if (field === "image") {
+      setImagePreview(value as string);
+    }
   }, []);
 
   const handleFieldVisibilityToggle = useCallback((field: string) => {
@@ -489,6 +499,15 @@ export default function ItemDetail() {
       [sectionName]: !prev[sectionName],
     }));
   }, []);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <LoadingSpinner size="xl" />
+      </div>
+    );
+  }
 
   return (
     <>

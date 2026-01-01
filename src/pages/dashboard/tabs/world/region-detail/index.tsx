@@ -15,7 +15,6 @@ import { getRacesByBookId } from "@/lib/db/races.service";
 import {
   getRegionById,
   getRegionsByBookId,
-  updateRegion,
   deleteRegion,
   type ITimelineEra,
 } from "@/lib/db/regions.service";
@@ -25,6 +24,8 @@ import {
   type IRegion,
   type RegionScale,
 } from "@/pages/dashboard/tabs/world/types/region-types";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useRegionsStore } from "@/stores/regions-store";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { RegionDetailView } from "./view";
@@ -41,6 +42,9 @@ export function RegionDetail() {
     ?.fromMapVersionId;
   const navigate = useNavigate();
   const { t } = useTranslation(["region-detail", "common"]);
+
+  // Store hook
+  const updateRegionInCache = useRegionsStore((state) => state.updateRegionInCache);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -461,9 +465,9 @@ export function RegionDetail() {
                 itemsFound: JSON.stringify(cleanedItems),
               };
 
-              // Update database
+              // Update database and cache
               try {
-                await updateRegion(regionId, cleanedRegion);
+                await updateRegionInCache(regionId, cleanedRegion);
                 // Update state with cleaned data
                 setRegion(cleanedRegion);
                 setEditData(cleanedRegion);
@@ -540,6 +544,7 @@ export function RegionDetail() {
       };
 
       setRegion(updatedRegion);
+      setImagePreview(updatedRegion.image || "");
 
       // Get current visibility state from refs
       const currentSectionVisibility = sectionVisibilityRef.current;
@@ -586,8 +591,8 @@ export function RegionDetail() {
         timeline: JSON.stringify(timeline),
       };
 
-      // Update the region in database
-      await updateRegion(regionId, dataToSave);
+      // Update the region in database and cache
+      await updateRegionInCache(regionId, dataToSave);
 
       // Update original visibility to match saved state
       setOriginalSectionVisibility(currentSectionVisibility);
@@ -645,6 +650,7 @@ export function RegionDetail() {
 
     // If no changes, cancel immediately
     setEditData(region);
+    setImagePreview(region?.image || "");
     setTimeline(originalTimeline);
     setSectionVisibility(originalSectionVisibility);
     setErrors({});
@@ -658,6 +664,7 @@ export function RegionDetail() {
 
   const handleConfirmCancel = useCallback(() => {
     setEditData(region);
+    setImagePreview(region?.image || "");
     setTimeline(originalTimeline);
     setSectionVisibility(originalSectionVisibility);
     setErrors({});
@@ -743,6 +750,11 @@ export function RegionDetail() {
 
   const handleEditDataChange = useCallback((field: string, value: unknown) => {
     setEditData((prev) => ({ ...prev, [field]: value }));
+
+    // Update image preview when image field changes
+    if (field === "image") {
+      setImagePreview(value as string);
+    }
   }, []);
 
   const handleAdvancedSectionToggle = useCallback(() => {
@@ -769,10 +781,7 @@ export function RegionDetail() {
   if (!region) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-sm text-muted-foreground">{t("common:loading")}</p>
-        </div>
+        <LoadingSpinner size="xl" />
       </div>
     );
   }

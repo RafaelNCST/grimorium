@@ -9,6 +9,7 @@ import {
   getRaceRelationships,
   saveRaceRelationships,
 } from "@/lib/db/races.service";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useRacesStore } from "@/stores/races-store";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
@@ -281,6 +282,7 @@ export function RaceDetail() {
       await saveRaceRelationships(raceId, relationships);
 
       setRace(updatedRace);
+      setImagePreview(updatedRace.image || "");
       setOriginalFieldVisibility(fieldVisibility);
       setOriginalSectionVisibility(currentSectionVisibility);
       setOriginalRelationships(relationships);
@@ -428,6 +430,11 @@ export function RaceDetail() {
 
   const handleEditDataChange = useCallback((field: string, value: any) => {
     setEditData((prev) => ({ ...prev, [field]: value }));
+
+    // Update image preview when image field changes
+    if (field === "image") {
+      setImagePreview(value as string);
+    }
   }, []);
 
   const validateField = useCallback(
@@ -472,9 +479,7 @@ export function RaceDetail() {
   if (isLoading || !race.id || race.id === "" || !race.name) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <p className="text-lg text-muted-foreground">{t("common:loading")}</p>
-        </div>
+        <LoadingSpinner size="xl" />
       </div>
     );
   }

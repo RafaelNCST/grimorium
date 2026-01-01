@@ -28,6 +28,7 @@ import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import type { IRegion } from "@/pages/dashboard/tabs/world/types/region-types";
 import { useCharactersStore } from "@/stores/characters-store";
 import { type ICharacter } from "@/types/character-types";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { ALIGNMENTS_CONSTANT } from "./constants/alignments-constant";
@@ -112,7 +113,7 @@ export function CharacterDetail() {
     const stored = localStorage.getItem("characterDetailAdvancedSectionOpen");
     return stored ? JSON.parse(stored) : false;
   });
-  const [_isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [allCharacters, setAllCharacters] = useState<ICharacter[]>([]);
   const [regions, setRegions] = useState<IRegion[]>([]);
   const [races, setRaces] = useState<IRace[]>([]);
@@ -314,7 +315,6 @@ export function CharacterDetail() {
     // Compare family
     if (JSON.stringify(character.family) !== JSON.stringify(editData.family))
       return true;
-
     return false;
   }, [
     character,
@@ -466,7 +466,9 @@ export function CharacterDetail() {
       });
 
       const updatedCharacter = { ...editData };
+
       setCharacter(updatedCharacter);
+      setImagePreview(updatedCharacter.image || "");
 
       // Save relationships
       if (updatedCharacter.relationships) {
@@ -536,6 +538,7 @@ export function CharacterDetail() {
 
     // If no changes, cancel immediately
     setEditData({ ...character, relationships: character.relationships || [] });
+    setImagePreview(character.image || "");
     setSectionVisibility(originalSectionVisibility);
     setErrors({});
     setIsEditing(false);
@@ -547,6 +550,7 @@ export function CharacterDetail() {
 
   const handleConfirmCancel = useCallback(() => {
     setEditData({ ...character, relationships: character.relationships || [] });
+    setImagePreview(character.image || "");
     setSectionVisibility(originalSectionVisibility);
     setErrors({});
     setIsEditing(false);
@@ -643,7 +647,9 @@ export function CharacterDetail() {
         reader.onload = (e) => {
           const result = e.target?.result as string;
           setImagePreview(result);
-          setEditData((prev) => ({ ...prev, image: result }));
+          setEditData((prev) => {
+            return { ...prev, image: result };
+          });
         };
         reader.readAsDataURL(file);
       }
@@ -754,6 +760,11 @@ export function CharacterDetail() {
 
   const handleEditDataChange = useCallback((field: string, value: unknown) => {
     setEditData((prev) => ({ ...prev, [field]: value }));
+
+    // Update image preview when image field changes
+    if (field === "image") {
+      setImagePreview(value as string);
+    }
   }, []);
 
   const _handleNewQualityChange = useCallback((value: string) => {
@@ -838,6 +849,15 @@ export function CharacterDetail() {
     },
     [t]
   );
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <LoadingSpinner size="xl" />
+      </div>
+    );
+  }
 
   return (
     <>

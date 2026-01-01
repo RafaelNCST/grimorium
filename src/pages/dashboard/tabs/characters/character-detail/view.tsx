@@ -349,10 +349,7 @@ export function CharacterDetailView({
             <FormImageUpload
               value={imagePreview}
               onChange={(value) => {
-                const event = {
-                  target: { files: [new File([value], "image")] },
-                } as any;
-                onImageFileChange(event);
+                onEditDataChange("image", value);
               }}
               label={t("character-detail:fields.image")}
               shape="circle"

@@ -8,6 +8,7 @@ import { z } from "zod";
 import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-status";
 import { FACTION_TYPES_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-types";
 import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { getFactionById } from "@/lib/db/factions.service";
 import { FactionSchema } from "@/lib/validation/faction-schema";
 import { useCharactersStore } from "@/stores/characters-store";
@@ -301,6 +302,7 @@ export function FactionDetail() {
       const currentUiState = uiStateRef.current;
       const updatedFaction = { ...editData, uiState: currentUiState };
       setFaction(updatedFaction);
+      setImagePreview(updatedFaction.image || "");
 
       console.log('[Faction Save] currentUiState from ref:', currentUiState);
       console.log('[Faction Save] updatedFaction.uiState:', updatedFaction.uiState);
@@ -405,6 +407,11 @@ export function FactionDetail() {
     (field: string, value: unknown) => {
       setEditData((prev) => ({ ...prev, [field]: value }));
 
+      // Update image preview when image field changes
+      if (field === "image") {
+        setImagePreview(value as string);
+      }
+
       // Clear error for this field when user starts typing (for required fields)
       if (errors[field]) {
         // Re-validate the field to clear error if value is now valid
@@ -489,10 +496,7 @@ export function FactionDetail() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">{t("loading")}</p>
-        </div>
+        <LoadingSpinner size="xl" />
       </div>
     );
   }
