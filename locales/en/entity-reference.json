@@ -1,0 +1,37 @@
+{
+  "title": "Quick References",
+  "pinned_section": "Pinned",
+  "no_pinned_entities": "No pinned entities",
+  "search_placeholder": "Search entities...",
+  "empty_state": "No entities found",
+  "filter": {
+    "all": "All Types"
+  },
+  "entity_types": {
+    "character": "Character",
+    "region": "Region",
+    "faction": "Faction",
+    "item": "Item",
+    "race": "Race"
+  },
+  "entity_types_plural": {
+    "character": "Characters",
+    "region": "Regions",
+    "faction": "Factions",
+    "item": "Items",
+    "race": "Races"
+  },
+  "fields": {
+    "description": "Description",
+    "summary": "Summary"
+  },
+  "actions": {
+    "view_details": "View full details",
+    "show_advanced": "Show advanced info",
+    "hide_advanced": "Hide advanced info",
+    "show_list": "Show list",
+    "hide_list": "Hide list",
+    "read_more": "Read more",
+    "read_less": "Read less"
+  }
+}

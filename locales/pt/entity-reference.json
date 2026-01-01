@@ -1,0 +1,37 @@
+{
+  "title": "Referências Rápidas",
+  "pinned_section": "Fixados",
+  "no_pinned_entities": "Nenhuma entidade fixada",
+  "search_placeholder": "Buscar entidades...",
+  "empty_state": "Nenhuma entidade encontrada",
+  "filter": {
+    "all": "Todos os Tipos"
+  },
+  "entity_types": {
+    "character": "Personagem",
+    "region": "Região",
+    "faction": "Facção",
+    "item": "Item",
+    "race": "Raça"
+  },
+  "entity_types_plural": {
+    "character": "Personagens",
+    "region": "Regiões",
+    "faction": "Facções",
+    "item": "Itens",
+    "race": "Raças"
+  },
+  "fields": {
+    "description": "Descrição",
+    "summary": "Resumo"
+  },
+  "actions": {
+    "view_details": "Ver detalhes completos",
+    "show_advanced": "Mostrar informações avançadas",
+    "hide_advanced": "Ocultar informações avançadas",
+    "show_list": "Mostrar lista",
+    "hide_list": "Esconder lista",
+    "read_more": "Ler mais",
+    "read_less": "Ler menos"
+  }
+}

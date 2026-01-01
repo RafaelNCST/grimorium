@@ -8,6 +8,7 @@ import {
   Settings,
   BookOpen,
   Download,
+  Library,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -32,6 +33,7 @@ interface EditorHeaderProps {
   title: string;
   showAllAnnotationsSidebar?: boolean;
   showPlotArcEventsSidebar?: boolean;
+  showEntityReferencePanel?: boolean;
   hasPlotArc?: boolean;
   previousChapter?: { id: string; number: string; title: string };
   nextChapter?: { id: string; number: string; title: string };
@@ -40,6 +42,7 @@ interface EditorHeaderProps {
   onTitleChange: (value: string) => void;
   onShowAllAnnotations: () => void;
   onShowPlotArcEvents?: () => void;
+  onShowEntityReference?: () => void;
   onShowSettings: () => void;
   onNavigateToPrevious?: () => void;
   onNavigateToNext?: () => void;
@@ -51,6 +54,7 @@ export function EditorHeader({
   title,
   showAllAnnotationsSidebar = false,
   showPlotArcEventsSidebar = false,
+  showEntityReferencePanel = false,
   hasPlotArc = false,
   previousChapter,
   nextChapter,
@@ -59,6 +63,7 @@ export function EditorHeader({
   onTitleChange,
   onShowAllAnnotations,
   onShowPlotArcEvents,
+  onShowEntityReference,
   onShowSettings,
   onNavigateToPrevious,
   onNavigateToNext,
@@ -233,6 +238,23 @@ export function EditorHeader({
                 <MessageSquare className="w-4 h-4 mr-2" />
                 {t("header_bar.annotations")}
               </Button>
+
+              {onShowEntityReference && (
+                <Button
+                  variant="ghost-bright"
+                  size="sm"
+                  onClick={onShowEntityReference}
+                  className={cn(
+                    "border border-transparent transition-all duration-200",
+                    showEntityReferencePanel
+                      ? "bg-primary/10 border-primary text-primary"
+                      : "hover:bg-primary/5 hover:border-primary/30 hover:text-primary"
+                  )}
+                >
+                  <Library className="w-4 h-4 mr-2" />
+                  {t("header_bar.references")}
+                </Button>
+              )}
 
               {hasPlotArc && onShowPlotArcEvents && (
                 <Button

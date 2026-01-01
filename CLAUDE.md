@@ -1,5 +1,6 @@
 # Regras principais
 - Sempre certifique-se de seguir os padrões propostos em `@docs\tech.md` em cada implementação do projeto
+- EM NENHUM MOMENTO BUILD OU RODE O APP SEM EU PEDI, deixe que eu menciono qualquer erro necessário
 
 ## Documentação para padronização e criação
 - Para ver buttons: `@docs\build\buttons.md`

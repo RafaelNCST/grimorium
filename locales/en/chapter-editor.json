@@ -312,6 +312,7 @@
     "export_as_word": "Export as Word",
     "export_as_pdf": "Export as PDF",
     "annotations": "Annotations",
+    "references": "References",
     "arc": "Arc",
     "warnings": "Warnings",
     "chapter_title": "Chapter {{number}}: {{title}}"

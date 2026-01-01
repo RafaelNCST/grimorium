@@ -24,6 +24,7 @@ import { AllAnnotationsSidebar } from "./components/AllAnnotationsSidebar";
 import { AnnotationsSidebar } from "./components/AnnotationsSidebar";
 import { EditorHeader } from "./components/EditorHeader";
 import { EditorSettingsModal } from "./components/EditorSettingsModal";
+import { EntityReferencePanel } from "./components/entity-reference-panel";
 import { FormattingToolbar } from "./components/FormattingToolbar";
 import { PlotArcEventsSidebar } from "./components/PlotArcEventsSidebar";
 import { StatsBar } from "./components/StatsBar";
@@ -111,6 +112,10 @@ function ChapterEditorContent() {
   const [currentPlotArc, setCurrentPlotArc] = useState<IPlotArc | null>(null);
   const isManualArcChangeRef = useRef(false);
   const [showStatsDetailModal, setShowStatsDetailModal] = useState(false);
+
+  // Entity Reference Panel state
+  const [showEntityReferencePanel, setShowEntityReferencePanel] = useState(false);
+  const [entityRefListVisible, setEntityRefListVisible] = useState(true);
 
   // Session timer hook (GLOBAL - não reseta ao trocar de capítulo)
   const { sessionMinutes, sessionId: _sessionId } = useSessionTimer();
@@ -507,6 +512,7 @@ function ChapterEditorContent() {
 
     setSelectedAnnotationId(newAnnotation.id);
     setShowAnnotationsSidebar(true);
+    setShowEntityReferencePanel(false);
     setSelectedText("");
     setSelectedRange(null);
   };
@@ -546,6 +552,7 @@ function ChapterEditorContent() {
     // Open specific annotation sidebar
     setSelectedAnnotationId(annotationId);
     setShowAnnotationsSidebar(true);
+    setShowEntityReferencePanel(false);
   };
 
   // Navigate to annotation
@@ -555,6 +562,7 @@ function ChapterEditorContent() {
     // Open specific annotation sidebar
     setSelectedAnnotationId(annotationId);
     setShowAnnotationsSidebar(true);
+    setShowEntityReferencePanel(false);
     // Scroll to annotation in editor
     setScrollToAnnotation(annotationId);
     // Clear scroll trigger after a short delay
@@ -694,9 +702,40 @@ function ChapterEditorContent() {
     setShowAnnotationsSidebar(false);
     setSelectedAnnotationId(null);
     setShowAllAnnotationsSidebar(false);
+    // Close entity reference panel
+    setShowEntityReferencePanel(false);
     // Toggle plot arc events sidebar
     setShowPlotArcEventsSidebar(!showPlotArcEventsSidebar);
   };
+
+  // Entity reference panel handlers
+  const handleShowEntityReference = () => {
+    // Close other sidebars (entity reference doesn't conflict with annotations/arc)
+    // but we'll close them for clarity
+    setShowAnnotationsSidebar(false);
+    setSelectedAnnotationId(null);
+    setShowAllAnnotationsSidebar(false);
+    setShowPlotArcEventsSidebar(false);
+    // Toggle entity reference panel
+    setShowEntityReferencePanel(!showEntityReferencePanel);
+    // Reset list visibility when opening
+    if (!showEntityReferencePanel) {
+      setEntityRefListVisible(true);
+    }
+  };
+
+  // Keyboard shortcut for entity reference panel (Ctrl+Shift+E)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "e") {
+        e.preventDefault();
+        handleShowEntityReference();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showEntityReferencePanel]);
 
   const handleToggleEventCompletion = async (eventId: string) => {
     if (!currentPlotArc) return;
@@ -728,14 +767,21 @@ function ChapterEditorContent() {
   const hasSidebarOpen =
     showAnnotationsSidebar ||
     showAllAnnotationsSidebar ||
-    showPlotArcEventsSidebar;
+    showPlotArcEventsSidebar ||
+    showEntityReferencePanel;
 
   return (
     <div className="h-full bg-background flex">
       {/* Main Content - Adjust width when sidebar is open */}
       <div
         className="flex-1 transition-all duration-300 flex flex-col overflow-hidden"
-        style={{ marginRight: hasSidebarOpen ? "384px" : "0" }}
+        style={{
+          marginRight: showEntityReferencePanel
+            ? (entityRefListVisible ? "1000px" : "600px")
+            : hasSidebarOpen
+              ? "384px"
+              : "0"
+        }}
       >
         {/* Header */}
         <EditorHeader
@@ -743,6 +789,7 @@ function ChapterEditorContent() {
           title={chapter.title}
           showAllAnnotationsSidebar={showAllAnnotationsSidebar}
           showPlotArcEventsSidebar={showPlotArcEventsSidebar}
+          showEntityReferencePanel={showEntityReferencePanel}
           hasPlotArc={!!currentPlotArc}
           previousChapter={
             previousChapter
@@ -775,10 +822,13 @@ function ChapterEditorContent() {
             setSelectedAnnotationId(null);
             // Close plot arc events sidebar
             setShowPlotArcEventsSidebar(false);
+            // Close entity reference panel
+            setShowEntityReferencePanel(false);
             // Toggle all annotations sidebar
             setShowAllAnnotationsSidebar(!showAllAnnotationsSidebar);
           }}
           onShowPlotArcEvents={handleShowPlotArcEvents}
+          onShowEntityReference={handleShowEntityReference}
           onShowSettings={() => setShowSettingsModal(true)}
           onNavigateToPrevious={handleNavigateToPrevious}
           onNavigateToNext={handleNavigateToNext}
@@ -905,6 +955,17 @@ function ChapterEditorContent() {
           arc={currentPlotArc}
           onClose={() => setShowPlotArcEventsSidebar(false)}
           onToggleEventCompletion={handleToggleEventCompletion}
+        />
+      )}
+
+      {/* Entity Reference Panel */}
+      {showEntityReferencePanel && (
+        <EntityReferencePanel
+          chapterId={editorChaptersId}
+          bookId={dashboardId}
+          isListVisible={entityRefListVisible}
+          onToggleList={() => setEntityRefListVisible(!entityRefListVisible)}
+          onClose={() => setShowEntityReferencePanel(false)}
         />
       )}
 

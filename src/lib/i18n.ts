@@ -20,6 +20,7 @@ import enCreateRace from "../../locales/en/create-race.json";
 import enDialogs from "../../locales/en/dialogs.json";
 import enEmptyStates from "../../locales/en/empty-states.json";
 import enEntityLogs from "../../locales/en/entity-logs.json";
+import enEntityReference from "../../locales/en/entity-reference.json";
 import enErrors from "../../locales/en/errors.json";
 import enExportPreview from "../../locales/en/export-preview.json";
 import enFactionDetail from "../../locales/en/faction-detail.json";
@@ -63,6 +64,7 @@ import ptCreateRace from "../../locales/pt/create-race.json";
 import ptDialogs from "../../locales/pt/dialogs.json";
 import ptEmptyStates from "../../locales/pt/empty-states.json";
 import ptEntityLogs from "../../locales/pt/entity-logs.json";
+import ptEntityReference from "../../locales/pt/entity-reference.json";
 import ptErrors from "../../locales/pt/errors.json";
 import ptExportPreview from "../../locales/pt/export-preview.json";
 import ptFactionDetail from "../../locales/pt/faction-detail.json";
@@ -111,6 +113,7 @@ const resources = {
     dialogs: enDialogs,
     "empty-states": enEmptyStates,
     "entity-logs": enEntityLogs,
+    "entity-reference": enEntityReference,
     errors: enErrors,
     "export-preview": enExportPreview,
     "faction-detail": enFactionDetail,
@@ -156,6 +159,7 @@ const resources = {
     dialogs: ptDialogs,
     "empty-states": ptEmptyStates,
     "entity-logs": ptEntityLogs,
+    "entity-reference": ptEntityReference,
     errors: ptErrors,
     "export-preview": ptExportPreview,
     "faction-detail": ptFactionDetail,
