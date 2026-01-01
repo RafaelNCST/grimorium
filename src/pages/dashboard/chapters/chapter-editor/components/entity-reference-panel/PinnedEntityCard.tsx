@@ -367,7 +367,7 @@ export function PinnedEntityCard({
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.physical_type")}:</span>
                     <div className="mt-1">
-                      <span className="inline-block px-2 py-0.5 bg-slate-500/10 text-slate-600 dark:text-slate-400 rounded text-xs border border-slate-500/20">
+                      <span className="inline-block px-2 py-0.5 bg-purple-600/10 text-white rounded text-xs border border-purple-600">
                         {translateValue("physicalType", char.physicalType)}
                       </span>
                     </div>
@@ -385,7 +385,7 @@ export function PinnedEntityCard({
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.race")}:</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {char.speciesAndRace.map((raceId: string) => (
-                        <span key={raceId} className="px-2 py-0.5 bg-pink-500/10 text-pink-600 dark:text-pink-400 rounded text-xs border border-pink-500/20">
+                        <span key={raceId} className="px-2 py-0.5 bg-purple-600/10 text-white rounded text-xs border border-purple-600">
                           {getRaceName(raceId)}
                         </span>
                       ))}
@@ -406,7 +406,7 @@ export function PinnedEntityCard({
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.archetype")}:</span>
                     <div className="mt-1">
-                      <span className="inline-block px-2 py-0.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded text-xs border border-purple-500/20">
+                      <span className="inline-block px-2 py-0.5 bg-purple-600/10 text-white rounded text-xs border border-purple-600">
                         {translateValue("archetype", char.archetype)}
                       </span>
                     </div>
@@ -418,7 +418,7 @@ export function PinnedEntityCard({
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.alignment")}:</span>
                     <div className="mt-1">
-                      <span className="inline-block px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded text-xs border border-blue-500/20">
+                      <span className="inline-block px-2 py-0.5 bg-purple-600/10 text-white rounded text-xs border border-purple-600">
                         {translateValue("alignment", char.alignment)}
                       </span>
                     </div>
@@ -446,7 +446,7 @@ export function PinnedEntityCard({
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.birth_place")}:</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {char.birthPlace.map((regionId: string) => (
-                        <span key={regionId} className="px-2 py-0.5 bg-green-500/10 text-green-600 dark:text-green-400 rounded text-xs border border-green-500/20">
+                        <span key={regionId} className="px-2 py-0.5 bg-purple-600/10 text-white rounded text-xs border border-purple-600">
                           {getRegionName(regionId)}
                         </span>
                       ))}
