@@ -1223,7 +1223,14 @@ export function FactionDetailView({
         <FactionTimeline
           factionId={faction.id}
           bookId={bookId}
-          timeline={editData.timeline || []}
+          timeline={(editData.timeline || []).map((era, index) => ({
+            ...era,
+            id: era.id || `era-${index}-${Date.now()}`,
+            events: (era.events || []).map((event, eventIndex) => ({
+              ...event,
+              id: event.id || `event-${eventIndex}-${Date.now()}`,
+            })),
+          }))}
           isEditing={isEditing}
           onTimelineChange={(timeline) =>
             onEditDataChange("timeline", timeline)
