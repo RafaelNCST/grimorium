@@ -28,6 +28,7 @@ export interface TextEditorRef {
   canUndo: boolean;
   canRedo: boolean;
   markNextAsImmediate: () => void; // Mark next save as immediate (for formatting changes)
+  resetHistory: () => void; // Reset undo/redo history (for chapter navigation)
 }
 
 interface TextEditorProps {
@@ -118,7 +119,14 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       markNextAsImmediate: () => {
         isImmediateActionRef.current = true;
       },
-    }));
+      resetHistory: () => {
+        if (editorRef.current) {
+          const currentHtml = removeSearchHighlights(editorRef.current.innerHTML);
+          const cursorPos = editorRef.current.innerText.length;
+          undoRedo.resetHistory(currentHtml, annotations, cursorPos);
+        }
+      },
+    }), [undoRedo, annotations]);
 
     useEffect(() => {
       requestAnimationFrame(() => {

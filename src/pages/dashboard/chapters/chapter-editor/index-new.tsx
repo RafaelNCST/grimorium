@@ -201,6 +201,14 @@ function ChapterEditorContent() {
     loadChapter();
   }, [editorChaptersId, getChapter, setCachedChapter]);
 
+  // Reset undo/redo history when navigating between chapters
+  useEffect(() => {
+    // Reset editor history when chapter changes
+    if (textEditorRef.current) {
+      textEditorRef.current.resetHistory();
+    }
+  }, [editorChaptersId]);
+
   // Handle settings change - updates both local state and book store
   const handleSettingsChange = useCallback(
     (newSettings: EditorSettings) => {
