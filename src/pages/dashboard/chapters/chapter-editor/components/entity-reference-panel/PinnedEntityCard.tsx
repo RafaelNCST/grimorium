@@ -81,6 +81,31 @@ export function PinnedEntityCard({
 
   const Icon = ENTITY_CONFIG[type].icon;
 
+  // Helper to get domain color classes
+  const getDomainColor = (domain: string) => {
+    const normalizedDomain = domain.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    const colorMap: Record<string, { bg: string; text: string; border: string }> = {
+      'aquatico': { bg: 'from-cyan-600/20 to-cyan-500/20', text: 'text-cyan-200', border: 'border-cyan-600/30' },
+      'aquatic': { bg: 'from-cyan-600/20 to-cyan-500/20', text: 'text-cyan-200', border: 'border-cyan-600/30' },
+      'terrestre': { bg: 'from-green-600/20 to-green-500/20', text: 'text-green-200', border: 'border-green-600/30' },
+      'terrestrial': { bg: 'from-green-600/20 to-green-500/20', text: 'text-green-200', border: 'border-green-600/30' },
+      'aereo': { bg: 'from-sky-600/20 to-sky-500/20', text: 'text-sky-200', border: 'border-sky-600/30' },
+      'aerial': { bg: 'from-sky-600/20 to-sky-500/20', text: 'text-sky-200', border: 'border-sky-600/30' },
+      'subterraneo': { bg: 'from-stone-600/20 to-stone-500/20', text: 'text-stone-200', border: 'border-stone-600/30' },
+      'underground': { bg: 'from-stone-600/20 to-stone-500/20', text: 'text-stone-200', border: 'border-stone-600/30' },
+      'elevado': { bg: 'from-slate-600/20 to-slate-500/20', text: 'text-slate-200', border: 'border-slate-600/30' },
+      'elevated': { bg: 'from-slate-600/20 to-slate-500/20', text: 'text-slate-200', border: 'border-slate-600/30' },
+      'dimensional': { bg: 'from-violet-600/20 to-violet-500/20', text: 'text-violet-200', border: 'border-violet-600/30' },
+      'espiritual': { bg: 'from-amber-600/20 to-amber-500/20', text: 'text-amber-200', border: 'border-amber-600/30' },
+      'spiritual': { bg: 'from-amber-600/20 to-amber-500/20', text: 'text-amber-200', border: 'border-amber-600/30' },
+      'cosmico': { bg: 'from-indigo-600/20 to-indigo-500/20', text: 'text-indigo-200', border: 'border-indigo-600/30' },
+      'cosmic': { bg: 'from-indigo-600/20 to-indigo-500/20', text: 'text-indigo-200', border: 'border-indigo-600/30' }
+    };
+
+    return colorMap[normalizedDomain] || { bg: 'from-purple-600/20 to-purple-500/20', text: 'text-purple-200', border: 'border-purple-600/30' };
+  };
+
   // Helper to translate fixed values
   const translateValue = (field: string, value: string, entityType?: string) => {
     if (!value) return value;
@@ -206,10 +231,10 @@ export function PinnedEntityCard({
       const char = entity as any;
       return (
         <>
-          {char.age && <InfoRow label={t("character-detail:fields.age")} value={char.age} />}
-          {char.role && <InfoRow label={t("character-detail:fields.role")} value={translateValue("role", char.role)} />}
-          {char.status && <InfoRow label={t("character-detail:fields.status")} value={translateValue("characterStatus", char.status)} />}
-          {char.gender && <InfoRow label={t("character-detail:fields.gender")} value={translateValue("gender", char.gender)} />}
+          {char.age && <InfoRow label={t("character-detail:fields.age")} value={char.age} compact />}
+          {char.role && <InfoRow label={t("character-detail:fields.role")} value={translateValue("role", char.role)} compact />}
+          {char.status && <InfoRow label={t("character-detail:fields.status")} value={translateValue("characterStatus", char.status)} compact />}
+          {char.gender && <InfoRow label={t("character-detail:fields.gender")} value={translateValue("gender", char.gender)} compact />}
         </>
       );
     }
@@ -218,9 +243,23 @@ export function PinnedEntityCard({
       const region = entity as any;
       return (
         <>
-          {region.scale && <InfoRow label={t("region-detail:fields.scale")} value={translateValue("scale", region.scale)} />}
-          {region.climate && <InfoRow label={t("region-detail:fields.climate")} value={region.climate} />}
-          {region.currentSeason && <InfoRow label={t("region-detail:fields.current_season")} value={translateValue("currentSeason", region.currentSeason)} />}
+          {region.scale && (
+            <div className="text-xs">
+              <span className="text-purple-600 dark:text-purple-400 font-medium">{t("region-detail:fields.scale")}: </span>
+              <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                {translateValue("scale", region.scale)}
+              </span>
+            </div>
+          )}
+          {region.climate && <InfoRow label={t("region-detail:fields.climate")} value={region.climate} compact />}
+          {region.currentSeason && (
+            <div className="text-xs">
+              <span className="text-purple-600 dark:text-purple-400 font-medium">{t("region-detail:fields.current_season")}: </span>
+              <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                {translateValue("currentSeason", region.currentSeason)}
+              </span>
+            </div>
+          )}
         </>
       );
     }
@@ -229,10 +268,22 @@ export function PinnedEntityCard({
       const faction = entity as any;
       return (
         <>
-          {faction.factionType && <InfoRow label={t("faction-detail:fields.faction_type")} value={translateValue("factionType", faction.factionType)} />}
-          {faction.status && <InfoRow label={t("faction-detail:fields.status")} value={translateValue("factionStatus", faction.status)} />}
-          {faction.influence && <InfoRow label={t("faction-detail:fields.influence")} value={translateValue("influence", faction.influence)} />}
-          {faction.publicReputation && <InfoRow label={t("faction-detail:fields.public_reputation")} value={translateValue("publicReputation", faction.publicReputation)} />}
+          {faction.factionType && (
+            <div className="text-xs">
+              <span className="text-purple-600 dark:text-purple-400 font-medium">{t("faction-detail:fields.faction_type")}: </span>
+              <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                {translateValue("factionType", faction.factionType)}
+              </span>
+            </div>
+          )}
+          {faction.status && (
+            <div className="text-xs">
+              <span className="text-purple-600 dark:text-purple-400 font-medium">{t("faction-detail:fields.status")}: </span>
+              <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                {translateValue("factionStatus", faction.status)}
+              </span>
+            </div>
+          )}
         </>
       );
     }
@@ -241,8 +292,22 @@ export function PinnedEntityCard({
       const item = entity as any;
       return (
         <>
-          {item.category && <InfoRow label={t("item-detail:fields.category")} value={translateValue("itemCategory", item.category)} />}
-          {item.status && <InfoRow label={t("item-detail:fields.status")} value={translateValue("itemStatus", item.status)} />}
+          {item.category && (
+            <div className="text-xs">
+              <span className="text-purple-600 dark:text-purple-400 font-medium">{t("item-detail:fields.category")}: </span>
+              <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                {translateValue("itemCategory", item.category)}
+              </span>
+            </div>
+          )}
+          {item.status && (
+            <div className="text-xs">
+              <span className="text-purple-600 dark:text-purple-400 font-medium">{t("item-detail:fields.status")}: </span>
+              <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                {translateValue("itemStatus", item.status)}
+              </span>
+            </div>
+          )}
         </>
       );
     }
@@ -254,9 +319,17 @@ export function PinnedEntityCard({
           {race.domain && race.domain.length > 0 && (
             <div className="text-xs">
               <span className="text-purple-600 dark:text-purple-400 font-medium">{t("race-detail:fields.domain")}: </span>
-              <span className="text-foreground">
-                {race.domain.map((d: string) => translateValue("domain", d)).join(", ")}
-              </span>
+              {race.domain.map((d: string, index: number) => {
+                const colors = getDomainColor(d);
+                return (
+                  <span key={d}>
+                    <span className={`inline-block px-2.5 py-1 bg-gradient-to-r ${colors.bg} ${colors.text} rounded-md text-xs font-medium border ${colors.border}`}>
+                      {translateValue("domain", d)}
+                    </span>
+                    {index < race.domain.length - 1 && ' '}
+                  </span>
+                );
+              })}
             </div>
           )}
         </>
@@ -290,19 +363,29 @@ export function PinnedEntityCard({
 
     if (type === "region") {
       return !!(
-        e.customSeasonName || e.generalDescription || e.regionAnomalies ||
+        e.customSeasonName || e.generalDescription ||
+        (e.regionAnomalies && JSON.parse(e.regionAnomalies || '[]').length > 0) ||
         e.narrativePurpose || e.uniqueCharacteristics || e.politicalImportance ||
-        e.religiousImportance || e.worldPerception || e.regionMysteries || e.inspirations
+        e.religiousImportance || e.worldPerception ||
+        (e.regionMysteries && JSON.parse(e.regionMysteries || '[]').length > 0) ||
+        (e.inspirations && JSON.parse(e.inspirations || '[]').length > 0)
       );
     }
 
     if (type === "faction") {
       return !!(
         e.governmentForm || e.economy || e.symbolsAndSecrets || e.factionMotto ||
-        e.uniformAndAesthetics || e.alignment || e.rulesAndLaws ||
+        e.uniformAndAesthetics || e.alignment || e.influence || e.publicReputation ||
+        (e.rulesAndLaws && e.rulesAndLaws.length > 0) ||
         e.foundationDate || e.foundationHistorySummary ||
-        e.mainResources || e.currencies || e.dominatedAreas || e.mainBase || e.areasOfInterest ||
-        e.traditionsAndRituals || e.beliefsAndValues || e.languagesUsed ||
+        (e.mainResources && e.mainResources.length > 0) ||
+        (e.currencies && e.currencies.length > 0) ||
+        (e.dominatedAreas && e.dominatedAreas.length > 0) ||
+        (e.mainBase && e.mainBase.length > 0) ||
+        (e.areasOfInterest && e.areasOfInterest.length > 0) ||
+        (e.traditionsAndRituals && e.traditionsAndRituals.length > 0) ||
+        (e.beliefsAndValues && e.beliefsAndValues.length > 0) ||
+        (e.languagesUsed && e.languagesUsed.length > 0) ||
         e.militaryPower !== undefined || e.politicalPower !== undefined ||
         e.culturalPower !== undefined || e.economicPower !== undefined ||
         e.organizationObjectives || e.narrativeImportance || e.inspirations
@@ -319,11 +402,13 @@ export function PinnedEntityCard({
 
     if (type === "race") {
       return !!(
-        e.alternativeNames || e.culturalNotes || e.scientificName ||
+        (e.alternativeNames && e.alternativeNames.length > 0) || e.culturalNotes || e.scientificName ||
         e.generalAppearance || e.lifeExpectancy || e.averageHeight || e.averageWeight ||
         e.specialPhysicalCharacteristics || e.habits || e.reproductiveCycle ||
-        e.otherReproductiveCycleDescription || e.diet || e.elementalDiet || e.communication ||
-        e.otherCommunication || e.moralTendency || e.socialOrganization || e.habitat ||
+        e.otherReproductiveCycleDescription || e.diet || e.elementalDiet ||
+        (e.communication && e.communication.length > 0) ||
+        e.otherCommunication || e.moralTendency || e.socialOrganization ||
+        (e.habitat && e.habitat.length > 0) ||
         e.physicalCapacity || e.specialCharacteristics || e.weaknesses ||
         e.storyMotivation || e.inspirations
       );
@@ -365,12 +450,10 @@ export function PinnedEntityCard({
                 {/* Physical Type (grid -> badge) */}
                 {char.physicalType && (
                   <div className="text-xs">
-                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.physical_type")}:</span>
-                    <div className="mt-1">
-                      <span className="inline-block px-2 py-0.5 bg-purple-600/10 text-white rounded text-xs border border-purple-600">
-                        {translateValue("physicalType", char.physicalType)}
-                      </span>
-                    </div>
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.physical_type")}: </span>
+                    <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                      {translateValue("physicalType", char.physicalType)}
+                    </span>
                   </div>
                 )}
 
@@ -382,14 +465,15 @@ export function PinnedEntityCard({
                 {/* Species and Race (raças) */}
                 {char.speciesAndRace && char.speciesAndRace.length > 0 && (
                   <div className="text-xs">
-                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.race")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {char.speciesAndRace.map((raceId: string) => (
-                        <span key={raceId} className="px-2 py-0.5 bg-purple-600/10 text-white rounded text-xs border border-purple-600">
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.race")}: </span>
+                    {char.speciesAndRace.map((raceId: string, index: number) => (
+                      <span key={raceId}>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-600/5 text-purple-400 border border-purple-500/50 rounded-md text-xs font-medium">
                           {getRaceName(raceId)}
                         </span>
-                      ))}
-                    </div>
+                        {index < char.speciesAndRace.length - 1 && ' '}
+                      </span>
+                    ))}
                   </div>
                 )}
               </div>
@@ -404,24 +488,20 @@ export function PinnedEntityCard({
                 {/* Archetype (grid -> badge) */}
                 {char.archetype && (
                   <div className="text-xs">
-                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.archetype")}:</span>
-                    <div className="mt-1">
-                      <span className="inline-block px-2 py-0.5 bg-purple-600/10 text-white rounded text-xs border border-purple-600">
-                        {translateValue("archetype", char.archetype)}
-                      </span>
-                    </div>
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.archetype")}: </span>
+                    <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                      {translateValue("archetype", char.archetype)}
+                    </span>
                   </div>
                 )}
 
                 {/* Alignment (grid -> badge) */}
                 {char.alignment && (
                   <div className="text-xs">
-                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.alignment")}:</span>
-                    <div className="mt-1">
-                      <span className="inline-block px-2 py-0.5 bg-purple-600/10 text-white rounded text-xs border border-purple-600">
-                        {translateValue("alignment", char.alignment)}
-                      </span>
-                    </div>
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.alignment")}: </span>
+                    <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                      {translateValue("alignment", char.alignment)}
+                    </span>
                   </div>
                 )}
 
@@ -443,14 +523,15 @@ export function PinnedEntityCard({
                 {/* Birth Place (buscar nome da região) */}
                 {char.birthPlace && char.birthPlace.length > 0 && (
                   <div className="text-xs">
-                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.birth_place")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {char.birthPlace.map((regionId: string) => (
-                        <span key={regionId} className="px-2 py-0.5 bg-purple-600/10 text-white rounded text-xs border border-purple-600">
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("character-detail:fields.birth_place")}: </span>
+                    {char.birthPlace.map((regionId: string, index: number) => (
+                      <span key={regionId}>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-600/5 text-purple-400 border border-purple-500/50 rounded-md text-xs font-medium">
                           {getRegionName(regionId)}
                         </span>
-                      ))}
-                    </div>
+                        {index < char.birthPlace.length - 1 && ' '}
+                      </span>
+                    ))}
                   </div>
                 )}
 
@@ -479,24 +560,22 @@ export function PinnedEntityCard({
     if (type === "region") {
       const region = entity as any;
       return (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {/* Environment */}
           {(region.customSeasonName || region.generalDescription || region.regionAnomalies) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("region-detail:sections.environment")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("region-detail:sections.environment")}</p>
               <div className="space-y-1.5">
                 {region.customSeasonName && <InfoRow label={t("region-detail:fields.custom_season_name")} value={region.customSeasonName} compact />}
                 {region.generalDescription && <ExpandableField label={t("region-detail:fields.general_description")} value={region.generalDescription} fieldKey="generalDescription" expandedFields={expandedFields} onToggle={toggleField} />}
                 {region.regionAnomalies && JSON.parse(region.regionAnomalies).length > 0 && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("region-detail:fields.region_anomalies")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {JSON.parse(region.regionAnomalies).map((anomaly: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded text-xs">
-                          {anomaly}
-                        </span>
+                        <li key={i}>{anomaly}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
               </div>
@@ -506,7 +585,7 @@ export function PinnedEntityCard({
           {/* Narrative */}
           {(region.narrativePurpose || region.uniqueCharacteristics || region.politicalImportance || region.religiousImportance || region.worldPerception || region.regionMysteries || region.inspirations) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("region-detail:sections.narrative")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("region-detail:sections.narrative")}</p>
               <div className="space-y-1.5">
                 {region.narrativePurpose && <ExpandableField label={t("region-detail:fields.narrative_purpose")} value={region.narrativePurpose} fieldKey="narrativePurpose" expandedFields={expandedFields} onToggle={toggleField} />}
                 {region.uniqueCharacteristics && <ExpandableField label={t("region-detail:fields.unique_characteristics")} value={region.uniqueCharacteristics} fieldKey="uniqueCharacteristics" expandedFields={expandedFields} onToggle={toggleField} />}
@@ -516,25 +595,21 @@ export function PinnedEntityCard({
                 {region.regionMysteries && JSON.parse(region.regionMysteries).length > 0 && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("region-detail:fields.region_mysteries")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {JSON.parse(region.regionMysteries).map((mystery: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded text-xs">
-                          {mystery}
-                        </span>
+                        <li key={i}>{mystery}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
                 {region.inspirations && JSON.parse(region.inspirations).length > 0 && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("region-detail:fields.inspirations")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {JSON.parse(region.inspirations).map((inspiration: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded text-xs">
-                          {inspiration}
-                        </span>
+                        <li key={i}>{inspiration}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
               </div>
@@ -547,28 +622,49 @@ export function PinnedEntityCard({
     if (type === "faction") {
       const faction = entity as any;
       return (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {/* Organization */}
-          {(faction.governmentForm || faction.economy || faction.symbolsAndSecrets || faction.factionMotto || faction.uniformAndAesthetics || faction.alignment || faction.rulesAndLaws) && (
+          {(faction.governmentForm || faction.economy || faction.symbolsAndSecrets || faction.factionMotto || faction.uniformAndAesthetics || faction.alignment || faction.influence || faction.publicReputation || faction.rulesAndLaws) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("faction-detail:sections.organization")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("faction-detail:sections.organization")}</p>
               <div className="space-y-1.5">
                 {faction.governmentForm && <InfoRow label={t("faction-detail:fields.government_form")} value={faction.governmentForm} compact />}
+                {faction.influence && (
+                  <div className="text-xs">
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("faction-detail:fields.influence")}: </span>
+                    <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                      {translateValue("influence", faction.influence)}
+                    </span>
+                  </div>
+                )}
+                {faction.publicReputation && (
+                  <div className="text-xs">
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("faction-detail:fields.public_reputation")}: </span>
+                    <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                      {translateValue("publicReputation", faction.publicReputation)}
+                    </span>
+                  </div>
+                )}
                 {faction.economy && <ExpandableField label={t("faction-detail:fields.economy")} value={faction.economy} fieldKey="economy" expandedFields={expandedFields} onToggle={toggleField} />}
                 {faction.symbolsAndSecrets && <ExpandableField label={t("faction-detail:fields.symbols_and_secrets")} value={faction.symbolsAndSecrets} fieldKey="symbolsAndSecrets" expandedFields={expandedFields} onToggle={toggleField} />}
                 {faction.factionMotto && <InfoRow label={t("faction-detail:fields.faction_motto")} value={faction.factionMotto} compact />}
                 {faction.uniformAndAesthetics && <ExpandableField label={t("faction-detail:fields.uniform_and_aesthetics")} value={faction.uniformAndAesthetics} fieldKey="uniformAndAesthetics" expandedFields={expandedFields} onToggle={toggleField} />}
-                {faction.alignment && <InfoRow label={t("faction-detail:fields.alignment")} value={translateValue("factionAlignment", faction.alignment)} compact />}
+                {faction.alignment && (
+                  <div className="text-xs">
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("faction-detail:fields.alignment")}: </span>
+                    <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                      {translateValue("factionAlignment", faction.alignment)}
+                    </span>
+                  </div>
+                )}
                 {faction.rulesAndLaws && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("faction-detail:fields.rules_and_laws")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {faction.rulesAndLaws.map((rule: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400 rounded text-xs">
-                          {rule}
-                        </span>
+                        <li key={i}>{rule}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
               </div>
@@ -578,7 +674,7 @@ export function PinnedEntityCard({
           {/* History */}
           {(faction.foundationDate || faction.foundationHistorySummary) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("faction-detail:sections.history")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("faction-detail:sections.history")}</p>
               <div className="space-y-1.5">
                 {faction.foundationDate && <InfoRow label={t("faction-detail:fields.foundation_date")} value={faction.foundationDate} compact />}
                 {faction.foundationHistorySummary && <ExpandableField label={t("faction-detail:fields.foundation_history_summary")} value={faction.foundationHistorySummary} fieldKey="foundationHistorySummary" expandedFields={expandedFields} onToggle={toggleField} />}
@@ -589,66 +685,56 @@ export function PinnedEntityCard({
           {/* Resources & Territory */}
           {(faction.mainResources || faction.currencies || faction.dominatedAreas || faction.mainBase || faction.areasOfInterest) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("faction-detail:sections.resources")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("faction-detail:sections.resources")}</p>
               <div className="space-y-1.5">
                 {faction.mainResources && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("faction-detail:fields.main_resources")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {faction.mainResources.map((resource: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded text-xs">
-                          {resource}
-                        </span>
+                        <li key={i}>{resource}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
                 {faction.currencies && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("faction-detail:fields.currencies")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {faction.currencies.map((currency: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded text-xs">
-                          {currency}
-                        </span>
+                        <li key={i}>{currency}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
                 {faction.dominatedAreas && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("faction-detail:fields.dominated_areas")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {faction.dominatedAreas.map((area: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-green-500/10 text-green-600 dark:text-green-400 rounded text-xs">
-                          {area}
-                        </span>
+                        <li key={i}>{area}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
                 {faction.mainBase && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("faction-detail:fields.main_base")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {faction.mainBase.map((base: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded text-xs">
-                          {base}
-                        </span>
+                        <li key={i}>{base}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
                 {faction.areasOfInterest && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("faction-detail:fields.areas_of_interest")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {faction.areasOfInterest.map((area: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 rounded text-xs">
-                          {area}
-                        </span>
+                        <li key={i}>{area}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
               </div>
@@ -658,42 +744,36 @@ export function PinnedEntityCard({
           {/* Culture */}
           {(faction.traditionsAndRituals || faction.beliefsAndValues || faction.languagesUsed) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("faction-detail:sections.culture")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("faction-detail:sections.culture")}</p>
               <div className="space-y-1.5">
                 {faction.traditionsAndRituals && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("faction-detail:fields.traditions_and_rituals")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {faction.traditionsAndRituals.map((tradition: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-pink-500/10 text-pink-600 dark:text-pink-400 rounded text-xs">
-                          {tradition}
-                        </span>
+                        <li key={i}>{tradition}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
                 {faction.beliefsAndValues && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("faction-detail:fields.beliefs_and_values")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {faction.beliefsAndValues.map((belief: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded text-xs">
-                          {belief}
-                        </span>
+                        <li key={i}>{belief}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
                 {faction.languagesUsed && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("faction-detail:fields.languages_used")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {faction.languagesUsed.map((language: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-violet-500/10 text-violet-600 dark:text-violet-400 rounded text-xs">
-                          {language}
-                        </span>
+                        <li key={i}>{language}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
               </div>
@@ -703,7 +783,7 @@ export function PinnedEntityCard({
           {/* Power & Influence */}
           {(faction.militaryPower !== undefined || faction.politicalPower !== undefined || faction.culturalPower !== undefined || faction.economicPower !== undefined) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("faction-detail:sections.power")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("faction-detail:sections.power")}</p>
               <div className="space-y-1.5">
                 {faction.militaryPower !== undefined && <InfoRow label={t("faction-detail:fields.military_power")} value={`${faction.militaryPower}/10`} compact />}
                 {faction.politicalPower !== undefined && <InfoRow label={t("faction-detail:fields.political_power")} value={`${faction.politicalPower}/10`} compact />}
@@ -716,7 +796,7 @@ export function PinnedEntityCard({
           {/* Narrative */}
           {(faction.organizationObjectives || faction.narrativeImportance || faction.inspirations) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("faction-detail:sections.narrative")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("faction-detail:sections.narrative")}</p>
               <div className="space-y-1.5">
                 {faction.organizationObjectives && <ExpandableField label={t("faction-detail:fields.organization_objectives")} value={faction.organizationObjectives} fieldKey="organizationObjectives" expandedFields={expandedFields} onToggle={toggleField} />}
                 {faction.narrativeImportance && <ExpandableField label={t("faction-detail:fields.narrative_importance")} value={faction.narrativeImportance} fieldKey="narrativeImportance" expandedFields={expandedFields} onToggle={toggleField} />}
@@ -731,27 +811,36 @@ export function PinnedEntityCard({
     if (type === "item") {
       const item = entity as any;
       return (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {/* Details */}
-          {(item.appearance || item.origin || item.alternativeNames || item.storyRarity) && (
+          {(item.appearance || item.origin || (item.alternativeNames && item.alternativeNames.length > 0) || item.storyRarity) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("item-detail:sections.details")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("item-detail:sections.details")}</p>
               <div className="space-y-1.5">
                 {item.appearance && <ExpandableField label={t("item-detail:fields.appearance")} value={item.appearance} fieldKey="appearance" expandedFields={expandedFields} onToggle={toggleField} />}
                 {item.origin && <ExpandableField label={t("item-detail:fields.origin")} value={item.origin} fieldKey="origin" expandedFields={expandedFields} onToggle={toggleField} />}
+
+                {/* Alternative Names (lista simples sem badges) */}
                 {item.alternativeNames && item.alternativeNames.length > 0 && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("item-detail:fields.alternative_names")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {item.alternativeNames.map((name: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded text-xs">
-                          {name}
-                        </span>
+                        <li key={i}>{name}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
-                {item.storyRarity && <InfoRow label={t("item-detail:fields.story_rarity")} value={translateValue("storyRarity", item.storyRarity)} compact />}
+
+                {/* Story Rarity (grid badge) */}
+                {item.storyRarity && (
+                  <div className="text-xs">
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("item-detail:fields.story_rarity")}: </span>
+                    <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                      {translateValue("storyRarity", item.storyRarity)}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -759,7 +848,7 @@ export function PinnedEntityCard({
           {/* Usage */}
           {(item.itemUsage || item.usageRequirements || item.usageConsequences) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("item-detail:sections.usage")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("item-detail:sections.usage")}</p>
               <div className="space-y-1.5">
                 {item.itemUsage && <ExpandableField label={t("item-detail:fields.item_usage")} value={item.itemUsage} fieldKey="itemUsage" expandedFields={expandedFields} onToggle={toggleField} />}
                 {item.usageRequirements && <ExpandableField label={t("item-detail:fields.usage_requirements")} value={item.usageRequirements} fieldKey="usageRequirements" expandedFields={expandedFields} onToggle={toggleField} />}
@@ -771,7 +860,7 @@ export function PinnedEntityCard({
           {/* Narrative */}
           {item.narrativePurpose && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("item-detail:sections.narrative")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("item-detail:sections.narrative")}</p>
               <div className="space-y-1.5">
                 {item.narrativePurpose && <ExpandableField label={t("item-detail:fields.narrative_purpose")} value={item.narrativePurpose} fieldKey="narrativePurpose" expandedFields={expandedFields} onToggle={toggleField} />}
               </div>
@@ -784,25 +873,26 @@ export function PinnedEntityCard({
     if (type === "race") {
       const race = entity as any;
       return (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {/* Culture */}
-          {(race.alternativeNames || race.culturalNotes || race.scientificName) && (
+          {(race.scientificName || (race.alternativeNames && race.alternativeNames.length > 0) || race.culturalNotes) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("race-detail:sections.culture")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("race-detail:sections.culture")}</p>
               <div className="space-y-1.5">
                 {race.scientificName && <InfoRow label={t("race-detail:fields.scientific_name")} value={race.scientificName} compact />}
+
+                {/* Alternative Names (lista simples sem badges) */}
                 {race.alternativeNames && race.alternativeNames.length > 0 && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("race-detail:fields.alternative_names")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {race.alternativeNames.map((name: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-pink-500/10 text-pink-600 dark:text-pink-400 rounded text-xs">
-                          {name}
-                        </span>
+                        <li key={i}>{name}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
+
                 {race.culturalNotes && <ExpandableField label={t("race-detail:fields.cultural_notes")} value={race.culturalNotes} fieldKey="culturalNotes" expandedFields={expandedFields} onToggle={toggleField} />}
               </div>
             </div>
@@ -811,7 +901,7 @@ export function PinnedEntityCard({
           {/* Appearance */}
           {(race.generalAppearance || race.lifeExpectancy || race.averageHeight || race.averageWeight || race.specialPhysicalCharacteristics) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("race-detail:sections.appearance")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("race-detail:sections.appearance")}</p>
               <div className="space-y-1.5">
                 {race.generalAppearance && <ExpandableField label={t("race-detail:fields.general_appearance")} value={race.generalAppearance} fieldKey="generalAppearance" expandedFields={expandedFields} onToggle={toggleField} />}
                 {race.lifeExpectancy && <InfoRow label={t("race-detail:fields.life_expectancy")} value={race.lifeExpectancy} compact />}
@@ -823,40 +913,82 @@ export function PinnedEntityCard({
           )}
 
           {/* Behaviors */}
-          {(race.habits || race.reproductiveCycle || race.otherReproductiveCycleDescription || race.diet || race.elementalDiet || race.communication || race.otherCommunication || race.moralTendency || race.socialOrganization || race.habitat) && (
+          {(race.habits || race.reproductiveCycle || race.otherReproductiveCycleDescription || race.diet || race.elementalDiet || (race.communication && race.communication.length > 0) || race.otherCommunication || race.moralTendency || race.socialOrganization || (race.habitat && race.habitat.length > 0)) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("race-detail:sections.behaviors")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("race-detail:sections.behaviors")}</p>
               <div className="space-y-1.5">
-                {race.habits && <InfoRow label={t("race-detail:fields.habits")} value={translateValue("habits", race.habits)} compact />}
-                {race.reproductiveCycle && <InfoRow label={t("race-detail:fields.reproductive_cycle")} value={translateValue("reproductiveCycle", race.reproductiveCycle)} compact />}
-                {race.otherReproductiveCycleDescription && <ExpandableField label={t("race-detail:fields.other_reproductive_cycle_description")} value={race.otherReproductiveCycleDescription} fieldKey="otherReproductiveCycleDescription" expandedFields={expandedFields} onToggle={toggleField} />}
-                {race.diet && <InfoRow label={t("race-detail:fields.diet")} value={translateValue("diet", race.diet)} compact />}
-                {race.elementalDiet && <InfoRow label={t("race-detail:fields.elemental_diet")} value={race.elementalDiet} compact />}
-                {race.communication && race.communication.length > 0 && (
+                {/* Habits (grid badge) */}
+                {race.habits && (
                   <div className="text-xs">
-                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("race-detail:fields.communication")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {race.communication.map((comm: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 rounded text-xs">
-                          {translateValue("communication", comm)}
-                        </span>
-                      ))}
-                    </div>
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("race-detail:fields.habits")}: </span>
+                    <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                      {translateValue("habits", race.habits)}
+                    </span>
                   </div>
                 )}
+
+                {/* Reproductive Cycle (grid badge) */}
+                {race.reproductiveCycle && (
+                  <div className="text-xs">
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("race-detail:fields.reproductive_cycle")}: </span>
+                    <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                      {translateValue("reproductiveCycle", race.reproductiveCycle)}
+                    </span>
+                  </div>
+                )}
+
+                {race.otherReproductiveCycleDescription && <ExpandableField label={t("race-detail:fields.other_reproductive_cycle_description")} value={race.otherReproductiveCycleDescription} fieldKey="otherReproductiveCycleDescription" expandedFields={expandedFields} onToggle={toggleField} />}
+
+                {/* Diet (grid badge) */}
+                {race.diet && (
+                  <div className="text-xs">
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("race-detail:fields.diet")}: </span>
+                    <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                      {translateValue("diet", race.diet)}
+                    </span>
+                  </div>
+                )}
+
+                {race.elementalDiet && <InfoRow label={t("race-detail:fields.elemental_diet")} value={race.elementalDiet} compact />}
+
+                {/* Communication (grid badges) */}
+                {race.communication && race.communication.length > 0 && (
+                  <div className="text-xs">
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("race-detail:fields.communication")}: </span>
+                    {race.communication.map((comm: string, index: number) => (
+                      <span key={comm}>
+                        <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                          {translateValue("communication", comm)}
+                        </span>
+                        {index < race.communication.length - 1 && ' '}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 {race.otherCommunication && <InfoRow label={t("race-detail:fields.other_communication")} value={race.otherCommunication} compact />}
-                {race.moralTendency && <InfoRow label={t("race-detail:fields.moral_tendency")} value={translateValue("moralTendency", race.moralTendency)} compact />}
+
+                {/* Moral Tendency (grid badge) */}
+                {race.moralTendency && (
+                  <div className="text-xs">
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("race-detail:fields.moral_tendency")}: </span>
+                    <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                      {translateValue("moralTendency", race.moralTendency)}
+                    </span>
+                  </div>
+                )}
+
                 {race.socialOrganization && <ExpandableField label={t("race-detail:fields.social_organization")} value={race.socialOrganization} fieldKey="socialOrganization" expandedFields={expandedFields} onToggle={toggleField} />}
+
+                {/* Habitat (lista simples) */}
                 {race.habitat && race.habitat.length > 0 && (
                   <div className="text-xs">
                     <span className="text-purple-600 dark:text-purple-400 font-medium">{t("race-detail:fields.habitat")}:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <ul className="list-disc list-inside mt-0.5 text-foreground space-y-0.5">
                       {race.habitat.map((habitat: string, i: number) => (
-                        <span key={i} className="px-2 py-0.5 bg-green-500/10 text-green-600 dark:text-green-400 rounded text-xs">
-                          {habitat}
-                        </span>
+                        <li key={i}>{habitat}</li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 )}
               </div>
@@ -866,9 +998,17 @@ export function PinnedEntityCard({
           {/* Power */}
           {(race.physicalCapacity || race.specialCharacteristics || race.weaknesses) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("race-detail:sections.power")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("race-detail:sections.power")}</p>
               <div className="space-y-1.5">
-                {race.physicalCapacity && <InfoRow label={t("race-detail:fields.physical_capacity")} value={translateValue("physicalCapacity", race.physicalCapacity)} compact />}
+                {/* Physical Capacity (grid badge) */}
+                {race.physicalCapacity && (
+                  <div className="text-xs">
+                    <span className="text-purple-600 dark:text-purple-400 font-medium">{t("race-detail:fields.physical_capacity")}: </span>
+                    <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-purple-600/20 to-purple-500/20 text-purple-200 rounded-md text-xs font-medium border border-purple-600/30">
+                      {translateValue("physicalCapacity", race.physicalCapacity)}
+                    </span>
+                  </div>
+                )}
                 {race.specialCharacteristics && <ExpandableField label={t("race-detail:fields.special_characteristics")} value={race.specialCharacteristics} fieldKey="specialCharacteristics" expandedFields={expandedFields} onToggle={toggleField} />}
                 {race.weaknesses && <ExpandableField label={t("race-detail:fields.weaknesses")} value={race.weaknesses} fieldKey="weaknesses" expandedFields={expandedFields} onToggle={toggleField} />}
               </div>
@@ -878,7 +1018,7 @@ export function PinnedEntityCard({
           {/* Narrative */}
           {(race.storyMotivation || race.inspirations) && (
             <div className="space-y-1.5">
-              <p className="font-semibold text-foreground text-xs uppercase">{t("race-detail:sections.narrative")}</p>
+              <p className="font-semibold text-foreground text-xs uppercase tracking-wide mb-2">{t("race-detail:sections.narrative")}</p>
               <div className="space-y-1.5">
                 {race.storyMotivation && <ExpandableField label={t("race-detail:fields.story_motivation")} value={race.storyMotivation} fieldKey="storyMotivation" expandedFields={expandedFields} onToggle={toggleField} />}
                 {race.inspirations && <InfoRow label={t("race-detail:fields.inspirations")} value={race.inspirations} compact />}
@@ -911,10 +1051,22 @@ export function PinnedEntityCard({
           size="icon"
           className="h-6 w-6 flex-shrink-0"
           onClick={onUnpin}
+          onPointerDown={(e) => e.stopPropagation()}
         >
           <X className="w-3 h-3" />
         </Button>
       </div>
+
+      {/* Parent Region Badge (only for regions) */}
+      {type === "region" && (entity as any).parentId && (
+        <div className="px-3 py-2 bg-muted/30 border-b border-border">
+          <div className="flex items-center gap-1.5 text-xs">
+            <MapPin className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+            <span className="text-muted-foreground">{t("region-detail:fields.parent_of")}:</span>
+            <span className="text-foreground font-medium truncate">{getRegionName((entity as any).parentId)}</span>
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <ScrollArea className="flex-1">
@@ -931,6 +1083,7 @@ export function PinnedEntityCard({
               {showReadMore && (
                 <button
                   onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                  onPointerDown={(e) => e.stopPropagation()}
                   className="text-primary hover:underline text-xs font-medium"
                 >
                   {isDescriptionExpanded ? t("actions.read_less") : t("actions.read_more")}
@@ -950,6 +1103,7 @@ export function PinnedEntityCard({
               <Separator />
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
+                onPointerDown={(e) => e.stopPropagation()}
                 className="w-full flex items-center justify-between px-3 py-2 hover:bg-muted/50 transition-colors"
               >
                   <span className="text-xs font-medium text-foreground">
@@ -1008,16 +1162,17 @@ function ExpandableField({
 
   return (
     <div className="text-xs">
-      <span className="text-purple-600 dark:text-purple-400 font-medium">{label}:</span>
+      <span className="text-purple-600 dark:text-purple-400 font-medium">{label}:{needsExpand ? '' : ' '}</span>
       <p
         ref={ref}
-        className={`text-foreground mt-0.5 ${isExpanded ? '' : 'line-clamp-2'}`}
+        className={`text-foreground ${needsExpand ? 'mt-0.5' : 'inline'} ${isExpanded ? '' : 'line-clamp-2'}`}
       >
         {value}
       </p>
       {needsExpand && (
         <button
           onClick={() => onToggle(fieldKey)}
+          onPointerDown={(e) => e.stopPropagation()}
           className="text-primary hover:underline text-xs font-medium mt-0.5"
         >
           {isExpanded ? t("actions.read_less") : t("actions.read_more")}

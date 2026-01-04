@@ -23,7 +23,9 @@
   "sections": {
     "basic_info": "Basic Information",
     "advanced_info": "Advanced Information",
-    "versions": "Versions"
+    "versions": "Versions",
+    "environment": "Environment",
+    "narrative": "Narrative"
   },
   "fields": {
     "image": "Image",
@@ -31,7 +33,19 @@
     "parent": "Parent Region",
     "parent_of": "Part of",
     "scale": "Scale",
-    "summary": "Summary"
+    "summary": "Summary",
+    "climate": "Climate",
+    "current_season": "Current Season",
+    "custom_season_name": "Custom Season Name",
+    "general_description": "General Description",
+    "region_anomalies": "Region Anomalies",
+    "narrative_purpose": "Narrative Purpose",
+    "unique_characteristics": "Unique Characteristics",
+    "political_importance": "Political Importance",
+    "religious_importance": "Religious Importance",
+    "world_perception": "How It's Seen by the World",
+    "region_mysteries": "Region Mysteries",
+    "inspirations": "Inspirations"
   },
   "empty_states": {
     "no_data": "Nothing added yet",

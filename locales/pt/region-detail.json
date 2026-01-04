@@ -23,7 +23,9 @@
   "sections": {
     "basic_info": "Informações Básicas",
     "advanced_info": "Informações Avançadas",
-    "versions": "Versões"
+    "versions": "Versões",
+    "environment": "Ambiente",
+    "narrative": "Narrativa"
   },
   "fields": {
     "image": "Imagem",
@@ -31,7 +33,19 @@
     "parent": "Região Pai",
     "parent_of": "Parte de",
     "scale": "Escala",
-    "summary": "Resumo"
+    "summary": "Resumo",
+    "climate": "Clima",
+    "current_season": "Estação Atual",
+    "custom_season_name": "Nome da Estação Personalizada",
+    "general_description": "Descrição Geral",
+    "region_anomalies": "Anomalias da Região",
+    "narrative_purpose": "Propósito Narrativo",
+    "unique_characteristics": "Características Únicas do Local",
+    "political_importance": "Importância Política",
+    "religious_importance": "Importância Religiosa",
+    "world_perception": "Como é Visto pelo Resto do Mundo",
+    "region_mysteries": "Mistérios da Região",
+    "inspirations": "Inspirações"
   },
   "empty_states": {
     "no_data": "Nada foi adicionado ainda",

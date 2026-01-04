@@ -14,6 +14,7 @@ interface UsePinnedEntitiesReturn {
   pinEntity: (type: EntityType, id: string) => void;
   unpinEntity: (type: EntityType, id: string) => void;
   isPinned: (type: EntityType, id: string) => boolean;
+  reorderPinnedEntities: (newOrder: PinnedEntity[]) => void;
   pinnedData: {
     characters: ICharacter[];
     regions: any[];
@@ -83,6 +84,11 @@ export function usePinnedEntities(
     [pins]
   );
 
+  // Reorder pinned entities
+  const reorderPinnedEntities = useCallback((newOrder: PinnedEntity[]) => {
+    setPins(newOrder);
+  }, []);
+
   // Get actual entity data for pinned entities
   const pinnedData = useMemo(() => {
     const allCharacters = getCharacters(bookId);
@@ -124,6 +130,7 @@ export function usePinnedEntities(
     pinEntity,
     unpinEntity,
     isPinned,
+    reorderPinnedEntities,
     pinnedData,
   };
 }

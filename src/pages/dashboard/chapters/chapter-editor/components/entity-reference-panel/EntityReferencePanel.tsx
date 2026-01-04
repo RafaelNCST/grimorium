@@ -1,5 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+  type DragOverEvent,
+  DragOverlay,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import {
   X,
   Search,
@@ -42,6 +59,7 @@ import { EntityListItem } from "./EntityListItem";
 import { useEntitySearch } from "./hooks/useEntitySearch";
 import { usePinnedEntities } from "./hooks/usePinnedEntities";
 import { PinnedEntityCard } from "./PinnedEntityCard";
+import { SortablePinnedCard } from "./SortablePinnedCard";
 import type { EntityReferencePanelProps, EntityType } from "./types";
 
 const ENTITY_CONFIG = {
@@ -97,8 +115,81 @@ export function EntityReferencePanel({
   const { searchTerm, setSearchTerm, selectedType, setSelectedType, filteredEntities } =
     useEntitySearch(bookId);
 
-  const { pinnedEntities, pinEntity, unpinEntity, isPinned, pinnedData } =
+  const { pinnedEntities, pinEntity, unpinEntity, isPinned, reorderPinnedEntities, pinnedData } =
     usePinnedEntities(chapterId, bookId);
+
+  // Track active drag item and drop target
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
+
+  // DnD sensors - leve e responsivo
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // Distância mínima para iniciar drag (mais leve)
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handle drag start
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  // Handle drag over - para mostrar indicador visual
+  const handleDragOver = (event: DragOverEvent) => {
+    const { over } = event;
+    setOverId(over ? (over.id as string) : null);
+  };
+
+  // Handle drag end - troca simples de posição (swap)
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = pinnedEntities.findIndex(
+        (p) => `${p.type}-${p.id}` === active.id
+      );
+      const newIndex = pinnedEntities.findIndex(
+        (p) => `${p.type}-${p.id}` === over.id
+      );
+
+      // Cria novo array com swap simples (troca apenas os dois cards)
+      const newOrder = [...pinnedEntities];
+      [newOrder[oldIndex], newOrder[newIndex]] = [newOrder[newIndex], newOrder[oldIndex]];
+
+      reorderPinnedEntities(newOrder);
+    }
+
+    setActiveId(null);
+    setOverId(null);
+  };
+
+  // Get active entity for drag overlay
+  const activeEntity = useMemo(() => {
+    if (!activeId) return null;
+
+    const allEntities = pinnedEntities.map((pin) => {
+      let entityData: any = null;
+      if (pin.type === "character") {
+        entityData = pinnedData.characters.find((c) => c.id === pin.id);
+      } else if (pin.type === "region") {
+        entityData = pinnedData.regions.find((r: any) => r.id === pin.id);
+      } else if (pin.type === "faction") {
+        entityData = pinnedData.factions.find((f: any) => f.id === pin.id);
+      } else if (pin.type === "item") {
+        entityData = pinnedData.items.find((i: any) => i.id === pin.id);
+      } else if (pin.type === "race") {
+        entityData = pinnedData.races.find((r: any) => r.id === pin.id);
+      }
+      return { type: pin.type, id: pin.id, data: entityData };
+    }).filter(e => e.data !== null);
+
+    return allEntities.find(e => `${e.type}-${e.id}` === activeId) || null;
+  }, [activeId, pinnedEntities, pinnedData]);
 
   const renderEntityList = (type: EntityType, entities: any[]) => {
     if (entities.length === 0) return null;
@@ -134,6 +225,30 @@ export function EntityReferencePanel({
       </Collapsible>
     );
   };
+
+  // Memoize column calculation for performance
+  const { leftColumn, rightColumn } = useMemo(() => {
+    const allEntities = pinnedEntities.map((pin) => {
+      let entityData: any = null;
+      if (pin.type === "character") {
+        entityData = pinnedData.characters.find((c) => c.id === pin.id);
+      } else if (pin.type === "region") {
+        entityData = pinnedData.regions.find((r: any) => r.id === pin.id);
+      } else if (pin.type === "faction") {
+        entityData = pinnedData.factions.find((f: any) => f.id === pin.id);
+      } else if (pin.type === "item") {
+        entityData = pinnedData.items.find((i: any) => i.id === pin.id);
+      } else if (pin.type === "race") {
+        entityData = pinnedData.races.find((r: any) => r.id === pin.id);
+      }
+      return { type: pin.type, id: pin.id, data: entityData };
+    }).filter(e => e.data !== null);
+
+    return {
+      leftColumn: allEntities.filter((_, index) => index % 2 === 0),
+      rightColumn: allEntities.filter((_, index) => index % 2 === 1),
+    };
+  }, [pinnedEntities, pinnedData]);
 
   return (
     <div
@@ -251,50 +366,70 @@ export function EntityReferencePanel({
                   </p>
                 </div>
               ) : (
-                (() => {
-                  // Combine all entities into a single array with their original order
-                  const allEntities = [
-                    ...pinnedData.characters.map((char) => ({ type: 'character' as const, data: char })),
-                    ...pinnedData.regions.map((region: any) => ({ type: 'region' as const, data: region })),
-                    ...pinnedData.factions.map((faction: any) => ({ type: 'faction' as const, data: faction })),
-                    ...pinnedData.items.map((item: any) => ({ type: 'item' as const, data: item })),
-                    ...pinnedData.races.map((race: any) => ({ type: 'race' as const, data: race })),
-                  ];
-
-                  // Split into two columns (alternating)
-                  const leftColumn = allEntities.filter((_, index) => index % 2 === 0);
-                  const rightColumn = allEntities.filter((_, index) => index % 2 === 1);
-
-                  return (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
+                  onDragOver={handleDragOver}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={pinnedEntities.map((p) => `${p.type}-${p.id}`)}
+                    strategy={verticalListSortingStrategy}
+                  >
                     <div className="flex gap-3">
                       {/* Left Column */}
                       <div className="flex-1 space-y-3">
                         {leftColumn.map((entity) => (
-                          <PinnedEntityCard
-                            key={entity.data.id}
-                            type={entity.type}
-                            id={entity.data.id}
-                            bookId={bookId}
-                            onUnpin={() => unpinEntity(entity.type, entity.data.id)}
-                          />
+                          <SortablePinnedCard
+                            key={`${entity.type}-${entity.id}`}
+                            id={`${entity.type}-${entity.id}`}
+                            isOver={overId === `${entity.type}-${entity.id}` && activeId !== overId}
+                          >
+                            <PinnedEntityCard
+                              type={entity.type}
+                              id={entity.id}
+                              bookId={bookId}
+                              onUnpin={() => unpinEntity(entity.type, entity.id)}
+                            />
+                          </SortablePinnedCard>
                         ))}
                       </div>
 
                       {/* Right Column */}
                       <div className="flex-1 space-y-3">
                         {rightColumn.map((entity) => (
-                          <PinnedEntityCard
-                            key={entity.data.id}
-                            type={entity.type}
-                            id={entity.data.id}
-                            bookId={bookId}
-                            onUnpin={() => unpinEntity(entity.type, entity.data.id)}
-                          />
+                          <SortablePinnedCard
+                            key={`${entity.type}-${entity.id}`}
+                            id={`${entity.type}-${entity.id}`}
+                            isOver={overId === `${entity.type}-${entity.id}` && activeId !== overId}
+                          >
+                            <PinnedEntityCard
+                              type={entity.type}
+                              id={entity.id}
+                              bookId={bookId}
+                              onUnpin={() => unpinEntity(entity.type, entity.id)}
+                            />
+                          </SortablePinnedCard>
                         ))}
                       </div>
                     </div>
-                  );
-                })()
+                  </SortableContext>
+
+                  {/* Drag Overlay - mostra cópia durante arraste */}
+                  <DragOverlay dropAnimation={null}>
+                    {activeEntity ? (
+                      <div className="w-[280px] opacity-90 shadow-2xl ring-2 ring-primary/50 cursor-grabbing">
+                        <PinnedEntityCard
+                          type={activeEntity.type}
+                          id={activeEntity.id}
+                          bookId={bookId}
+                          onUnpin={() => {}}
+                        />
+                      </div>
+                    ) : null}
+                  </DragOverlay>
+                </DndContext>
               )}
             </div>
           </ScrollArea>

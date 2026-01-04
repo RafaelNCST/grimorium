@@ -25,6 +25,7 @@
     "basic_info": "Informações Básicas",
     "advanced_info": "Informações Avançadas",
     "internal_structure": "Estrutura Interna",
+    "organization": "Organização",
     "relationships": "Relacionamentos",
     "alignment": "Alinhamento",
     "culture": "Cultura",
@@ -37,6 +38,7 @@
     "diplomacy": "Diplomacia",
     "hierarchy": "Hierarquia",
     "territory": "Território",
+    "resources": "Recursos e Território",
     "chapter_metrics": "Métricas de Capítulo"
   },
   "fields": {
