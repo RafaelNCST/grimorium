@@ -89,7 +89,7 @@ export function EntityReferencePanel({
 
   // Load all entities on mount and ensure fresh data
   useEffect(() => {
-    // Always fetch fresh data when panel is mounted/visible
+    // Initial load - use cache if available
     const loadEntities = async () => {
       await Promise.all([
         fetchCharacters(bookId),
@@ -103,8 +103,15 @@ export function EntityReferencePanel({
     loadEntities();
 
     // Refetch when window regains focus (after suspension/tab switch)
+    // Force refresh to ensure data is up-to-date
     const handleFocus = () => {
-      loadEntities();
+      Promise.all([
+        fetchCharacters(bookId, true), // forceRefresh = true
+        fetchRegions(bookId, true),
+        fetchFactions(bookId, true),
+        fetchItems(bookId, true),
+        fetchRaces(bookId, true),
+      ]);
     };
 
     window.addEventListener('focus', handleFocus);

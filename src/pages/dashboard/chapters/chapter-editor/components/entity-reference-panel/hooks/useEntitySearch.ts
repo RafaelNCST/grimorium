@@ -26,22 +26,16 @@ export function useEntitySearch(bookId: string): UseEntitySearchReturn {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState<EntityType | "all">("all");
 
-  // Get entities from stores
-  const getCharacters = useCharactersStore((state) => state.getCharacters);
-  const getRegions = useRegionsStore((state) => state.getRegions);
-  const getFactions = useFactionsStore((state) => state.getFactions);
-  const getItems = useItemsStore((state) => state.getItems);
-  const getRaces = useRacesStore((state) => state.getRaces);
+  // Get entities directly from store cache (reactive)
+  const allCharacters = useCharactersStore((state) => state.cache[bookId]?.characters || []);
+  const allRegions = useRegionsStore((state) => state.cache[bookId]?.regions || []);
+  const allFactions = useFactionsStore((state) => state.cache[bookId]?.factions || []);
+  const allItems = useItemsStore((state) => state.cache[bookId]?.items || []);
+  const allRaces = useRacesStore((state) => state.cache[bookId]?.races || []);
 
   // Filter entities based on search term and type
   const filteredEntities = useMemo(() => {
     const term = searchTerm.toLowerCase().trim();
-
-    const allCharacters = getCharacters(bookId);
-    const allRegions = getRegions(bookId);
-    const allFactions = getFactions(bookId);
-    const allItems = getItems(bookId);
-    const allRaces = getRaces(bookId);
 
     const filterByName = (entities: any[]) => {
       if (!term) return entities;
@@ -79,12 +73,11 @@ export function useEntitySearch(bookId: string): UseEntitySearchReturn {
   }, [
     searchTerm,
     selectedType,
-    bookId,
-    getCharacters,
-    getRegions,
-    getFactions,
-    getItems,
-    getRaces,
+    allCharacters,
+    allRegions,
+    allFactions,
+    allItems,
+    allRaces,
   ]);
 
   return {

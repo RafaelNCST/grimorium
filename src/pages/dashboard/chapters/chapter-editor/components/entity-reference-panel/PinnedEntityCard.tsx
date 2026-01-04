@@ -58,26 +58,24 @@ export function PinnedEntityCard({
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const [expandedFields, setExpandedFields] = useState<Record<string, boolean>>({});
 
-  // Get entity data from stores
-  const getCharacters = useCharactersStore((state) => state.getCharacters);
-  const getRegions = useRegionsStore((state) => state.getRegions);
-  const getFactions = useFactionsStore((state) => state.getFactions);
-  const getItems = useItemsStore((state) => state.getItems);
-  const getRaces = useRacesStore((state) => state.getRaces);
+  // Get entity data directly from store cache (reactive)
+  const characters = useCharactersStore((state) => state.cache[bookId]?.characters || []);
+  const regions = useRegionsStore((state) => state.cache[bookId]?.regions || []);
+  const factions = useFactionsStore((state) => state.cache[bookId]?.factions || []);
+  const items = useItemsStore((state) => state.cache[bookId]?.items || []);
+  const races = useRacesStore((state) => state.cache[bookId]?.races || []);
 
   // Get the specific entity
   const entity =
     type === "character"
-      ? getCharacters(bookId).find((e) => e.id === id)
+      ? characters.find((e) => e.id === id)
       : type === "region"
-        ? getRegions(bookId).find((e) => e.id === id)
+        ? regions.find((e) => e.id === id)
         : type === "faction"
-          ? getFactions(bookId).find((e) => e.id === id)
+          ? factions.find((e) => e.id === id)
           : type === "item"
-            ? getItems(bookId).find((e) => e.id === id)
-            : getRaces(bookId).find((e) => e.id === id);
-
-  if (!entity) return null;
+            ? items.find((e) => e.id === id)
+            : races.find((e) => e.id === id);
 
   const Icon = ENTITY_CONFIG[type].icon;
 
@@ -225,6 +223,9 @@ export function PinnedEntityCard({
       setShowReadMore(element.scrollHeight > element.clientHeight);
     }
   }, [entity]);
+
+  // Early return AFTER all hooks to avoid hook rule violations
+  if (!entity) return null;
 
   const renderBasicInfo = () => {
     if (type === "character") {
@@ -417,18 +418,14 @@ export function PinnedEntityCard({
     return false;
   };
 
-  // Get all entities from stores
-  const allRaces = getRaces(bookId);
-  const allRegions = getRegions(bookId);
-
   // Helper functions to get entity names
   const getRaceName = (raceId: string) => {
-    const race = allRaces.find(r => r.id === raceId);
+    const race = races.find(r => r.id === raceId);
     return race?.name || raceId;
   };
 
   const getRegionName = (regionId: string) => {
-    const region = allRegions.find(r => r.id === regionId);
+    const region = regions.find(r => r.id === regionId);
     return region?.name || regionId;
   };
 

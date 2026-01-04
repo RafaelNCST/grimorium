@@ -30,12 +30,12 @@ export function usePinnedEntities(
 ): UsePinnedEntitiesReturn {
   const [pins, setPins] = useState<PinnedEntity[]>([]);
 
-  // Get entities from stores
-  const getCharacters = useCharactersStore((state) => state.getCharacters);
-  const getRegions = useRegionsStore((state) => state.getRegions);
-  const getFactions = useFactionsStore((state) => state.getFactions);
-  const getItems = useItemsStore((state) => state.getItems);
-  const getRaces = useRacesStore((state) => state.getRaces);
+  // Get entities directly from store cache (reactive)
+  const characters = useCharactersStore((state) => state.cache[bookId]?.characters || []);
+  const regions = useRegionsStore((state) => state.cache[bookId]?.regions || []);
+  const factions = useFactionsStore((state) => state.cache[bookId]?.factions || []);
+  const items = useItemsStore((state) => state.cache[bookId]?.items || []);
+  const races = useRacesStore((state) => state.cache[bookId]?.races || []);
 
   // Load pinned entities from localStorage on mount
   useEffect(() => {
@@ -91,39 +91,39 @@ export function usePinnedEntities(
 
   // Get actual entity data for pinned entities
   const pinnedData = useMemo(() => {
-    const allCharacters = getCharacters(bookId);
-    const allRegions = getRegions(bookId);
-    const allFactions = getFactions(bookId);
-    const allItems = getItems(bookId);
-    const allRaces = getRaces(bookId);
-
-    const characters = pins
+    const pinnedCharacters = pins
       .filter((p) => p.type === "character")
-      .map((p) => allCharacters.find((c) => c.id === p.id))
+      .map((p) => characters.find((c) => c.id === p.id))
       .filter(Boolean) as ICharacter[];
 
-    const regions = pins
+    const pinnedRegions = pins
       .filter((p) => p.type === "region")
-      .map((p) => allRegions.find((r) => r.id === p.id))
+      .map((p) => regions.find((r) => r.id === p.id))
       .filter(Boolean);
 
-    const factions = pins
+    const pinnedFactions = pins
       .filter((p) => p.type === "faction")
-      .map((p) => allFactions.find((f) => f.id === p.id))
+      .map((p) => factions.find((f) => f.id === p.id))
       .filter(Boolean);
 
-    const items = pins
+    const pinnedItems = pins
       .filter((p) => p.type === "item")
-      .map((p) => allItems.find((i) => i.id === p.id))
+      .map((p) => items.find((i) => i.id === p.id))
       .filter(Boolean);
 
-    const races = pins
+    const pinnedRaces = pins
       .filter((p) => p.type === "race")
-      .map((p) => allRaces.find((r) => r.id === p.id))
+      .map((p) => races.find((r) => r.id === p.id))
       .filter(Boolean);
 
-    return { characters, regions, factions, items, races };
-  }, [pins, getCharacters, getRegions, getFactions, getItems, getRaces, bookId]);
+    return {
+      characters: pinnedCharacters,
+      regions: pinnedRegions,
+      factions: pinnedFactions,
+      items: pinnedItems,
+      races: pinnedRaces
+    };
+  }, [pins, characters, regions, factions, items, races]);
 
   return {
     pinnedEntities: pins,
