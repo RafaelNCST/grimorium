@@ -112,7 +112,8 @@
       "Bash(powershell.exe:*)",
       "Bash(Out-String -Stream)",
       "WebFetch(domain:www.radix-ui.com)",
-      "Bash(Start-Sleep -Seconds 10)"
+      "Bash(Start-Sleep -Seconds 10)",
+      "Bash(rmdir:*)"
     ],
     "deny": [
       "Bash(git push --force:*)",
