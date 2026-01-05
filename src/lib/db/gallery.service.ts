@@ -9,10 +9,10 @@ import {
 import { GALLERY_DIRECTORY } from "@/pages/gallery/constants/gallery-constants";
 import { EntityType, IGalleryItem, IGalleryLink } from "@/types/gallery-types";
 
+import { safeDBOperation } from "./safe-db-operation";
 import { DBGalleryItem, DBGalleryLink } from "./types";
 
 import { getDB } from "./index";
-import { safeDBOperation } from "./safe-db-operation";
 
 // ========================================
 // Converters
@@ -113,7 +113,7 @@ export async function ensureGalleryDirectory(): Promise<void> {
         recursive: true,
       });
     }
-  }, 'ensureGalleryDirectory');
+  }, "ensureGalleryDirectory");
 }
 
 // ========================================
@@ -139,7 +139,7 @@ export async function ensureThumbnailsDirectory(): Promise<void> {
         recursive: true,
       });
     }
-  }, 'ensureThumbnailsDirectory');
+  }, "ensureThumbnailsDirectory");
 }
 
 /**
@@ -167,7 +167,7 @@ export async function saveThumbnailFile(
     );
 
     return await saveThumbnailToFile(itemId, base64Data);
-  }, 'saveThumbnailFile');
+  }, "saveThumbnailFile");
 }
 
 /**
@@ -187,7 +187,7 @@ export async function deleteThumbnailFile(
         baseDir: BaseDirectory.AppData,
       });
     }
-  }, 'deleteThumbnailFile');
+  }, "deleteThumbnailFile");
 }
 
 /**
@@ -196,13 +196,11 @@ export async function deleteThumbnailFile(
  * @returns Data URL for thumbnail
  */
 export async function loadThumbnailWithFallback(
-  item: Pick<IGalleryItem, 'id' | 'thumbnailPath' | 'originalPath' | 'mimeType'>
+  item: Pick<IGalleryItem, "id" | "thumbnailPath" | "originalPath" | "mimeType">
 ): Promise<string> {
   return safeDBOperation(async () => {
-    const {
-      loadThumbnailAsDataURL,
-      regenerateThumbnailFromOriginal,
-    } = await import("@/pages/gallery/utils/image-utils");
+    const { loadThumbnailAsDataURL, regenerateThumbnailFromOriginal } =
+      await import("@/pages/gallery/utils/image-utils");
 
     try {
       // Tentar carregar thumbnail do filesystem
@@ -239,7 +237,7 @@ export async function loadThumbnailWithFallback(
         );
       }
     }
-  }, 'loadThumbnailWithFallback');
+  }, "loadThumbnailWithFallback");
 }
 
 /**
@@ -248,11 +246,13 @@ export async function loadThumbnailWithFallback(
  * @returns Data URL for the original full-quality image
  */
 export async function loadOriginalImageAsDataURL(
-  item: Pick<IGalleryItem, 'originalPath' | 'mimeType'>
+  item: Pick<IGalleryItem, "originalPath" | "mimeType">
 ): Promise<string> {
   return safeDBOperation(async () => {
     const { readFile } = await import("@tauri-apps/plugin-fs");
-    const { bytesToDataURL } = await import("@/pages/gallery/utils/image-utils");
+    const { bytesToDataURL } = await import(
+      "@/pages/gallery/utils/image-utils"
+    );
 
     try {
       // Read original file from filesystem
@@ -273,7 +273,7 @@ export async function loadOriginalImageAsDataURL(
         }`
       );
     }
-  }, 'loadOriginalImageAsDataURL');
+  }, "loadOriginalImageAsDataURL");
 }
 
 /**
@@ -293,7 +293,7 @@ export async function deleteGalleryImageFile(
         baseDir: BaseDirectory.AppData,
       });
     }
-  }, 'deleteGalleryImageFile');
+  }, "deleteGalleryImageFile");
 }
 
 /**
@@ -310,7 +310,7 @@ export async function copyImageToGallery(
     await copyFile(sourceFilePath, destinationPath, {
       toPathBaseDir: BaseDirectory.AppData,
     });
-  }, 'copyImageToGallery');
+  }, "copyImageToGallery");
 }
 
 // ========================================
@@ -338,7 +338,7 @@ export async function getAllGalleryItems(): Promise<IGalleryItem[]> {
     }
 
     return itemsWithLinks;
-  }, 'getAllGalleryItems');
+  }, "getAllGalleryItems");
 }
 
 /**
@@ -356,10 +356,12 @@ export async function getGalleryItemsPaginated(
     let params: unknown[];
 
     if (bookId) {
-      query = "SELECT * FROM gallery_items WHERE book_id = $1 ORDER BY order_index ASC, updated_at DESC LIMIT $2 OFFSET $3";
+      query =
+        "SELECT * FROM gallery_items WHERE book_id = $1 ORDER BY order_index ASC, updated_at DESC LIMIT $2 OFFSET $3";
       params = [bookId, limit, offset];
     } else {
-      query = "SELECT * FROM gallery_items ORDER BY updated_at DESC LIMIT $1 OFFSET $2";
+      query =
+        "SELECT * FROM gallery_items ORDER BY updated_at DESC LIMIT $1 OFFSET $2";
       params = [limit, offset];
     }
 
@@ -376,13 +378,15 @@ export async function getGalleryItemsPaginated(
     }
 
     return itemsWithLinks;
-  }, 'getGalleryItemsPaginated');
+  }, "getGalleryItemsPaginated");
 }
 
 /**
  * Get total count of gallery items
  */
-export async function getGalleryItemsCount(bookId: string | null): Promise<number> {
+export async function getGalleryItemsCount(
+  bookId: string | null
+): Promise<number> {
   return safeDBOperation(async () => {
     const db = await getDB();
 
@@ -399,7 +403,7 @@ export async function getGalleryItemsCount(bookId: string | null): Promise<numbe
 
     const result = await db.select<Array<{ count: number }>>(query, params);
     return result[0]?.count || 0;
-  }, 'getGalleryItemsCount');
+  }, "getGalleryItemsCount");
 }
 
 /**
@@ -426,7 +430,7 @@ export async function getGalleryItemsByBookId(
     }
 
     return itemsWithLinks;
-  }, 'getGalleryItemsByBookId');
+  }, "getGalleryItemsByBookId");
 }
 
 /**
@@ -452,7 +456,7 @@ export async function getGalleryItemById(
       ...dbGalleryItemToGalleryItem(result[0]),
       links,
     };
-  }, 'getGalleryItemById');
+  }, "getGalleryItemById");
 }
 
 /**
@@ -498,7 +502,7 @@ export async function createGalleryItem(item: IGalleryItem): Promise<void> {
     for (const link of item.links) {
       await addGalleryLink(item.id, link);
     }
-  }, 'createGalleryItem');
+  }, "createGalleryItem");
 }
 
 /**
@@ -534,7 +538,10 @@ export async function updateGalleryItem(
       }
 
       // Salvar novo thumbnail
-      const newThumbnailPath = await saveThumbnailFile(id, updates.thumbnailBase64);
+      const newThumbnailPath = await saveThumbnailFile(
+        id,
+        updates.thumbnailBase64
+      );
 
       // Atualizar thumbnail_path no banco
       updateFields.push(`thumbnail_path = $${updateValues.length + 1}`);
@@ -571,7 +578,7 @@ export async function updateGalleryItem(
     const query = `UPDATE gallery_items SET ${updateFields.join(", ")} WHERE id = $${updateValues.length}`;
 
     await db.execute(query, updateValues);
-  }, 'updateGalleryItem');
+  }, "updateGalleryItem");
 }
 
 /**
@@ -595,7 +602,7 @@ export async function deleteGalleryItem(id: string): Promise<void> {
 
     // Delete from database (links will be deleted automatically via CASCADE)
     await db.execute("DELETE FROM gallery_items WHERE id = $1", [id]);
-  }, 'deleteGalleryItem');
+  }, "deleteGalleryItem");
 }
 
 /**
@@ -606,7 +613,7 @@ export async function deleteGalleryItems(ids: string[]): Promise<void> {
     for (const id of ids) {
       await deleteGalleryItem(id);
     }
-  }, 'deleteGalleryItems');
+  }, "deleteGalleryItems");
 }
 
 // ========================================
@@ -625,7 +632,7 @@ export async function getGalleryLinks(itemId: string): Promise<IGalleryLink[]> {
     );
 
     return result.map(dbGalleryLinkToGalleryLink);
-  }, 'getGalleryLinks');
+  }, "getGalleryLinks");
 }
 
 /**
@@ -654,7 +661,7 @@ export async function addGalleryLink(
 
     // Update item's updated_at
     await updateGalleryItem(itemId, {});
-  }, 'addGalleryLink');
+  }, "addGalleryLink");
 }
 
 /**
@@ -676,7 +683,7 @@ export async function removeGalleryLink(linkId: string): Promise<void> {
     if (link.length > 0) {
       await updateGalleryItem(link[0].gallery_item_id, {});
     }
-  }, 'removeGalleryLink');
+  }, "removeGalleryLink");
 }
 
 /**
@@ -713,7 +720,7 @@ export async function updateGalleryLinks(
 
     // Update item's updated_at
     await updateGalleryItem(itemId, {});
-  }, 'updateGalleryLinks');
+  }, "updateGalleryLinks");
 }
 
 // ========================================
@@ -735,7 +742,7 @@ export async function reorderGalleryItems(
         [item.orderIndex, item.id]
       );
     }
-  }, 'reorderGalleryItems');
+  }, "reorderGalleryItems");
 }
 
 // ========================================
@@ -781,5 +788,5 @@ export async function getGalleryItemsByEntityTypes(
     }
 
     return items;
-  }, 'getGalleryItemsByEntityTypes');
+  }, "getGalleryItemsByEntityTypes");
 }

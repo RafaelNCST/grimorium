@@ -7,6 +7,8 @@ import { z } from "zod";
 import { type ISectionVisibility } from "@/components/detail-page/visibility-helpers";
 import { CHARACTER_ROLES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-roles";
 import { GENDERS_CONSTANT as GENDERS_CONSTANT_MODAL } from "@/components/modals/create-character-modal/constants/genders";
+import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   getCharacterById,
   getCharactersByBookId,
@@ -26,14 +28,12 @@ import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import type { IRegion } from "@/pages/dashboard/tabs/world/types/region-types";
 import { useCharactersStore } from "@/stores/characters-store";
 import { type ICharacter } from "@/types/character-types";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { ALIGNMENTS_CONSTANT } from "./constants/alignments-constant";
 import { RELATIONSHIP_TYPES_CONSTANT } from "./constants/relationship-types-constant";
 import { getRelationshipTypeData } from "./utils/get-relationship-type-data";
 import { CharacterDetailView } from "./view";
-import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
 
 // Extended type to include page/section titles
 interface IPowerLinkWithTitles extends IPowerCharacterLink {
@@ -504,7 +504,12 @@ export function CharacterDetail() {
     } catch (error) {
       console.error("Error deleting character:", error);
     }
-  }, [navigateToCharactersTab, characterId, dashboardId, deleteCharacterFromStore]);
+  }, [
+    navigateToCharactersTab,
+    characterId,
+    dashboardId,
+    deleteCharacterFromStore,
+  ]);
 
   const handleCancel = useCallback(() => {
     if (hasChanges) {
@@ -518,11 +523,7 @@ export function CharacterDetail() {
     setSectionVisibility(originalSectionVisibility);
     setErrors({});
     setIsEditing(false);
-  }, [
-    character,
-    originalSectionVisibility,
-    hasChanges,
-  ]);
+  }, [character, originalSectionVisibility, hasChanges]);
 
   const handleConfirmCancel = useCallback(() => {
     setEditData({ ...character, relationships: character.relationships || [] });
@@ -559,9 +560,7 @@ export function CharacterDetail() {
         reader.onload = (e) => {
           const result = e.target?.result as string;
           setImagePreview(result);
-          setEditData((prev) => {
-            return { ...prev, image: result };
-          });
+          setEditData((prev) => ({ ...prev, image: result }));
         };
         reader.readAsDataURL(file);
       }

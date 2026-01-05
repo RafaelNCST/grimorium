@@ -283,14 +283,22 @@ export function FormSelectGrid<T extends string = string>({
 
   return (
     <div className="space-y-2">
-      <Label className={`text-sm font-medium ${error ? "text-destructive" : "text-primary"}`}>
+      <Label
+        className={`text-sm font-medium ${error ? "text-destructive" : "text-primary"}`}
+      >
         {label}
         {required && <span className="text-destructive ml-1">*</span>}
       </Label>
 
       {!!alertText.length && <InfoAlert>{alertText}</InfoAlert>}
 
-      <div className={cn("grid gap-3 w-full p-1", getGridColsClass(columns), className)}>
+      <div
+        className={cn(
+          "grid gap-3 w-full p-1",
+          getGridColsClass(columns),
+          className
+        )}
+      >
         {options.map((option) => {
           const Icon = option.icon;
           const selected = isSelected(option.value);

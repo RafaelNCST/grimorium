@@ -359,7 +359,9 @@ export function EditorSettingsModal({
                   {t("editor_settings_modal.typography.text_alignment")}
                 </Label>
                 <p className="text-sm text-muted-foreground">
-                  {t("editor_settings_modal.typography.text_alignment_description")}
+                  {t(
+                    "editor_settings_modal.typography.text_alignment_description"
+                  )}
                 </p>
               </div>
 

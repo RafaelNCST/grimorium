@@ -1,21 +1,19 @@
-import {
-  IRaceRelationship,
-} from "@/pages/dashboard/tabs/races/race-detail/types/race-detail-types";
+import { IRaceRelationship } from "@/pages/dashboard/tabs/races/race-detail/types/race-detail-types";
 import { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 
-import { DBRace, DBRaceRelationship } from "./types";
-
-import { getDB } from "./index";
-import { safeDBOperation } from "./safe-db-operation";
 import {
   cleanCommonEntityReferences,
   removeFromJSONArray,
   removeFromNestedJSONArray,
 } from "./cleanup-helpers";
+import { safeDBOperation } from "./safe-db-operation";
 import {
   safeParseStringArray,
   safeParseUnknownObject,
 } from "./safe-json-parse";
+import { DBRace, DBRaceRelationship } from "./types";
+
+import { getDB } from "./index";
 
 // Convert IRace to DBRace
 function raceToDBRace(bookId: string, race: IRace): DBRace {
@@ -96,9 +94,7 @@ function dbRaceToRace(dbRace: DBRace): IRace {
     otherCommunication: dbRace.other_communication,
     moralTendency: dbRace.moral_tendency,
     socialOrganization: dbRace.social_organization,
-    habitat: dbRace.habitat
-      ? safeParseStringArray(dbRace.habitat)
-      : undefined,
+    habitat: dbRace.habitat ? safeParseStringArray(dbRace.habitat) : undefined,
     physicalCapacity: dbRace.physical_capacity,
     specialCharacteristics: dbRace.special_characteristics,
     weaknesses: dbRace.weaknesses,
@@ -122,7 +118,7 @@ export async function getRacesByBookId(bookId: string): Promise<IRace[]> {
       [bookId]
     );
     return result.map(dbRaceToRace);
-  }, 'getRacesByBookId');
+  }, "getRacesByBookId");
 }
 
 export async function getRaceById(id: string): Promise<IRace | null> {
@@ -133,7 +129,7 @@ export async function getRaceById(id: string): Promise<IRace | null> {
       [id]
     );
     return result.length > 0 ? dbRaceToRace(result[0]) : null;
-  }, 'getRaceById');
+  }, "getRaceById");
 }
 
 export async function createRace(bookId: string, race: IRace): Promise<void> {
@@ -195,7 +191,7 @@ export async function createRace(bookId: string, race: IRace): Promise<void> {
         dbRace.updated_at,
       ]
     );
-  }, 'createRace');
+  }, "createRace");
 }
 
 export async function updateRace(
@@ -277,7 +273,7 @@ export async function updateRace(
         id,
       ]
     );
-  }, 'updateRace');
+  }, "updateRace");
 }
 
 export async function deleteRace(id: string): Promise<void> {
@@ -307,7 +303,7 @@ export async function deleteRace(id: string): Promise<void> {
 
     // 6. Finally, delete the race (CASCADE will handle versions, relationships)
     await db.execute("DELETE FROM races WHERE id = $1", [id]);
-  }, 'deleteRace');
+  }, "deleteRace");
 }
 
 // Race Relationships
@@ -327,7 +323,7 @@ export async function getRaceRelationships(
       type: rel.type as IRaceRelationship["type"],
       description: rel.description,
     }));
-  }, 'getRaceRelationships');
+  }, "getRaceRelationships");
 }
 
 export async function saveRaceRelationships(
@@ -348,8 +344,15 @@ export async function saveRaceRelationships(
       await db.execute(
         `INSERT INTO race_relationships (id, race_id, related_race_id, type, description, created_at)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        [relId, raceId, rel.raceId, rel.type, rel.description || null, Date.now()]
+        [
+          relId,
+          raceId,
+          rel.raceId,
+          rel.type,
+          rel.description || null,
+          Date.now(),
+        ]
       );
     }
-  }, 'saveRaceRelationships');
+  }, "saveRaceRelationships");
 }

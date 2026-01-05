@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 
-import {
-  Bold,
-  Italic,
-  Undo,
-  Redo,
-  Check,
-} from "lucide-react";
+import { Bold, Italic, Undo, Redo, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";

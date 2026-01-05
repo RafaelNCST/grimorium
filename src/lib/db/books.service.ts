@@ -1,8 +1,5 @@
 import { Book } from "@/stores/book-store";
 
-import { DBBook } from "./types";
-
-import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
 import {
   safeParseStringArray,
@@ -12,6 +9,9 @@ import {
   sectionsConfigSchema,
   tabsConfigSchema,
 } from "./safe-json-parse";
+import { DBBook } from "./types";
+
+import { getDB } from "./index";
 
 // Convert Book store type to DBBook
 function bookToDBBook(book: Book, tabsConfig?: string): DBBook {
@@ -77,7 +77,7 @@ export async function getAllBooks(): Promise<Book[]> {
     );
 
     return result.map(dbBookToBook);
-  }, 'getAllBooks');
+  }, "getAllBooks");
 }
 
 export async function getBookById(id: string): Promise<Book | null> {
@@ -88,7 +88,7 @@ export async function getBookById(id: string): Promise<Book | null> {
       [id]
     );
     return result.length > 0 ? dbBookToBook(result[0]) : null;
-  }, 'getBookById');
+  }, "getBookById");
 }
 
 export async function createBook(
@@ -141,7 +141,7 @@ export async function createBook(
         dbBook.tabs_config,
       ]
     );
-  }, 'createBook');
+  }, "createBook");
 }
 
 export async function updateBook(
@@ -211,7 +211,7 @@ export async function updateBook(
         values
       );
     }
-  }, 'updateBook');
+  }, "updateBook");
 }
 
 export async function deleteBook(id: string): Promise<void> {
@@ -233,7 +233,7 @@ export async function deleteBook(id: string): Promise<void> {
 
     // Now delete the book (CASCADE will handle all database records)
     await db.execute("DELETE FROM books WHERE id = $1", [id]);
-  }, 'deleteBook');
+  }, "deleteBook");
 }
 
 export async function updateLastOpened(id: string): Promise<void> {
@@ -244,7 +244,7 @@ export async function updateLastOpened(id: string): Promise<void> {
       "UPDATE books SET last_opened_at = $1, updated_at = $2 WHERE id = $3",
       [now, now, id]
     );
-  }, 'updateLastOpened');
+  }, "updateLastOpened");
 }
 
 // Overview-specific update functions
@@ -346,7 +346,7 @@ export async function updateOverviewData(
         values
       );
     }
-  }, 'updateOverviewData');
+  }, "updateOverviewData");
 }
 
 export async function getOverviewData(bookId: string): Promise<OverviewData> {
@@ -368,7 +368,10 @@ export async function getOverviewData(bookId: string): Promise<OverviewData> {
     const overviewData: OverviewData = {};
 
     // Parse goals
-    if (row.words_per_day !== undefined || row.chapters_per_week !== undefined) {
+    if (
+      row.words_per_day !== undefined ||
+      row.chapters_per_week !== undefined
+    ) {
       overviewData.goals = {
         wordsPerDay: row.words_per_day || 0,
         chaptersPerWeek: row.chapters_per_week || 0,
@@ -422,7 +425,7 @@ export async function getOverviewData(bookId: string): Promise<OverviewData> {
     }
 
     return overviewData;
-  }, 'getOverviewData');
+  }, "getOverviewData");
 }
 
 // Tabs configuration
@@ -445,7 +448,7 @@ export async function getTabsConfig(bookId: string): Promise<TabConfig[]> {
     }
 
     return safeJSONParse(result[0].tabs_config, tabsConfigSchema, []);
-  }, 'getTabsConfig');
+  }, "getTabsConfig");
 }
 
 export async function updateTabsConfig(
@@ -459,5 +462,5 @@ export async function updateTabsConfig(
       "UPDATE books SET tabs_config = $1, updated_at = $2 WHERE id = $3",
       [JSON.stringify(tabs), now, bookId]
     );
-  }, 'updateTabsConfig');
+  }, "updateTabsConfig");
 }

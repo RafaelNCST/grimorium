@@ -283,7 +283,9 @@ export function UploadImageModal({
           <div className="space-y-4">
             {/* Image Selection */}
             <div className="space-y-2">
-              <Label className="text-primary">{t("upload_modal.select_image")}</Label>
+              <Label className="text-primary">
+                {t("upload_modal.select_image")}
+              </Label>
               {imagePreview ? (
                 <div
                   className="relative w-full h-64 rounded-lg border overflow-hidden cursor-pointer group"
@@ -360,7 +362,9 @@ export function UploadImageModal({
             {/* Links */}
             {!disableLinksManagement && (
               <div className="space-y-2">
-                <Label className="text-primary">{t("upload_modal.links_label")}</Label>
+                <Label className="text-primary">
+                  {t("upload_modal.links_label")}
+                </Label>
                 <Button
                   type="button"
                   variant="secondary"

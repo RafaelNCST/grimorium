@@ -6,13 +6,13 @@ import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { InfoAlert } from "@/components/ui/info-alert";
 import {
-  getPlotArcChapterMetrics,
-  type PlotArcChapterMetrics,
-} from "@/lib/services/chapter-metrics.service";
-import {
   shouldShowChapterWarning,
   getChapterLimitForSize,
 } from "@/lib/constants/plot-arc-chapter-limits";
+import {
+  getPlotArcChapterMetrics,
+  type PlotArcChapterMetrics,
+} from "@/lib/services/chapter-metrics.service";
 import type { PlotArcSize } from "@/types/plot-types";
 
 interface PropsPlotArcChapterMetricsSection {
@@ -109,7 +109,7 @@ export function PlotArcChapterMetricsSection({
               {t("plot_section.chapter_limit_exceeded", {
                 totalChapters: metrics.totalChapters,
                 maxChapters: getChapterLimitForSize(arcSize).maxChapters,
-                arcSize: arcSize,
+                arcSize,
               })}
             </InfoAlert>
           )}

@@ -6,8 +6,9 @@ import {
   ImportanceLevel,
 } from "@/types/entity-log-types";
 
-import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
+
+import { getDB } from "./index";
 
 // Convert IEntityLog to DBEntityLog
 function entityLogToDBEntityLog(log: IEntityLog): DBEntityLog {
@@ -22,12 +23,8 @@ function entityLogToDBEntityLog(log: IEntityLog): DBEntityLog {
     importance: log.importance,
     description: log.description,
     order_index: log.orderIndex,
-    created_at: log.createdAt
-      ? new Date(log.createdAt).getTime()
-      : Date.now(),
-    updated_at: log.updatedAt
-      ? new Date(log.updatedAt).getTime()
-      : Date.now(),
+    created_at: log.createdAt ? new Date(log.createdAt).getTime() : Date.now(),
+    updated_at: log.updatedAt ? new Date(log.updatedAt).getTime() : Date.now(),
   };
 }
 

@@ -1,10 +1,13 @@
 import { IPlotArc, IPlotEvent } from "@/types/plot-types";
 
+import { safeDBOperation } from "./safe-db-operation";
+import {
+  safeParseStringArray,
+  safeParseFieldVisibility,
+} from "./safe-json-parse";
 import { DBPlotArc, DBPlotEvent } from "./types";
 
 import { getDB } from "./index";
-import { safeDBOperation } from "./safe-db-operation";
-import { safeParseStringArray, safeParseFieldVisibility } from "./safe-json-parse";
 
 // Convert IPlotArc to DBPlotArc
 function arcToDBPlotArc(bookId: string, arc: IPlotArc): DBPlotArc {
@@ -18,18 +21,22 @@ function arcToDBPlotArc(bookId: string, arc: IPlotArc): DBPlotArc {
     progress: arc.progress,
     status: arc.status,
     order_index: arc.order,
-    important_characters: arc.importantCharacters && arc.importantCharacters.length > 0
-      ? JSON.stringify(arc.importantCharacters)
-      : undefined,
-    important_factions: arc.importantFactions && arc.importantFactions.length > 0
-      ? JSON.stringify(arc.importantFactions)
-      : undefined,
-    important_items: arc.importantItems && arc.importantItems.length > 0
-      ? JSON.stringify(arc.importantItems)
-      : undefined,
-    important_regions: arc.importantRegions && arc.importantRegions.length > 0
-      ? JSON.stringify(arc.importantRegions)
-      : undefined,
+    important_characters:
+      arc.importantCharacters && arc.importantCharacters.length > 0
+        ? JSON.stringify(arc.importantCharacters)
+        : undefined,
+    important_factions:
+      arc.importantFactions && arc.importantFactions.length > 0
+        ? JSON.stringify(arc.importantFactions)
+        : undefined,
+    important_items:
+      arc.importantItems && arc.importantItems.length > 0
+        ? JSON.stringify(arc.importantItems)
+        : undefined,
+    important_regions:
+      arc.importantRegions && arc.importantRegions.length > 0
+        ? JSON.stringify(arc.importantRegions)
+        : undefined,
     arc_message: arc.arcMessage,
     world_impact: arc.worldImpact,
     field_visibility: arc.fieldVisibility
@@ -107,7 +114,7 @@ export async function getPlotArcsByBookId(bookId: string): Promise<IPlotArc[]> {
     }
 
     return arcs;
-  }, 'getPlotArcsByBookId');
+  }, "getPlotArcsByBookId");
 }
 
 // Get a single arc by ID
@@ -128,7 +135,7 @@ export async function getPlotArcById(arcId: string): Promise<IPlotArc | null> {
 
     const events = eventsResult.map(dbPlotEventToEvent);
     return dbPlotArcToArc(arcResult[0], events);
-  }, 'getPlotArcById');
+  }, "getPlotArcById");
 }
 
 // Create a new arc
@@ -185,7 +192,7 @@ export async function createPlotArc(
         ]
       );
     }
-  }, 'createPlotArc');
+  }, "createPlotArc");
 }
 
 // Update an arc
@@ -228,7 +235,8 @@ export async function updatePlotArc(
         updates.status !== undefined
           ? updates.status
           : (currentArc.status as IPlotArc["status"]),
-      order: updates.order !== undefined ? updates.order : currentArc.order_index,
+      order:
+        updates.order !== undefined ? updates.order : currentArc.order_index,
       events: updates.events || [],
       importantCharacters:
         updates.importantCharacters !== undefined
@@ -313,7 +321,7 @@ export async function updatePlotArc(
         );
       }
     }
-  }, 'updatePlotArc');
+  }, "updatePlotArc");
 }
 
 // Delete an arc
@@ -322,13 +330,14 @@ export async function deletePlotArc(arcId: string): Promise<void> {
     const db = await getDB();
 
     // 1. Set plot_arc_id to NULL in chapters that reference this arc
-    await db.execute("UPDATE chapters SET plot_arc_id = NULL WHERE plot_arc_id = $1", [
-      arcId,
-    ]);
+    await db.execute(
+      "UPDATE chapters SET plot_arc_id = NULL WHERE plot_arc_id = $1",
+      [arcId]
+    );
 
     // 2. Delete the arc (CASCADE will handle events)
     await db.execute("DELETE FROM plot_arcs WHERE id = $1", [arcId]);
-  }, 'deletePlotArc');
+  }, "deletePlotArc");
 }
 
 // Update event completion status
@@ -342,7 +351,7 @@ export async function updateEventCompletion(
       completed ? 1 : 0,
       eventId,
     ]);
-  }, 'updateEventCompletion');
+  }, "updateEventCompletion");
 }
 
 // Reorder arcs
@@ -358,7 +367,7 @@ export async function reorderPlotArcs(
         arc.id,
       ]);
     }
-  }, 'reorderPlotArcs');
+  }, "reorderPlotArcs");
 }
 
 // Reorder events
@@ -369,10 +378,10 @@ export async function reorderPlotEvents(
     const db = await getDB();
 
     for (const event of events) {
-      await db.execute("UPDATE plot_events SET order_index = $1 WHERE id = $2", [
-        event.order,
-        event.id,
-      ]);
+      await db.execute(
+        "UPDATE plot_events SET order_index = $1 WHERE id = $2",
+        [event.order, event.id]
+      );
     }
-  }, 'reorderPlotEvents');
+  }, "reorderPlotEvents");
 }

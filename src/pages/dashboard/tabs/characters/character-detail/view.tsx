@@ -365,7 +365,9 @@ export function CharacterDetailView({
             <div className="flex-1 space-y-4">
               {/* Name */}
               <div className="space-y-2">
-                <Label className={`text-sm font-medium ${errors.name ? "text-destructive" : "text-primary"}`}>
+                <Label
+                  className={`text-sm font-medium ${errors.name ? "text-destructive" : "text-primary"}`}
+                >
                   {t("character-detail:fields.name")}
                   <span className="text-destructive ml-1">*</span>
                 </Label>
@@ -393,7 +395,9 @@ export function CharacterDetailView({
               <div className="grid grid-cols-2 gap-4">
                 {/* Age */}
                 <div className="space-y-2">
-                  <Label className={`text-sm font-medium ${errors.age ? "text-destructive" : "text-primary"}`}>
+                  <Label
+                    className={`text-sm font-medium ${errors.age ? "text-destructive" : "text-primary"}`}
+                  >
                     {t("character-detail:fields.age")}
                     <span className="text-destructive ml-1">*</span>
                   </Label>
@@ -420,7 +424,9 @@ export function CharacterDetailView({
 
                 {/* Gender */}
                 <div className="space-y-2">
-                  <Label className={`text-sm font-medium ${errors.gender ? "text-destructive" : "text-primary"}`}>
+                  <Label
+                    className={`text-sm font-medium ${errors.gender ? "text-destructive" : "text-primary"}`}
+                  >
                     {t("character-detail:fields.gender")}
                     <span className="text-destructive ml-1">*</span>
                   </Label>
@@ -503,7 +509,9 @@ export function CharacterDetailView({
 
           {/* Description */}
           <div className="space-y-2">
-            <Label className={`text-sm font-medium ${errors.description ? "text-destructive" : "text-primary"}`}>
+            <Label
+              className={`text-sm font-medium ${errors.description ? "text-destructive" : "text-primary"}`}
+            >
               {t("character-detail:fields.description")}
               <span className="text-destructive ml-1">*</span>
             </Label>
@@ -618,191 +626,187 @@ export function CharacterDetailView({
           {t("character-detail:sections.appearance")}
         </h4>
 
-          {/* Height and Weight */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-primary">
-                {t("character-detail:fields.height")}
-              </Label>
-              {isEditing ? (
-                <>
-                  <Input
-                    value={editData.height || ""}
-                    onChange={(e) => onEditDataChange("height", e.target.value)}
-                    placeholder={t("create-character:modal.height_placeholder")}
-                    maxLength={50}
-                  />
-                  <div className="flex justify-end text-xs text-muted-foreground">
-                    <span>{editData.height?.length || 0}/50</span>
-                  </div>
-                </>
-              ) : (
-                <DisplayText value={character.height} />
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-primary">
-                {t("character-detail:fields.weight")}
-              </Label>
-              {isEditing ? (
-                <>
-                  <Input
-                    value={editData.weight || ""}
-                    onChange={(e) => onEditDataChange("weight", e.target.value)}
-                    placeholder={t("create-character:modal.weight_placeholder")}
-                    maxLength={50}
-                  />
-                  <div className="flex justify-end text-xs text-muted-foreground">
-                    <span>{editData.weight?.length || 0}/50</span>
-                  </div>
-                </>
-              ) : (
-                <DisplayText value={character.weight} />
-              )}
-            </div>
-          </div>
-
-          {/* Skin Tone */}
+        {/* Height and Weight */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label className="text-sm font-medium text-primary">
-              {t("character-detail:fields.skin_tone")}
+              {t("character-detail:fields.height")}
             </Label>
             {isEditing ? (
               <>
                 <Input
-                  value={editData.skinTone || ""}
-                  onChange={(e) => onEditDataChange("skinTone", e.target.value)}
-                  placeholder={t("character-detail:fields.skin_tone")}
-                  maxLength={100}
+                  value={editData.height || ""}
+                  onChange={(e) => onEditDataChange("height", e.target.value)}
+                  placeholder={t("create-character:modal.height_placeholder")}
+                  maxLength={50}
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{editData.skinTone?.length || 0}/100</span>
+                  <span>{editData.height?.length || 0}/50</span>
                 </div>
               </>
             ) : (
-              <DisplayText value={character.skinTone} />
+              <DisplayText value={character.height} />
             )}
           </div>
 
-          {/* Hair, Eyes, Face */}
-          {["hair", "eyes", "face"].map((field) => (
-            <div key={field} className="space-y-2">
-              <Label className="text-sm font-medium text-primary">
-                {t(`character-detail:fields.${field}`)}
-              </Label>
-              {isEditing ? (
-                <>
-                  <Input
-                    value={(editData as any)[field] || ""}
-                    onChange={(e) => onEditDataChange(field, e.target.value)}
-                    placeholder={t(`character-detail:fields.${field}`)}
-                    maxLength={field === "hair" ? 100 : 200}
-                  />
-                  <div className="flex justify-end text-xs text-muted-foreground">
-                    <span>
-                      {(editData as any)[field]?.length || 0}/
-                      {field === "hair" ? 100 : 200}
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <DisplayText value={(character as any)[field]} />
-              )}
-            </div>
-          ))}
-
-          {/* Species and Race */}
-          <div className="space-y-2">
-            {isEditing ? (
-              <FormEntityMultiSelectAuto
-                entityType="race"
-                bookId={bookId}
-                label={t("create-character:modal.species_and_race")}
-                placeholder={t("create-character:modal.species_placeholder")}
-                noSelectionText={t(
-                  "create-character:modal.no_species_selected"
-                )}
-                searchPlaceholder={t("create-character:modal.search_species")}
-                value={editData.speciesAndRace || []}
-                onChange={(value) => onEditDataChange("speciesAndRace", value)}
-                labelClassName="text-sm font-medium text-primary"
-              />
-            ) : (
-              <DisplayEntityList
-                label={t("create-character:modal.species_and_race")}
-                entities={
-                  character.speciesAndRace
-                    ?.map((raceId) => {
-                      const race = races.find((r) => r.id === raceId);
-                      return race
-                        ? { id: race.id, name: race.name, image: race.image }
-                        : null;
-                    })
-                    .filter(Boolean) as Array<{
-                    id: string;
-                    name: string;
-                    image?: string;
-                  }>
-                }
-                open={openSections.speciesAndRace}
-                onOpenChange={() => toggleSection("speciesAndRace")}
-              />
-            )}
-          </div>
-
-          {/* Physical Type */}
-          <div className="space-y-2">
-            {isEditing ? (
-              <FormSimpleGrid
-                value={editData.physicalType || ""}
-                onChange={(value) => onEditDataChange("physicalType", value)}
-                label={t("character-detail:fields.physical_type")}
-                columns={6}
-                options={physicalTypeOptions}
-              />
-            ) : (
-              <>
-                <Label className="text-sm font-medium text-primary">
-                  {t("character-detail:fields.physical_type")}
-                </Label>
-                <DisplaySimpleGrid
-                  value={character.physicalType}
-                  options={physicalTypeOptions}
-                />
-              </>
-            )}
-          </div>
-
-          {/* Distinguishing Features */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-primary">
-              {t("character-detail:fields.distinguishing_features")}
+              {t("character-detail:fields.weight")}
             </Label>
             {isEditing ? (
               <>
-                <Textarea
-                  value={editData.distinguishingFeatures || ""}
-                  onChange={(e) =>
-                    onEditDataChange("distinguishingFeatures", e.target.value)
-                  }
-                  placeholder={t(
-                    "character-detail:fields.distinguishing_features"
-                  )}
-                  rows={3}
-                  maxLength={400}
-                  className="resize-none"
+                <Input
+                  value={editData.weight || ""}
+                  onChange={(e) => onEditDataChange("weight", e.target.value)}
+                  placeholder={t("create-character:modal.weight_placeholder")}
+                  maxLength={50}
+                />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{editData.weight?.length || 0}/50</span>
+                </div>
+              </>
+            ) : (
+              <DisplayText value={character.weight} />
+            )}
+          </div>
+        </div>
+
+        {/* Skin Tone */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-primary">
+            {t("character-detail:fields.skin_tone")}
+          </Label>
+          {isEditing ? (
+            <>
+              <Input
+                value={editData.skinTone || ""}
+                onChange={(e) => onEditDataChange("skinTone", e.target.value)}
+                placeholder={t("character-detail:fields.skin_tone")}
+                maxLength={100}
+              />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.skinTone?.length || 0}/100</span>
+              </div>
+            </>
+          ) : (
+            <DisplayText value={character.skinTone} />
+          )}
+        </div>
+
+        {/* Hair, Eyes, Face */}
+        {["hair", "eyes", "face"].map((field) => (
+          <div key={field} className="space-y-2">
+            <Label className="text-sm font-medium text-primary">
+              {t(`character-detail:fields.${field}`)}
+            </Label>
+            {isEditing ? (
+              <>
+                <Input
+                  value={(editData as any)[field] || ""}
+                  onChange={(e) => onEditDataChange(field, e.target.value)}
+                  placeholder={t(`character-detail:fields.${field}`)}
+                  maxLength={field === "hair" ? 100 : 200}
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
                   <span>
-                    {editData.distinguishingFeatures?.length || 0}/400
+                    {(editData as any)[field]?.length || 0}/
+                    {field === "hair" ? 100 : 200}
                   </span>
                 </div>
               </>
             ) : (
-              <DisplayTextarea value={character.distinguishingFeatures} />
+              <DisplayText value={(character as any)[field]} />
             )}
           </div>
+        ))}
+
+        {/* Species and Race */}
+        <div className="space-y-2">
+          {isEditing ? (
+            <FormEntityMultiSelectAuto
+              entityType="race"
+              bookId={bookId}
+              label={t("create-character:modal.species_and_race")}
+              placeholder={t("create-character:modal.species_placeholder")}
+              noSelectionText={t("create-character:modal.no_species_selected")}
+              searchPlaceholder={t("create-character:modal.search_species")}
+              value={editData.speciesAndRace || []}
+              onChange={(value) => onEditDataChange("speciesAndRace", value)}
+              labelClassName="text-sm font-medium text-primary"
+            />
+          ) : (
+            <DisplayEntityList
+              label={t("create-character:modal.species_and_race")}
+              entities={
+                character.speciesAndRace
+                  ?.map((raceId) => {
+                    const race = races.find((r) => r.id === raceId);
+                    return race
+                      ? { id: race.id, name: race.name, image: race.image }
+                      : null;
+                  })
+                  .filter(Boolean) as Array<{
+                  id: string;
+                  name: string;
+                  image?: string;
+                }>
+              }
+              open={openSections.speciesAndRace}
+              onOpenChange={() => toggleSection("speciesAndRace")}
+            />
+          )}
+        </div>
+
+        {/* Physical Type */}
+        <div className="space-y-2">
+          {isEditing ? (
+            <FormSimpleGrid
+              value={editData.physicalType || ""}
+              onChange={(value) => onEditDataChange("physicalType", value)}
+              label={t("character-detail:fields.physical_type")}
+              columns={6}
+              options={physicalTypeOptions}
+            />
+          ) : (
+            <>
+              <Label className="text-sm font-medium text-primary">
+                {t("character-detail:fields.physical_type")}
+              </Label>
+              <DisplaySimpleGrid
+                value={character.physicalType}
+                options={physicalTypeOptions}
+              />
+            </>
+          )}
+        </div>
+
+        {/* Distinguishing Features */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-primary">
+            {t("character-detail:fields.distinguishing_features")}
+          </Label>
+          {isEditing ? (
+            <>
+              <Textarea
+                value={editData.distinguishingFeatures || ""}
+                onChange={(e) =>
+                  onEditDataChange("distinguishingFeatures", e.target.value)
+                }
+                placeholder={t(
+                  "character-detail:fields.distinguishing_features"
+                )}
+                rows={3}
+                maxLength={400}
+                className="resize-none"
+              />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.distinguishingFeatures?.length || 0}/400</span>
+              </div>
+            </>
+          ) : (
+            <DisplayTextarea value={character.distinguishingFeatures} />
+          )}
+        </div>
       </div>
 
       <Separator className="my-6" />
@@ -813,102 +817,102 @@ export function CharacterDetailView({
           {t("character-detail:sections.behavior")}
         </h4>
 
-          {/* Archetype */}
-          <div className="space-y-2">
-            {isEditing ? (
-              <FormSelectGrid
-                value={editData.archetype || ""}
-                onChange={(value) => onEditDataChange("archetype", value)}
-                label={t("character-detail:fields.archetype")}
-                columns={4}
+        {/* Archetype */}
+        <div className="space-y-2">
+          {isEditing ? (
+            <FormSelectGrid
+              value={editData.archetype || ""}
+              onChange={(value) => onEditDataChange("archetype", value)}
+              label={t("character-detail:fields.archetype")}
+              columns={4}
+              options={archetypeOptions}
+            />
+          ) : (
+            <>
+              <Label className="text-sm font-medium text-primary">
+                {t("character-detail:fields.archetype")}
+              </Label>
+              <DisplaySelectGrid
+                value={character.archetype}
                 options={archetypeOptions}
               />
-            ) : (
-              <>
-                <Label className="text-sm font-medium text-primary">
-                  {t("character-detail:fields.archetype")}
-                </Label>
-                <DisplaySelectGrid
-                  value={character.archetype}
-                  options={archetypeOptions}
-                />
-              </>
-            )}
-          </div>
-
-          {/* Alignment */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-primary">
-              {t("character-detail:fields.alignment")}
-            </Label>
-            <AlignmentMatrix
-              value={isEditing ? editData.alignment : character.alignment}
-              onChange={(value) => onEditDataChange("alignment", value)}
-              isEditable={isEditing}
-            />
-          </div>
-
-          {/* Favorite Food and Music */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {["favoriteFood", "favoriteMusic"].map((field) => (
-              <div key={field} className="space-y-2">
-                <Label className="text-sm font-medium text-primary">
-                  {t(
-                    `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
-                  )}
-                </Label>
-                {isEditing ? (
-                  <>
-                    <Input
-                      value={(editData as any)[field] || ""}
-                      onChange={(e) => onEditDataChange(field, e.target.value)}
-                      placeholder={t(
-                        `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
-                      )}
-                      maxLength={100}
-                    />
-                    <div className="flex justify-end text-xs text-muted-foreground">
-                      <span>{(editData as any)[field]?.length || 0}/100</span>
-                    </div>
-                  </>
-                ) : (
-                  <DisplayText value={(character as any)[field]} />
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Personality, Hobbies, Dreams, Fears */}
-          {["personality", "hobbies", "dreamsAndGoals", "fearsAndTraumas"].map(
-            (field) => (
-              <div key={field} className="space-y-2">
-                <Label className="text-sm font-medium text-primary">
-                  {t(
-                    `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
-                  )}
-                </Label>
-                {isEditing ? (
-                  <>
-                    <Textarea
-                      value={(editData as any)[field] || ""}
-                      onChange={(e) => onEditDataChange(field, e.target.value)}
-                      placeholder={t(
-                        `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
-                      )}
-                      rows={3}
-                      maxLength={500}
-                      className="resize-none"
-                    />
-                    <div className="flex justify-end text-xs text-muted-foreground">
-                      <span>{(editData as any)[field]?.length || 0}/500</span>
-                    </div>
-                  </>
-                ) : (
-                  <DisplayTextarea value={(character as any)[field]} />
-                )}
-              </div>
-            )
+            </>
           )}
+        </div>
+
+        {/* Alignment */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-primary">
+            {t("character-detail:fields.alignment")}
+          </Label>
+          <AlignmentMatrix
+            value={isEditing ? editData.alignment : character.alignment}
+            onChange={(value) => onEditDataChange("alignment", value)}
+            isEditable={isEditing}
+          />
+        </div>
+
+        {/* Favorite Food and Music */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {["favoriteFood", "favoriteMusic"].map((field) => (
+            <div key={field} className="space-y-2">
+              <Label className="text-sm font-medium text-primary">
+                {t(
+                  `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
+                )}
+              </Label>
+              {isEditing ? (
+                <>
+                  <Input
+                    value={(editData as any)[field] || ""}
+                    onChange={(e) => onEditDataChange(field, e.target.value)}
+                    placeholder={t(
+                      `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
+                    )}
+                    maxLength={100}
+                  />
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{(editData as any)[field]?.length || 0}/100</span>
+                  </div>
+                </>
+              ) : (
+                <DisplayText value={(character as any)[field]} />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Personality, Hobbies, Dreams, Fears */}
+        {["personality", "hobbies", "dreamsAndGoals", "fearsAndTraumas"].map(
+          (field) => (
+            <div key={field} className="space-y-2">
+              <Label className="text-sm font-medium text-primary">
+                {t(
+                  `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
+                )}
+              </Label>
+              {isEditing ? (
+                <>
+                  <Textarea
+                    value={(editData as any)[field] || ""}
+                    onChange={(e) => onEditDataChange(field, e.target.value)}
+                    placeholder={t(
+                      `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
+                    )}
+                    rows={3}
+                    maxLength={500}
+                    className="resize-none"
+                  />
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{(editData as any)[field]?.length || 0}/500</span>
+                  </div>
+                </>
+              ) : (
+                <DisplayTextarea value={(character as any)[field]} />
+              )}
+            </div>
+          )
+        )}
       </div>
 
       <Separator className="my-6" />
@@ -919,97 +923,95 @@ export function CharacterDetailView({
           {t("character-detail:sections.locations_orgs")}
         </h4>
 
-          {/* Birth Place */}
-          <div className="space-y-2">
-            {isEditing ? (
-              <FormEntityMultiSelectAuto
-                entityType="region"
-                bookId={bookId}
-                label={t("character-detail:fields.birth_place")}
-                placeholder={t(
-                  "create-character:modal.birth_place_placeholder"
-                )}
-                noSelectionText={t(
-                  "create-character:modal.no_birth_place_selected"
-                )}
-                searchPlaceholder={t("create-character:modal.search_location")}
-                value={editData.birthPlace || []}
-                onChange={(value) => onEditDataChange("birthPlace", value)}
-                labelClassName="text-sm font-medium text-primary"
-                maxSelections={1}
-              />
-            ) : (
-              <DisplayEntityList
-                label={t("character-detail:fields.birth_place")}
-                entities={
-                  character.birthPlace
-                    ?.map((regionId) => {
-                      const region = regions.find((r) => r.id === regionId);
-                      return region
-                        ? {
-                            id: region.id,
-                            name: region.name,
-                            image: region.image,
-                          }
-                        : null;
-                    })
-                    .filter(Boolean) as Array<{
-                    id: string;
-                    name: string;
-                    image?: string;
-                  }>
-                }
-                open={openSections.birthPlace}
-                onOpenChange={() => toggleSection("birthPlace")}
-              />
-            )}
-          </div>
+        {/* Birth Place */}
+        <div className="space-y-2">
+          {isEditing ? (
+            <FormEntityMultiSelectAuto
+              entityType="region"
+              bookId={bookId}
+              label={t("character-detail:fields.birth_place")}
+              placeholder={t("create-character:modal.birth_place_placeholder")}
+              noSelectionText={t(
+                "create-character:modal.no_birth_place_selected"
+              )}
+              searchPlaceholder={t("create-character:modal.search_location")}
+              value={editData.birthPlace || []}
+              onChange={(value) => onEditDataChange("birthPlace", value)}
+              labelClassName="text-sm font-medium text-primary"
+              maxSelections={1}
+            />
+          ) : (
+            <DisplayEntityList
+              label={t("character-detail:fields.birth_place")}
+              entities={
+                character.birthPlace
+                  ?.map((regionId) => {
+                    const region = regions.find((r) => r.id === regionId);
+                    return region
+                      ? {
+                          id: region.id,
+                          name: region.name,
+                          image: region.image,
+                        }
+                      : null;
+                  })
+                  .filter(Boolean) as Array<{
+                  id: string;
+                  name: string;
+                  image?: string;
+                }>
+              }
+              open={openSections.birthPlace}
+              onOpenChange={() => toggleSection("birthPlace")}
+            />
+          )}
+        </div>
 
-          {/* Nicknames */}
-          <div className="space-y-2">
-            {isEditing ? (
-              <FormListInput
-                value={editData.nicknames || []}
-                onChange={(value) => onEditDataChange("nicknames", value)}
-                label={t("character-detail:fields.nicknames")}
-                placeholder={t("create-character:modal.nickname_placeholder")}
-                buttonText={t("create-character:modal.add_nickname")}
-                inputSize="small"
-                maxLength={100}
-              />
-            ) : (
-              <DisplayStringList
-                label={t("character-detail:fields.nicknames")}
-                items={character.nicknames}
-                open={openSections.nicknames}
-                onOpenChange={() => toggleSection("nicknames")}
-              />
-            )}
-          </div>
+        {/* Nicknames */}
+        <div className="space-y-2">
+          {isEditing ? (
+            <FormListInput
+              value={editData.nicknames || []}
+              onChange={(value) => onEditDataChange("nicknames", value)}
+              label={t("character-detail:fields.nicknames")}
+              placeholder={t("create-character:modal.nickname_placeholder")}
+              buttonText={t("create-character:modal.add_nickname")}
+              inputSize="small"
+              maxLength={100}
+            />
+          ) : (
+            <DisplayStringList
+              label={t("character-detail:fields.nicknames")}
+              items={character.nicknames}
+              open={openSections.nicknames}
+              onOpenChange={() => toggleSection("nicknames")}
+            />
+          )}
+        </div>
 
-          {/* Past */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-primary">
-              {t("character-detail:fields.past")}
-            </Label>
-            {isEditing ? (
-              <>
-                <Textarea
-                  value={editData.past || ""}
-                  onChange={(e) => onEditDataChange("past", e.target.value)}
-                  placeholder={t("create-character:modal.past_placeholder")}
-                  rows={5}
-                  maxLength={1000}
-                  className="resize-none"
-                />
-                <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{editData.past?.length || 0}/1000</span>
-                </div>
-              </>
-            ) : (
-              <DisplayTextarea value={character.past} />
-            )}
-          </div>
+        {/* Past */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-primary">
+            {t("character-detail:fields.past")}
+          </Label>
+          {isEditing ? (
+            <>
+              <Textarea
+                value={editData.past || ""}
+                onChange={(e) => onEditDataChange("past", e.target.value)}
+                placeholder={t("create-character:modal.past_placeholder")}
+                rows={5}
+                maxLength={1000}
+                className="resize-none"
+              />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.past?.length || 0}/1000</span>
+              </div>
+            </>
+          ) : (
+            <DisplayTextarea value={character.past} />
+          )}
+        </div>
       </div>
     </>
   );

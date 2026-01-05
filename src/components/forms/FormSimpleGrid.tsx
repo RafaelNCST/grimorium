@@ -186,20 +186,21 @@ export function FormSimpleGrid<T extends string = string>({
   className,
   multi = false,
 }: FormSimpleGridProps<T>) {
-  const gridColsClass = {
-    1: "grid-cols-1",
-    2: "grid-cols-2",
-    3: "grid-cols-3",
-    4: "grid-cols-4",
-    5: "grid-cols-5",
-    6: "grid-cols-6",
-    7: "grid-cols-7",
-    8: "grid-cols-8",
-    9: "grid-cols-9",
-    10: "grid-cols-10",
-    11: "grid-cols-11",
-    12: "grid-cols-12",
-  }[columns] || "grid-cols-5";
+  const gridColsClass =
+    {
+      1: "grid-cols-1",
+      2: "grid-cols-2",
+      3: "grid-cols-3",
+      4: "grid-cols-4",
+      5: "grid-cols-5",
+      6: "grid-cols-6",
+      7: "grid-cols-7",
+      8: "grid-cols-8",
+      9: "grid-cols-9",
+      10: "grid-cols-10",
+      11: "grid-cols-11",
+      12: "grid-cols-12",
+    }[columns] || "grid-cols-5";
 
   const handleClick = (optionValue: T) => {
     if (multi) {
@@ -229,7 +230,9 @@ export function FormSimpleGrid<T extends string = string>({
   return (
     <div className="space-y-2">
       {label && (
-        <Label className={`text-sm font-medium ${error ? "text-destructive" : "text-primary"}`}>
+        <Label
+          className={`text-sm font-medium ${error ? "text-destructive" : "text-primary"}`}
+        >
           {label}
           {required && <span className="text-destructive ml-1">*</span>}
         </Label>

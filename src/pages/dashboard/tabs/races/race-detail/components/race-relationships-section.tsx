@@ -251,7 +251,13 @@ export function RaceRelationshipsSection({
       clearTimeout(timeoutId);
       observer.disconnect();
     };
-  }, [availableRaces, modalStep, isAddDialogOpen, isEditDialogOpen, editingRelationship]);
+  }, [
+    availableRaces,
+    modalStep,
+    isAddDialogOpen,
+    isEditDialogOpen,
+    editingRelationship,
+  ]);
 
   return (
     <div className="space-y-4">
@@ -324,7 +330,9 @@ export function RaceRelationshipsSection({
                             <BadgeIcon className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
                             <div className="flex flex-col gap-0.5">
                               <span className="text-xs font-medium leading-tight">
-                                {t(`race-detail:relationship_types.${badgeConfig.translationKey}`)}
+                                {t(
+                                  `race-detail:relationship_types.${badgeConfig.translationKey}`
+                                )}
                               </span>
                               <span className="text-[10px] leading-tight opacity-80">
                                 {relationshipDesc}
@@ -599,7 +607,9 @@ export function RaceRelationshipsSection({
                         {getRaceById(editingRelationship.raceId)?.image ? (
                           <Avatar className="w-12 h-12">
                             <AvatarImage
-                              src={getRaceById(editingRelationship.raceId)?.image}
+                              src={
+                                getRaceById(editingRelationship.raceId)?.image
+                              }
                               className="object-cover"
                             />
                           </Avatar>
@@ -639,8 +649,10 @@ export function RaceRelationshipsSection({
                           `race-detail:relationship_types.${type.translationKey}_label`
                         )} ${currentRaceName}`,
                         icon: type.icon,
-                        backgroundColor: RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
-                        borderColor: RACE_RELATIONSHIP_COLOR_MAP[type.value].border,
+                        backgroundColor:
+                          RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
+                        borderColor:
+                          RACE_RELATIONSHIP_COLOR_MAP[type.value].border,
                       }))}
                     />
                   </div>

@@ -20,7 +20,9 @@ export function useAutomaticCleanup() {
         console.log("[auto-cleanup] Running automatic cleanup...");
 
         // Fix duplicate maps (same region with multiple maps)
-        const { fixDuplicateMaps } = await import("@/lib/db/fix-duplicate-maps");
+        const { fixDuplicateMaps } = await import(
+          "@/lib/db/fix-duplicate-maps"
+        );
         const fixReport = await fixDuplicateMaps();
 
         if (fixReport.duplicatesFound > 0) {
@@ -35,7 +37,10 @@ export function useAutomaticCleanup() {
         }
 
         if (fixReport.errors.length > 0) {
-          console.warn("[auto-cleanup] Errors during cleanup:", fixReport.errors);
+          console.warn(
+            "[auto-cleanup] Errors during cleanup:",
+            fixReport.errors
+          );
         }
       } catch (error) {
         console.error("[auto-cleanup] Error during automatic cleanup:", error);

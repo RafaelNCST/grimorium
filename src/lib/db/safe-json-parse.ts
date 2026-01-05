@@ -83,10 +83,12 @@ export const stickyNoteSchema = z.object({
   id: z.string(),
   content: z.string(),
   color: z.string().optional(),
-  position: z.object({
-    x: z.number(),
-    y: z.number(),
-  }).optional(),
+  position: z
+    .object({
+      x: z.number(),
+      y: z.number(),
+    })
+    .optional(),
 });
 
 export const stickyNotesSchema = z.array(stickyNoteSchema);

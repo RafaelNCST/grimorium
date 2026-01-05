@@ -46,8 +46,8 @@ import {
 } from "@/lib/db/migrate-chapters";
 import { getPlotArcsByBookId, getPlotArcById } from "@/lib/db/plot.service";
 import { checkAndShowArcWarning } from "@/lib/helpers/chapter-arc-warning";
-import { type ChapterData, useChaptersStore } from "@/stores/chapters-store";
 import { useChapterOrderWarningStore } from "@/stores/chapter-order-warning-store";
+import { type ChapterData, useChaptersStore } from "@/stores/chapters-store";
 import type { IPlotArc } from "@/types/plot-types";
 
 import { ChapterCard } from "./components/chapter-card";
@@ -70,7 +70,11 @@ interface Chapter {
   characterCountWithSpaces: number;
   lastEdited: Date;
   summary?: string;
-  plotArc?: { id: string; name: string; status?: import("@/types/plot-types").PlotArcStatus };
+  plotArc?: {
+    id: string;
+    name: string;
+    status?: import("@/types/plot-types").PlotArcStatus;
+  };
   mentionedCharacters?: EntityMention[];
   mentionedRegions?: EntityMention[];
   mentionedItems?: EntityMention[];
@@ -162,7 +166,9 @@ export function ChaptersPage() {
     if (cachedChapters.length === 0) return [];
 
     return cachedChapters.map((ch) => {
-      const arc = ch.plotArcId ? plotArcs.find((arc) => arc.id === ch.plotArcId) : undefined;
+      const arc = ch.plotArcId
+        ? plotArcs.find((arc) => arc.id === ch.plotArcId)
+        : undefined;
 
       return {
         id: ch.id,
@@ -392,13 +398,16 @@ export function ChaptersPage() {
 
   // Calculate push preview - how many chapters will be affected
   const pushPreview = useMemo(() => {
-    if (reorderMode !== "push" || !pushFromChapterId) return { count: 0, examples: [] };
+    if (reorderMode !== "push" || !pushFromChapterId)
+      return { count: 0, examples: [] };
 
     // Sort chapters first
     const sortedChapters = [...chapters].sort((a, b) => a.number - b.number);
 
     // Find the index of the selected chapter
-    const selectedIndex = sortedChapters.findIndex((ch) => ch.id === pushFromChapterId);
+    const selectedIndex = sortedChapters.findIndex(
+      (ch) => ch.id === pushFromChapterId
+    );
     if (selectedIndex === -1) return { count: 0, examples: [] };
 
     // Get all chapters from this position onwards (including the selected one)
@@ -422,15 +431,23 @@ export function ChaptersPage() {
   const handleReorderChapters = async () => {
     try {
       const { updateChapter } = await import("@/lib/db/chapters.service");
-      let allUpdates: Array<{ id: string; originalNumber: string; newNumber: string }> = [];
+      let allUpdates: Array<{
+        id: string;
+        originalNumber: string;
+        newNumber: string;
+      }> = [];
 
       if (reorderMode === "push") {
         // MODO PUSH: Empurrar capítulos a partir de um capítulo específico (por ID)
         // Sort chapters first to find correct position
-        const sortedChapters = [...chapters].sort((a, b) => a.number - b.number);
+        const sortedChapters = [...chapters].sort(
+          (a, b) => a.number - b.number
+        );
 
         // Find the index of the selected chapter
-        const selectedIndex = sortedChapters.findIndex((ch) => ch.id === pushFromChapterId);
+        const selectedIndex = sortedChapters.findIndex(
+          (ch) => ch.id === pushFromChapterId
+        );
 
         if (selectedIndex === -1) {
           console.error("Selected chapter not found");
@@ -481,7 +498,10 @@ export function ChaptersPage() {
           const originalNumber = parseInt(chapter.chapterNumber, 10);
 
           // If this is a different number than previous, increment counter
-          if (previousOriginalNumber !== null && originalNumber !== previousOriginalNumber) {
+          if (
+            previousOriginalNumber !== null &&
+            originalNumber !== previousOriginalNumber
+          ) {
             currentNumber++;
           }
 
@@ -571,8 +591,8 @@ export function ChaptersPage() {
       scrollPositionRef.current = container.scrollTop;
     };
 
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    return () => container.removeEventListener('scroll', handleScroll);
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Restore scroll position after re-renders (but not on initial mount)
@@ -738,7 +758,10 @@ export function ChaptersPage() {
             for (const chapter of sortedChapters) {
               const originalNumber = parseInt(chapter.chapterNumber, 10);
 
-              if (previousOriginalNumber !== null && originalNumber !== previousOriginalNumber) {
+              if (
+                previousOriginalNumber !== null &&
+                originalNumber !== previousOriginalNumber
+              ) {
                 currentNumber++;
               }
 
@@ -1003,7 +1026,10 @@ export function ChaptersPage() {
       </AlertDialog>
 
       {/* Enumerate Chapters Dialog */}
-      <AlertDialog open={showEnumerateDialog} onOpenChange={setShowEnumerateDialog}>
+      <AlertDialog
+        open={showEnumerateDialog}
+        onOpenChange={setShowEnumerateDialog}
+      >
         <AlertDialogContent
           onOverlayClick={() => setShowEnumerateDialog(false)}
           onOpenAutoFocus={(e) => {
@@ -1042,13 +1068,18 @@ export function ChaptersPage() {
             >
               <RadioGroupItem value="auto" id="mode-auto" className="mt-0.5" />
               <div className="flex-1">
-                <div className="font-semibold text-sm">{t("chapters:reorder.autoMode")}</div>
+                <div className="font-semibold text-sm">
+                  {t("chapters:reorder.autoMode")}
+                </div>
                 <div className="text-xs text-muted-foreground mt-1">
                   {t("chapters:reorder.autoModeDescription")}
                 </div>
                 {reorderMode === "auto" && chaptersToReorder > 0 && (
                   <div className="text-xs text-primary mt-2">
-                    → {chaptersToReorder} {chaptersToReorder === 1 ? t("chapters:reorder.chapterWillBeUpdated") : t("chapters:reorder.chaptersWillBeUpdated")}
+                    → {chaptersToReorder}{" "}
+                    {chaptersToReorder === 1
+                      ? t("chapters:reorder.chapterWillBeUpdated")
+                      : t("chapters:reorder.chaptersWillBeUpdated")}
                   </div>
                 )}
                 {reorderMode === "auto" && chaptersToReorder === 0 && (
@@ -1070,7 +1101,9 @@ export function ChaptersPage() {
             >
               <RadioGroupItem value="push" id="mode-push" className="mt-0.5" />
               <div className="flex-1">
-                <div className="font-semibold text-sm">{t("chapters:reorder.pushMode")}</div>
+                <div className="font-semibold text-sm">
+                  {t("chapters:reorder.pushMode")}
+                </div>
                 <div className="text-xs text-muted-foreground mt-1">
                   {t("chapters:reorder.pushModeDescription")}
                 </div>
@@ -1078,22 +1111,23 @@ export function ChaptersPage() {
                 {reorderMode === "push" && (
                   <div className="mt-3 space-y-2">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-medium">{t("chapters:reorder.pushFromChapter")}</label>
+                      <label className="text-xs font-medium">
+                        {t("chapters:reorder.pushFromChapter")}
+                      </label>
                       <Select
                         value={pushFromChapterId}
                         onValueChange={(value) => setPushFromChapterId(value)}
                       >
                         <SelectTrigger className="h-9">
-                          <SelectValue placeholder={t("chapters:reorder.selectChapter")} />
+                          <SelectValue
+                            placeholder={t("chapters:reorder.selectChapter")}
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           {chapters
                             .sort((a, b) => a.number - b.number)
                             .map((chapter) => (
-                              <SelectItem
-                                key={chapter.id}
-                                value={chapter.id}
-                              >
+                              <SelectItem key={chapter.id} value={chapter.id}>
                                 {chapter.chapterNumber} - {chapter.title}
                               </SelectItem>
                             ))}
@@ -1104,7 +1138,11 @@ export function ChaptersPage() {
                     {pushPreview.count > 0 && (
                       <div className="rounded-md bg-muted p-3 space-y-1 text-xs">
                         <div className="font-medium text-primary">
-                          {pushPreview.count} {pushPreview.count === 1 ? t("chapters:reorder.chapterWillBePushed") : t("chapters:reorder.chaptersWillBePushed")}:
+                          {pushPreview.count}{" "}
+                          {pushPreview.count === 1
+                            ? t("chapters:reorder.chapterWillBePushed")
+                            : t("chapters:reorder.chaptersWillBePushed")}
+                          :
                         </div>
                         {pushPreview.examples.map((ex, idx) => (
                           <div key={idx} className="text-muted-foreground">
@@ -1113,7 +1151,9 @@ export function ChaptersPage() {
                         ))}
                         {pushPreview.hasMore && (
                           <div className="text-muted-foreground italic">
-                            {t("chapters:reorder.andMoreChapters", { count: pushPreview.count - 5 })}
+                            {t("chapters:reorder.andMoreChapters", {
+                              count: pushPreview.count - 5,
+                            })}
                           </div>
                         )}
                       </div>
@@ -1130,7 +1170,9 @@ export function ChaptersPage() {
           </RadioGroup>
 
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("chapters:reorder.cancel")}</AlertDialogCancel>
+            <AlertDialogCancel>
+              {t("chapters:reorder.cancel")}
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleReorderChapters}
               variant="magical"

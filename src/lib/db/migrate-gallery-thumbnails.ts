@@ -5,10 +5,11 @@
  * Essa migração roda automaticamente no startup do app.
  */
 
-import { getDB } from "./index";
-import { DBGalleryItem } from "./types";
 import { saveThumbnailFile, getThumbnailPath } from "./gallery.service";
 import { safeDBOperation } from "./safe-db-operation";
+import { DBGalleryItem } from "./types";
+
+import { getDB } from "./index";
 
 /**
  * Verifica se há thumbnails em base64 que precisam ser migrados
@@ -26,7 +27,7 @@ export async function needsGalleryThumbnailMigration(): Promise<boolean> {
     );
 
     return (result[0]?.count || 0) > 0;
-  }, 'needsGalleryThumbnailMigration');
+  }, "needsGalleryThumbnailMigration");
 }
 
 /**
@@ -44,7 +45,7 @@ export async function migrateGalleryThumbnails(
   return safeDBOperation(async () => {
     const db = await getDB();
 
-    console.log('[Migration] Starting gallery thumbnail migration...');
+    console.log("[Migration] Starting gallery thumbnail migration...");
 
     // Buscar todos os items que precisam migração
     const itemsToMigrate = await db.select<DBGalleryItem[]>(
@@ -61,7 +62,7 @@ export async function migrateGalleryThumbnails(
     console.log(`[Migration] Found ${total} items to migrate`);
 
     if (total === 0) {
-      console.log('[Migration] No items to migrate');
+      console.log("[Migration] No items to migrate");
       return { success: 0, failed: 0, total: 0 };
     }
 
@@ -77,10 +78,7 @@ export async function migrateGalleryThumbnails(
         );
       } catch (error) {
         failed++;
-        console.error(
-          `[Migration] Failed to migrate item ${item.id}:`,
-          error
-        );
+        console.error(`[Migration] Failed to migrate item ${item.id}:`, error);
         // Continuar migração mesmo se um item falhar
       }
 
@@ -95,7 +93,7 @@ export async function migrateGalleryThumbnails(
     );
 
     return { success, failed, total };
-  }, 'migrateGalleryThumbnails');
+  }, "migrateGalleryThumbnails");
 }
 
 /**

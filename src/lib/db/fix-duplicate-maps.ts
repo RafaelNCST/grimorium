@@ -6,6 +6,7 @@
  */
 
 import { BaseDirectory, exists, remove } from "@tauri-apps/plugin-fs";
+
 import { getDB } from "./index";
 
 export interface DuplicateMapReport {
@@ -101,7 +102,9 @@ export async function fixDuplicateMaps(): Promise<DuplicateMapReport> {
               baseDir: BaseDirectory.AppData,
             });
             report.filesDeleted.push(oldMap.image_path);
-            console.log(`[fix-duplicates] ✓ Deleted file: ${oldMap.image_path}`);
+            console.log(
+              `[fix-duplicates] ✓ Deleted file: ${oldMap.image_path}`
+            );
           } else {
             console.log(
               `[fix-duplicates] File not found (already deleted?): ${oldMap.image_path}`
@@ -129,9 +132,13 @@ export async function fixDuplicateMaps(): Promise<DuplicateMapReport> {
     }
 
     console.log("[fix-duplicates] Cleanup complete");
-    console.log(`[fix-duplicates] Regions with duplicates: ${report.duplicatesFound}`);
+    console.log(
+      `[fix-duplicates] Regions with duplicates: ${report.duplicatesFound}`
+    );
     console.log(`[fix-duplicates] Old maps removed: ${report.mapsRemoved}`);
-    console.log(`[fix-duplicates] Files deleted: ${report.filesDeleted.length}`);
+    console.log(
+      `[fix-duplicates] Files deleted: ${report.filesDeleted.length}`
+    );
   } catch (error) {
     const errorMsg = `Fatal error in fixDuplicateMaps: ${error}`;
     console.error(`[fix-duplicates] ${errorMsg}`);

@@ -1,7 +1,14 @@
 import React, { useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { AlertCircle, BookOpen, Info, Package, Image, ScrollText } from "lucide-react";
+import {
+  AlertCircle,
+  BookOpen,
+  Info,
+  Package,
+  Image,
+  ScrollText,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -827,11 +834,19 @@ export const ItemDetailView = React.memo(
                   isCollapsible: true,
                   defaultOpen: false,
                   isVisible: sectionVisibility["chapter-metrics"] !== false,
-                  onVisibilityToggle: () => onSectionVisibilityToggle("chapter-metrics"),
-                  emptyState: !isEditing && hasChapterMetrics === false ? "empty-view" : null,
+                  onVisibilityToggle: () =>
+                    onSectionVisibilityToggle("chapter-metrics"),
+                  emptyState:
+                    !isEditing && hasChapterMetrics === false
+                      ? "empty-view"
+                      : null,
                   emptyIcon: BookOpen,
-                  emptyTitle: t("chapter-metrics:entity_section.empty_state_title"),
-                  emptyDescription: t("chapter-metrics:entity_section.no_mentions.item"),
+                  emptyTitle: t(
+                    "chapter-metrics:entity_section.empty_state_title"
+                  ),
+                  emptyDescription: t(
+                    "chapter-metrics:entity_section.no_mentions.item"
+                  ),
                 },
               ]}
               showMenuButton

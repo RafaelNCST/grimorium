@@ -93,7 +93,9 @@ export function EntityModal({
                 isOpen={isAdvancedOpen}
                 onToggle={() => setIsAdvancedOpen(!isAdvancedOpen)}
               >
-                <div className="space-y-6 w-full max-w-full">{advancedFields}</div>
+                <div className="space-y-6 w-full max-w-full">
+                  {advancedFields}
+                </div>
               </CollapsibleSection>
             </div>
           )}

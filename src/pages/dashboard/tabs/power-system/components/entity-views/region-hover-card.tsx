@@ -20,10 +20,7 @@ interface RegionHoverCardProps {
   children: React.ReactNode;
 }
 
-export function RegionHoverCard({
-  regionId,
-  children,
-}: RegionHoverCardProps) {
+export function RegionHoverCard({ regionId, children }: RegionHoverCardProps) {
   const { t } = useTranslation(["power-system", "world"]);
   const [region, setRegion] = useState<IRegion | null>(null);
   const [parentRegion, setParentRegion] = useState<IRegion | null>(null);

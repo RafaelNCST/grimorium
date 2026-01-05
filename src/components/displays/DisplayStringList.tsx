@@ -116,7 +116,9 @@ export function DisplayStringList({
             ))}
           </ul>
         ) : (
-          <span className="italic text-muted-foreground/60">{t("no_data")}</span>
+          <span className="italic text-muted-foreground/60">
+            {t("no_data")}
+          </span>
         )}
       </CollapsibleContent>
     </Collapsible>

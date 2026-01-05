@@ -7,6 +7,7 @@ import {
   type IPowerBlock,
   type SpacerContent,
 } from "../../types/power-system-types";
+
 import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 
 interface SpacerBlockProps {

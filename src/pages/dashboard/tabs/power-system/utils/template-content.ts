@@ -509,7 +509,14 @@ const magicTemplateContent: Record<Language, TemplateContent> = {
                     type: "dropdown",
                     content: {
                       dataSource: "manual",
-                      options: ["Evocação", "Ilusão", "Necromancia", "Encantamento", "Transmutação", "Adivinhação"],
+                      options: [
+                        "Evocação",
+                        "Ilusão",
+                        "Necromancia",
+                        "Encantamento",
+                        "Transmutação",
+                        "Adivinhação",
+                      ],
                       selectedValue: "",
                     },
                   },
@@ -542,7 +549,14 @@ const magicTemplateContent: Record<Language, TemplateContent> = {
                     type: "multi-dropdown",
                     content: {
                       dataSource: "manual",
-                      options: ["Luz Mágica", "Bola de Fogo", "Escudo Arcano", "Raio Congelante", "Teletransporte", "Meteoro Flamejante"],
+                      options: [
+                        "Luz Mágica",
+                        "Bola de Fogo",
+                        "Escudo Arcano",
+                        "Raio Congelante",
+                        "Teletransporte",
+                        "Meteoro Flamejante",
+                      ],
                       selectedValues: [],
                     },
                   },
@@ -1224,7 +1238,14 @@ const magicTemplateContent: Record<Language, TemplateContent> = {
                     type: "dropdown",
                     content: {
                       dataSource: "manual",
-                      options: ["Evocation", "Illusion", "Necromancy", "Enchantment", "Transmutation", "Divination"],
+                      options: [
+                        "Evocation",
+                        "Illusion",
+                        "Necromancy",
+                        "Enchantment",
+                        "Transmutation",
+                        "Divination",
+                      ],
                       selectedValue: "",
                     },
                   },
@@ -1257,7 +1278,14 @@ const magicTemplateContent: Record<Language, TemplateContent> = {
                     type: "multi-dropdown",
                     content: {
                       dataSource: "manual",
-                      options: ["Magic Light", "Fireball", "Arcane Shield", "Freezing Ray", "Teleportation", "Flaming Meteor"],
+                      options: [
+                        "Magic Light",
+                        "Fireball",
+                        "Arcane Shield",
+                        "Freezing Ray",
+                        "Teleportation",
+                        "Flaming Meteor",
+                      ],
                       selectedValues: [],
                     },
                   },
@@ -1947,7 +1975,12 @@ const martialTemplateContent: Record<Language, TemplateContent> = {
                     type: "dropdown",
                     content: {
                       dataSource: "manual",
-                      options: ["Estilo do Tigre", "Estilo da Serpente", "Estilo da Tartaruga", "Estilo da Garça"],
+                      options: [
+                        "Estilo do Tigre",
+                        "Estilo da Serpente",
+                        "Estilo da Tartaruga",
+                        "Estilo da Garça",
+                      ],
                       selectedValue: "",
                     },
                   },
@@ -1980,7 +2013,14 @@ const martialTemplateContent: Record<Language, TemplateContent> = {
                     type: "multi-dropdown",
                     content: {
                       dataSource: "manual",
-                      options: ["Soco de Ferro", "Palma de Aço", "Chute Voador", "Golpe do Dragão", "Barreira de Energia", "Onda de Choque de Ki"],
+                      options: [
+                        "Soco de Ferro",
+                        "Palma de Aço",
+                        "Chute Voador",
+                        "Golpe do Dragão",
+                        "Barreira de Energia",
+                        "Onda de Choque de Ki",
+                      ],
                       selectedValues: [],
                     },
                   },
@@ -2669,7 +2709,12 @@ const martialTemplateContent: Record<Language, TemplateContent> = {
                     type: "dropdown",
                     content: {
                       dataSource: "manual",
-                      options: ["Tiger Style", "Snake Style", "Turtle Style", "Crane Style"],
+                      options: [
+                        "Tiger Style",
+                        "Snake Style",
+                        "Turtle Style",
+                        "Crane Style",
+                      ],
                       selectedValue: "",
                     },
                   },
@@ -2702,7 +2747,14 @@ const martialTemplateContent: Record<Language, TemplateContent> = {
                     type: "multi-dropdown",
                     content: {
                       dataSource: "manual",
-                      options: ["Iron Fist", "Steel Palm", "Flying Kick", "Dragon Strike", "Energy Barrier", "Ki Shockwave"],
+                      options: [
+                        "Iron Fist",
+                        "Steel Palm",
+                        "Flying Kick",
+                        "Dragon Strike",
+                        "Energy Barrier",
+                        "Ki Shockwave",
+                      ],
                       selectedValues: [],
                     },
                   },

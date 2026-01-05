@@ -13,13 +13,13 @@ import { cn } from "@/lib/utils";
 import { useEditorShortcuts } from "../hooks/useEditorShortcuts";
 import { useTextSearch } from "../hooks/useTextSearch";
 import { useUndoRedo } from "../hooks/useUndoRedo";
+import { ANNOTATION_COLORS } from "../types";
 import { CURSOR_COLORS } from "../types/editor-settings";
 
 import { ContextMenu } from "./ContextMenu";
 import { SearchBar } from "./SearchBar";
 
 import type { Annotation, TextAlignment } from "../types";
-import { ANNOTATION_COLORS } from "../types";
 import type { EditorSettings } from "../types/editor-settings";
 
 export interface TextEditorRef {
@@ -91,8 +91,10 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     const justExitedAnnotationRef = useRef(false);
     const lastCursorPositionRef = useRef(0);
     const lastContentLengthRef = useRef(0);
-    const lastActionTypeRef = useRef<'insert' | 'delete' | null>(null);
-    const lastShowAnnotationHighlightsRef = useRef(settings?.showAnnotationHighlights);
+    const lastActionTypeRef = useRef<"insert" | "delete" | null>(null);
+    const lastShowAnnotationHighlightsRef = useRef(
+      settings?.showAnnotationHighlights
+    );
     const lastAnnotationsRef = useRef<Annotation[]>(annotations);
     const mountTimeRef = useRef(Date.now());
     const initialContentRef = useRef(content);
@@ -115,24 +117,30 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     });
 
     // Expose undo/redo through ref
-    useImperativeHandle(ref, () => ({
-      undo: handleUndo,
-      redo: handleRedo,
-      canUndo: undoRedo.canUndo,
-      canRedo: undoRedo.canRedo,
-      markNextAsImmediate: () => {
-        isImmediateActionRef.current = true;
-      },
-      resetHistory: () => {
-        // Reset history by reading current state from DOM
-        // This ensures we always use the actual rendered content
-        if (editorRef.current) {
-          const currentHtml = removeSearchHighlights(editorRef.current.innerHTML);
-          const cursorPos = editorRef.current.innerText.length;
-          undoRedo.resetHistory(currentHtml, annotations, cursorPos);
-        }
-      },
-    }), [undoRedo, annotations]);
+    useImperativeHandle(
+      ref,
+      () => ({
+        undo: handleUndo,
+        redo: handleRedo,
+        canUndo: undoRedo.canUndo,
+        canRedo: undoRedo.canRedo,
+        markNextAsImmediate: () => {
+          isImmediateActionRef.current = true;
+        },
+        resetHistory: () => {
+          // Reset history by reading current state from DOM
+          // This ensures we always use the actual rendered content
+          if (editorRef.current) {
+            const currentHtml = removeSearchHighlights(
+              editorRef.current.innerHTML
+            );
+            const cursorPos = editorRef.current.innerText.length;
+            undoRedo.resetHistory(currentHtml, annotations, cursorPos);
+          }
+        },
+      }),
+      [undoRedo, annotations]
+    );
 
     // CRITICAL: Reset history on EVERY mount (component remounts when chapter changes due to key prop)
     // This ensures each chapter starts with a clean history
@@ -145,12 +153,17 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           if (editorRef.current) {
-            const initialHtml = removeSearchHighlights(editorRef.current.innerHTML);
+            const initialHtml = removeSearchHighlights(
+              editorRef.current.innerHTML
+            );
             const cursorPos = editorRef.current.innerText.length;
 
             // DEFENSIVE: Only reset if we have valid data
             // Don't reset with empty annotations if we should have some
-            console.log('[TextEditor] Initial mount reset - annotations count:', annotations.length);
+            console.log(
+              "[TextEditor] Initial mount reset - annotations count:",
+              annotations.length
+            );
             undoRedo.resetHistory(initialHtml, annotations, cursorPos);
           }
         });
@@ -164,8 +177,11 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
       // Only check in the first 2 seconds after mount
       if (timeSinceMount < 2000 && content !== initialContentRef.current) {
-        const lengthDiff = Math.abs(content.length - initialContentRef.current.length);
-        const avgLength = (content.length + initialContentRef.current.length) / 2;
+        const lengthDiff = Math.abs(
+          content.length - initialContentRef.current.length
+        );
+        const avgLength =
+          (content.length + initialContentRef.current.length) / 2;
         const changePercentage = avgLength > 0 ? lengthDiff / avgLength : 0;
 
         // If content changed by more than 30%, it's likely new chapter content loaded
@@ -173,11 +189,16 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           initialContentRef.current = content;
 
           // Reset history with the NEW content
-          console.log('[TextEditor] Content changed >30% after mount - resetting with annotations count:', annotations.length);
+          console.log(
+            "[TextEditor] Content changed >30% after mount - resetting with annotations count:",
+            annotations.length
+          );
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
               if (editorRef.current) {
-                const currentHtml = removeSearchHighlights(editorRef.current.innerHTML);
+                const currentHtml = removeSearchHighlights(
+                  editorRef.current.innerHTML
+                );
                 const cursorPos = editorRef.current.innerText.length;
                 undoRedo.resetHistory(currentHtml, annotations, cursorPos);
               }
@@ -200,7 +221,9 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       }
 
       // Check if annotations changed externally (not from handleInput)
-      const annotationsChanged = JSON.stringify(lastAnnotationsRef.current) !== JSON.stringify(annotations);
+      const annotationsChanged =
+        JSON.stringify(lastAnnotationsRef.current) !==
+        JSON.stringify(annotations);
 
       if (annotationsChanged && editorRef.current) {
         // Annotations changed externally (e.g., color change from sidebar)
@@ -234,19 +257,30 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       };
 
       const handleKeyUp = (e: KeyboardEvent) => {
-        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].includes(e.key)) {
+        if (
+          [
+            "ArrowLeft",
+            "ArrowRight",
+            "ArrowUp",
+            "ArrowDown",
+            "Home",
+            "End",
+            "PageUp",
+            "PageDown",
+          ].includes(e.key)
+        ) {
           handleCursorMove();
         }
       };
 
       const editor = editorRef.current;
       if (editor) {
-        editor.addEventListener('click', handleClick);
-        editor.addEventListener('keyup', handleKeyUp);
+        editor.addEventListener("click", handleClick);
+        editor.addEventListener("keyup", handleKeyUp);
 
         return () => {
-          editor.removeEventListener('click', handleClick);
-          editor.removeEventListener('keyup', handleKeyUp);
+          editor.removeEventListener("click", handleClick);
+          editor.removeEventListener("keyup", handleKeyUp);
         };
       }
     }, [undoRedo]);
@@ -330,9 +364,9 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       tempDiv.innerHTML = html;
 
       // Remove all search highlight spans but keep their content
-      const searchSpans = tempDiv.querySelectorAll('span.search-highlight');
+      const searchSpans = tempDiv.querySelectorAll("span.search-highlight");
       searchSpans.forEach((span) => {
-        const textNode = document.createTextNode(span.textContent || '');
+        const textNode = document.createTextNode(span.textContent || "");
         span.replaceWith(textNode);
       });
 
@@ -444,17 +478,22 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           const isSelected = segment.annotation.id === selectedAnnotationId;
           const color = segment.annotation.annotation.color || "purple";
           const colorStyle = ANNOTATION_COLORS[color];
-          const backgroundColor = isSelected ? colorStyle.strong : colorStyle.weak;
-          const finalBackgroundColor = settings?.showAnnotationHighlights === false
-            ? "transparent"
-            : backgroundColor;
-          const dataInvisible = settings?.showAnnotationHighlights === false
-            ? ' data-invisible="true"'
-            : '';
+          const backgroundColor = isSelected
+            ? colorStyle.strong
+            : colorStyle.weak;
+          const finalBackgroundColor =
+            settings?.showAnnotationHighlights === false
+              ? "transparent"
+              : backgroundColor;
+          const dataInvisible =
+            settings?.showAnnotationHighlights === false
+              ? ' data-invisible="true"'
+              : "";
 
-          const searchClass = segment.search === "search-current"
-            ? "search-highlight search-current"
-            : "search-highlight";
+          const searchClass =
+            segment.search === "search-current"
+              ? "search-highlight search-current"
+              : "search-highlight";
 
           // Nest search inside annotation
           result += `<span class="annotation-highlight" data-annotation-id="${segment.annotation.id}"${dataInvisible} style="background-color: ${finalBackgroundColor}; transition: background-color 0.2s;"><span class="${searchClass}" data-search-result="true">${escapedText}</span></span>`;
@@ -464,21 +503,26 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           const isSelected = segment.annotation.id === selectedAnnotationId;
           const color = segment.annotation.annotation.color || "purple";
           const colorStyle = ANNOTATION_COLORS[color];
-          const backgroundColor = isSelected ? colorStyle.strong : colorStyle.weak;
-          const finalBackgroundColor = settings?.showAnnotationHighlights === false
-            ? "transparent"
-            : backgroundColor;
-          const dataInvisible = settings?.showAnnotationHighlights === false
-            ? ' data-invisible="true"'
-            : '';
+          const backgroundColor = isSelected
+            ? colorStyle.strong
+            : colorStyle.weak;
+          const finalBackgroundColor =
+            settings?.showAnnotationHighlights === false
+              ? "transparent"
+              : backgroundColor;
+          const dataInvisible =
+            settings?.showAnnotationHighlights === false
+              ? ' data-invisible="true"'
+              : "";
 
           result += `<span class="annotation-highlight" data-annotation-id="${segment.annotation.id}"${dataInvisible} style="background-color: ${finalBackgroundColor}; transition: background-color 0.2s;">${escapedText}</span>`;
         }
         // Only search
         else if (segment.search) {
-          const searchClass = segment.search === "search-current"
-            ? "search-highlight search-current"
-            : "search-highlight";
+          const searchClass =
+            segment.search === "search-current"
+              ? "search-highlight search-current"
+              : "search-highlight";
           result += `<span class="${searchClass}" data-search-result="true">${escapedText}</span>`;
         }
         // Plain text
@@ -498,10 +542,12 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       // CRITICAL: Detect if showAnnotationHighlights changed
       // If it did, force re-render regardless of refs
       const showAnnotationHighlightsChanged =
-        lastShowAnnotationHighlightsRef.current !== settings?.showAnnotationHighlights;
+        lastShowAnnotationHighlightsRef.current !==
+        settings?.showAnnotationHighlights;
 
       if (showAnnotationHighlightsChanged) {
-        lastShowAnnotationHighlightsRef.current = settings?.showAnnotationHighlights;
+        lastShowAnnotationHighlightsRef.current =
+          settings?.showAnnotationHighlights;
         // Reset all blocking refs to allow re-render
         isTypingRef.current = false;
         localAnnotationUpdateRef.current = false;
@@ -517,7 +563,10 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         return;
       }
 
-      if (!showAnnotationHighlightsChanged && localAnnotationUpdateRef.current) {
+      if (
+        !showAnnotationHighlightsChanged &&
+        localAnnotationUpdateRef.current
+      ) {
         localAnnotationUpdateRef.current = false;
         return;
       }
@@ -690,37 +739,44 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
         // CRITICAL: Adjust HTML colors BEFORE inserting into DOM to prevent flash
         // Always reconstruct colors based on CURRENT settings, not saved HTML state
-        const tempDiv = document.createElement('div');
+        const tempDiv = document.createElement("div");
         tempDiv.innerHTML = previousState.content;
-        const annotationSpans = tempDiv.querySelectorAll('.annotation-highlight');
+        const annotationSpans = tempDiv.querySelectorAll(
+          ".annotation-highlight"
+        );
 
         annotationSpans.forEach((span) => {
           const htmlSpan = span as HTMLElement;
-          const annotationId = htmlSpan.getAttribute('data-annotation-id');
+          const annotationId = htmlSpan.getAttribute("data-annotation-id");
           if (!annotationId) return;
 
           // Find the annotation in the saved state
-          const annotation = previousState.annotations.find((a) => a.id === annotationId);
+          const annotation = previousState.annotations.find(
+            (a) => a.id === annotationId
+          );
           if (!annotation) return;
 
           // Reconstruct the correct color based on CURRENT settings
           const color = annotation.color || "purple";
           const colorStyle = ANNOTATION_COLORS[color];
           const isSelected = annotationId === selectedAnnotationId;
-          const backgroundColor = isSelected ? colorStyle.strong : colorStyle.weak;
+          const backgroundColor = isSelected
+            ? colorStyle.strong
+            : colorStyle.weak;
 
           // Apply transparent or actual color based on current settings
-          const finalBackgroundColor = settings?.showAnnotationHighlights === false
-            ? 'transparent'
-            : backgroundColor;
+          const finalBackgroundColor =
+            settings?.showAnnotationHighlights === false
+              ? "transparent"
+              : backgroundColor;
 
           // Replace background-color in style attribute
-          const currentStyle = htmlSpan.getAttribute('style') || '';
+          const currentStyle = htmlSpan.getAttribute("style") || "";
           const newStyle = currentStyle.replace(
             /background-color:\s*[^;]+;?/,
             `background-color: ${finalBackgroundColor};`
           );
-          htmlSpan.setAttribute('style', newStyle);
+          htmlSpan.setAttribute("style", newStyle);
         });
 
         const htmlToRestore = tempDiv.innerHTML;
@@ -754,37 +810,44 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
         // CRITICAL: Adjust HTML colors BEFORE inserting into DOM to prevent flash
         // Always reconstruct colors based on CURRENT settings, not saved HTML state
-        const tempDiv = document.createElement('div');
+        const tempDiv = document.createElement("div");
         tempDiv.innerHTML = nextState.content;
-        const annotationSpans = tempDiv.querySelectorAll('.annotation-highlight');
+        const annotationSpans = tempDiv.querySelectorAll(
+          ".annotation-highlight"
+        );
 
         annotationSpans.forEach((span) => {
           const htmlSpan = span as HTMLElement;
-          const annotationId = htmlSpan.getAttribute('data-annotation-id');
+          const annotationId = htmlSpan.getAttribute("data-annotation-id");
           if (!annotationId) return;
 
           // Find the annotation in the saved state
-          const annotation = nextState.annotations.find((a) => a.id === annotationId);
+          const annotation = nextState.annotations.find(
+            (a) => a.id === annotationId
+          );
           if (!annotation) return;
 
           // Reconstruct the correct color based on CURRENT settings
           const color = annotation.color || "purple";
           const colorStyle = ANNOTATION_COLORS[color];
           const isSelected = annotationId === selectedAnnotationId;
-          const backgroundColor = isSelected ? colorStyle.strong : colorStyle.weak;
+          const backgroundColor = isSelected
+            ? colorStyle.strong
+            : colorStyle.weak;
 
           // Apply transparent or actual color based on current settings
-          const finalBackgroundColor = settings?.showAnnotationHighlights === false
-            ? 'transparent'
-            : backgroundColor;
+          const finalBackgroundColor =
+            settings?.showAnnotationHighlights === false
+              ? "transparent"
+              : backgroundColor;
 
           // Replace background-color in style attribute
-          const currentStyle = htmlSpan.getAttribute('style') || '';
+          const currentStyle = htmlSpan.getAttribute("style") || "";
           const newStyle = currentStyle.replace(
             /background-color:\s*[^;]+;?/,
             `background-color: ${finalBackgroundColor};`
           );
-          htmlSpan.setAttribute('style', newStyle);
+          htmlSpan.setAttribute("style", newStyle);
         });
 
         const htmlToRestore = tempDiv.innerHTML;
@@ -1017,9 +1080,13 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
       if (editorRef.current) {
         const newContentLength = editorRef.current.innerText.length;
-        const currentActionType: 'insert' | 'delete' = newContentLength > lastContentLengthRef.current ? 'insert' : 'delete';
+        const currentActionType: "insert" | "delete" =
+          newContentLength > lastContentLengthRef.current ? "insert" : "delete";
 
-        if (lastActionTypeRef.current !== null && lastActionTypeRef.current !== currentActionType) {
+        if (
+          lastActionTypeRef.current !== null &&
+          lastActionTypeRef.current !== currentActionType
+        ) {
           undoRedo.flush();
         }
 
@@ -1028,7 +1095,9 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
         // SPECIAL FIX: Move trailing whitespace out of annotation spans
         // This allows users to "exit" annotations by typing space at the end
-        const annotationSpansForWhitespace = editorRef.current.querySelectorAll('.annotation-highlight');
+        const annotationSpansForWhitespace = editorRef.current.querySelectorAll(
+          ".annotation-highlight"
+        );
         let movedWhitespace = false;
 
         annotationSpansForWhitespace.forEach((span) => {
@@ -1075,9 +1144,16 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           // Add to undo/redo history
           if (!isUndoRedoActionRef.current) {
             // Save full HTML with formatting AND annotations
-            const contentForHistory = removeSearchHighlights(editorRef.current.innerHTML);
+            const contentForHistory = removeSearchHighlights(
+              editorRef.current.innerHTML
+            );
             const cursorPos = getCurrentCursorPosition();
-            undoRedo.pushState(contentForHistory, cursorPos, annotations, false);
+            undoRedo.pushState(
+              contentForHistory,
+              cursorPos,
+              annotations,
+              false
+            );
           }
 
           return; // Exit early - don't process annotations again
@@ -1113,7 +1189,9 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         });
 
         // Get full HTML with formatting AND annotations for undo/redo
-        const contentForHistory = removeSearchHighlights(editorRef.current.innerHTML);
+        const contentForHistory = removeSearchHighlights(
+          editorRef.current.innerHTML
+        );
 
         // Extract plain text content (removes HTML tags) for onChange
         const newContent = editorRef.current.innerText;
@@ -1121,7 +1199,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         const annotationSpans = editorRef.current.querySelectorAll(
           ".annotation-highlight"
         );
-        let updatedAnnotations: Annotation[] = [];
+        const updatedAnnotations: Annotation[] = [];
         let needsForceRerender = hasGhostSpans; // Force rerender if we found ghost spans
 
         // CRITICAL: When annotation highlights are disabled, still track annotations via DOM spans
@@ -1250,11 +1328,22 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
         // DEFENSIVE: Prevent losing annotations due to rendering issues
         // If we had annotations before but now have none, only update if the annotation spans truly don't exist
-        const annotationSpansCount = editorRef.current.querySelectorAll('.annotation-highlight').length;
-        const isSuspiciousEmptyUpdate = annotations.length > 0 && updatedAnnotations.length === 0 && annotationSpansCount > 0;
+        const annotationSpansCount = editorRef.current.querySelectorAll(
+          ".annotation-highlight"
+        ).length;
+        const isSuspiciousEmptyUpdate =
+          annotations.length > 0 &&
+          updatedAnnotations.length === 0 &&
+          annotationSpansCount > 0;
 
         if (isSuspiciousEmptyUpdate) {
-          console.error('[TextEditor] PREVENTED annotation loss! Had', annotations.length, 'annotations but updatedAnnotations is empty while', annotationSpansCount, 'spans exist in DOM');
+          console.error(
+            "[TextEditor] PREVENTED annotation loss! Had",
+            annotations.length,
+            "annotations but updatedAnnotations is empty while",
+            annotationSpansCount,
+            "spans exist in DOM"
+          );
           // Don't update - keep existing annotations
           return;
         }
@@ -1301,7 +1390,12 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           const cursorPos = getCurrentCursorPosition();
           const immediate = isImmediateActionRef.current;
           // CRITICAL: Use updatedAnnotations to ensure latest annotation state (including color changes) is saved
-          undoRedo.pushState(contentForHistory, cursorPos, updatedAnnotations, immediate);
+          undoRedo.pushState(
+            contentForHistory,
+            cursorPos,
+            updatedAnnotations,
+            immediate
+          );
 
           // Update cursor position ref for tracking
           lastCursorPositionRef.current = cursorPos;
@@ -1658,7 +1752,9 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
             onSearch={handleSearchFromContextMenu}
             onBold={handleBold}
             onItalic={handleItalic}
-            annotationHighlightsEnabled={settings?.showAnnotationHighlights !== false}
+            annotationHighlightsEnabled={
+              settings?.showAnnotationHighlights !== false
+            }
           />
         )}
       </>

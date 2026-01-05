@@ -1,13 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import {
-  AlertTriangle,
-  Info,
-  Star,
-  Lightbulb,
-  Check,
-  X,
-} from "lucide-react";
+import { AlertTriangle, Info, Star, Lightbulb, Check, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -24,6 +17,7 @@ import {
   type IPowerBlock,
   type InformativeContent,
 } from "../../types/power-system-types";
+
 import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 
 interface InformativeBlockProps {

@@ -331,7 +331,10 @@ export function RelationshipsSection({
                   {/* Character Avatar */}
                   {character.image ? (
                     <Avatar className="w-12 h-12">
-                      <AvatarImage src={character.image} className="object-cover" />
+                      <AvatarImage
+                        src={character.image}
+                        className="object-cover"
+                      />
                     </Avatar>
                   ) : (
                     <FormImageDisplay
@@ -665,10 +668,15 @@ export function RelationshipsSection({
                     </Label>
                     <Card className="p-4 bg-primary/5 border-primary/20">
                       <div className="flex items-center gap-4">
-                        {getCharacterById(editingRelationship.characterId)?.image ? (
+                        {getCharacterById(editingRelationship.characterId)
+                          ?.image ? (
                           <Avatar className="w-12 h-12">
                             <AvatarImage
-                              src={getCharacterById(editingRelationship.characterId)?.image}
+                              src={
+                                getCharacterById(
+                                  editingRelationship.characterId
+                                )?.image
+                              }
                               className="object-cover"
                             />
                           </Avatar>
@@ -683,7 +691,10 @@ export function RelationshipsSection({
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-base truncate">
-                            {getCharacterById(editingRelationship.characterId)?.name}
+                            {
+                              getCharacterById(editingRelationship.characterId)
+                                ?.name
+                            }
                           </p>
                         </div>
                       </div>
@@ -694,7 +705,9 @@ export function RelationshipsSection({
                   <FormSimpleGrid
                     value={selectedType}
                     onChange={setSelectedType}
-                    label={t("character-detail:relationships.relationship_type")}
+                    label={t(
+                      "character-detail:relationships.relationship_type"
+                    )}
                     columns={4}
                     required
                     className="px-1"
@@ -709,37 +722,39 @@ export function RelationshipsSection({
                     }))}
                   />
 
-              {/* Intensity Slider */}
-              <div className="space-y-3">
-                <Label className="text-sm font-medium text-primary">
-                  {t("character-detail:relationships.intensity")}:{" "}
-                  {intensity[0]}
-                  /10
-                </Label>
-                <Slider
-                  value={intensity}
-                  onValueChange={setIntensity}
-                  max={10}
-                  min={1}
-                  step={1}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>
-                    {t("character-detail:relationships.intensity_labels.weak")}
-                  </span>
-                  <span>
-                    {t(
-                      "character-detail:relationships.intensity_labels.moderate"
-                    )}
-                  </span>
-                  <span>
-                    {t(
-                      "character-detail:relationships.intensity_labels.strong"
-                    )}
-                  </span>
-                </div>
-              </div>
+                  {/* Intensity Slider */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-primary">
+                      {t("character-detail:relationships.intensity")}:{" "}
+                      {intensity[0]}
+                      /10
+                    </Label>
+                    <Slider
+                      value={intensity}
+                      onValueChange={setIntensity}
+                      max={10}
+                      min={1}
+                      step={1}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>
+                        {t(
+                          "character-detail:relationships.intensity_labels.weak"
+                        )}
+                      </span>
+                      <span>
+                        {t(
+                          "character-detail:relationships.intensity_labels.moderate"
+                        )}
+                      </span>
+                      <span>
+                        {t(
+                          "character-detail:relationships.intensity_labels.strong"
+                        )}
+                      </span>
+                    </div>
+                  </div>
 
                   {/* Description Field */}
                   <div className="space-y-3">

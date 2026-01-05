@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 
-import { Circle, Star, Zap, FileText, ChevronDown, ChevronUp, Plus } from "lucide-react";
+import {
+  Circle,
+  Star,
+  Zap,
+  FileText,
+  ChevronDown,
+  ChevronUp,
+  Plus,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -142,7 +150,9 @@ export function CreateEditLogModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            {isEditing ? t("create_edit_modal.title_edit") : t("create_edit_modal.title_create")}
+            {isEditing
+              ? t("create_edit_modal.title_edit")
+              : t("create_edit_modal.title_create")}
           </DialogTitle>
           <DialogDescription>
             {isEditing
@@ -250,11 +260,7 @@ export function CreateEditLogModal({
           <Button variant="secondary" onClick={handleClose}>
             {t("create_edit_modal.cancel")}
           </Button>
-          <Button
-            variant="magical"
-            onClick={handleSave}
-            disabled={!isValid()}
-          >
+          <Button variant="magical" onClick={handleSave} disabled={!isValid()}>
             {isEditing ? (
               t("create_edit_modal.save")
             ) : (

@@ -28,7 +28,9 @@ export async function migrateChaptersFromLocalStorage(
     }
 
     // Parse dos dados
-    const parsedData = safeParseUnknownObject(localStorageData) as LocalStorageChaptersState;
+    const parsedData = safeParseUnknownObject(
+      localStorageData
+    ) as LocalStorageChaptersState;
     const chapters = Object.values(parsedData.state?.chapters || {});
 
     if (chapters.length === 0) {
@@ -73,7 +75,9 @@ export function hasChaptersInLocalStorage(): boolean {
 
     if (!localStorageData) return false;
 
-    const parsedData = safeParseUnknownObject(localStorageData) as LocalStorageChaptersState;
+    const parsedData = safeParseUnknownObject(
+      localStorageData
+    ) as LocalStorageChaptersState;
     const chapters = Object.values(parsedData.state?.chapters || {});
 
     return chapters.length > 0;

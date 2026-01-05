@@ -31,9 +31,15 @@ export function usePinnedEntities(
   const [pins, setPins] = useState<PinnedEntity[]>([]);
 
   // Get entities directly from store cache (reactive)
-  const characters = useCharactersStore((state) => state.cache[bookId]?.characters || []);
-  const regions = useRegionsStore((state) => state.cache[bookId]?.regions || []);
-  const factions = useFactionsStore((state) => state.cache[bookId]?.factions || []);
+  const characters = useCharactersStore(
+    (state) => state.cache[bookId]?.characters || []
+  );
+  const regions = useRegionsStore(
+    (state) => state.cache[bookId]?.regions || []
+  );
+  const factions = useFactionsStore(
+    (state) => state.cache[bookId]?.factions || []
+  );
   const items = useItemsStore((state) => state.cache[bookId]?.items || []);
   const races = useRacesStore((state) => state.cache[bookId]?.races || []);
 
@@ -57,19 +63,16 @@ export function usePinnedEntities(
   }, [pins, chapterId]);
 
   // Pin an entity
-  const pinEntity = useCallback(
-    (type: EntityType, id: string) => {
-      setPins((prev) => {
-        // Check if already pinned
-        if (prev.some((p) => p.type === type && p.id === id)) {
-          return prev;
-        }
+  const pinEntity = useCallback((type: EntityType, id: string) => {
+    setPins((prev) => {
+      // Check if already pinned
+      if (prev.some((p) => p.type === type && p.id === id)) {
+        return prev;
+      }
 
-        return [...prev, { type, id }];
-      });
-    },
-    []
-  );
+      return [...prev, { type, id }];
+    });
+  }, []);
 
   // Unpin an entity
   const unpinEntity = useCallback((type: EntityType, id: string) => {
@@ -78,9 +81,8 @@ export function usePinnedEntities(
 
   // Check if entity is pinned
   const isPinned = useCallback(
-    (type: EntityType, id: string) => {
-      return pins.some((p) => p.type === type && p.id === id);
-    },
+    (type: EntityType, id: string) =>
+      pins.some((p) => p.type === type && p.id === id),
     [pins]
   );
 
@@ -121,7 +123,7 @@ export function usePinnedEntities(
       regions: pinnedRegions,
       factions: pinnedFactions,
       items: pinnedItems,
-      races: pinnedRaces
+      races: pinnedRaces,
     };
   }, [pins, characters, regions, factions, items, races]);
 

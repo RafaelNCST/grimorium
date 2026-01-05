@@ -27,11 +27,9 @@ interface ChapterArcWarningState {
   totalChapters: number;
 }
 
-let globalShowWarning: ((
-  bookId: string,
-  plotArcId: string,
-  arc: IPlotArc
-) => Promise<void>) | null = null;
+let globalShowWarning:
+  | ((bookId: string, plotArcId: string, arc: IPlotArc) => Promise<void>)
+  | null = null;
 
 let forceShowNextWarning = false;
 
@@ -60,7 +58,10 @@ export function ChapterArcWarningProvider({
 
     try {
       const metrics = await getPlotArcChapterMetrics(bookId, plotArcId);
-      const shouldWarn = shouldShowChapterWarning(metrics.totalChapters, arc.size);
+      const shouldWarn = shouldShowChapterWarning(
+        metrics.totalChapters,
+        arc.size
+      );
 
       if (shouldWarn) {
         setWarningState({

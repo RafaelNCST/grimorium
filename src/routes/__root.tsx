@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
+
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
+import { WelcomeModal } from "@/components/modals/welcome-modal";
 import { TitleBar } from "@/components/title-bar";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { WelcomeModal } from "@/components/modals/welcome-modal";
 
 const WELCOME_MODAL_KEY = "grimorium-welcome-shown";
 

@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { Dna, Users, Image, AlertCircle, BookOpen, ScrollText } from "lucide-react";
+import {
+  Dna,
+  Users,
+  Image,
+  AlertCircle,
+  BookOpen,
+  ScrollText,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -172,7 +179,9 @@ export function RaceDetailView({
           {/* Name and Scientific Name */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className={`text-sm font-medium ${errors.name ? "text-destructive" : "text-primary"}`}>
+              <Label
+                className={`text-sm font-medium ${errors.name ? "text-destructive" : "text-primary"}`}
+              >
                 {t("race-detail:fields.name")}
                 <span className="text-destructive ml-1">*</span>
               </Label>
@@ -222,7 +231,9 @@ export function RaceDetailView({
 
           {/* Domain */}
           <div className="space-y-2">
-            <Label className={`text-sm font-medium ${errors.domain ? "text-destructive" : "text-primary"}`}>
+            <Label
+              className={`text-sm font-medium ${errors.domain ? "text-destructive" : "text-primary"}`}
+            >
               {t("race-detail:fields.domain")}
               <span className="text-destructive ml-1">*</span>
             </Label>
@@ -244,7 +255,9 @@ export function RaceDetailView({
 
           {/* Summary */}
           <div className="space-y-2">
-            <Label className={`text-sm font-medium ${errors.summary ? "text-destructive" : "text-primary"}`}>
+            <Label
+              className={`text-sm font-medium ${errors.summary ? "text-destructive" : "text-primary"}`}
+            >
               {t("race-detail:fields.summary")}
               <span className="text-destructive ml-1">*</span>
             </Label>
@@ -731,7 +744,10 @@ export function RaceDetailView({
                 hideLabel
               />
             ) : (
-              <DisplaySelectGrid value={race.diet} options={getDietOptions(t)} />
+              <DisplaySelectGrid
+                value={race.diet}
+                options={getDietOptions(t)}
+              />
             )}
           </FieldWithVisibilityToggle>
 
@@ -1183,7 +1199,8 @@ export function RaceDetailView({
       defaultOpen: false,
       isVisible: sectionVisibility["chapter-metrics"] !== false,
       onVisibilityToggle: () => onSectionVisibilityToggle("chapter-metrics"),
-      emptyState: !isEditing && hasChapterMetrics === false ? "empty-view" : null,
+      emptyState:
+        !isEditing && hasChapterMetrics === false ? "empty-view" : null,
       emptyIcon: BookOpen,
       emptyTitle: t("chapter-metrics:entity_section.empty_state_title"),
       emptyDescription: t("chapter-metrics:entity_section.no_mentions.race"),

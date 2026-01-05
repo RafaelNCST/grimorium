@@ -2,8 +2,12 @@
  * Helper functions for cleaning up orphaned references when deleting entities
  */
 
+import {
+  safeParseStringArray,
+  safeParseUnknownObject,
+} from "./safe-json-parse";
+
 import { getDB } from "./index";
-import { safeParseStringArray, safeParseUnknownObject } from "./safe-json-parse";
 
 /**
  * Remove an ID from a JSON array field in the database

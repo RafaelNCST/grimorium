@@ -1,6 +1,7 @@
 import { Monitor, Image as ImageIcon, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +9,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 
 interface ImageSourceDialogProps {
   open: boolean;
@@ -49,7 +49,9 @@ export function ImageSourceDialog({
           >
             <Monitor className="h-12 w-12 text-primary" />
             <div className="text-center">
-              <div className="font-semibold">{t("form_image.from_computer")}</div>
+              <div className="font-semibold">
+                {t("form_image.from_computer")}
+              </div>
               <div className="text-xs text-muted-foreground mt-1">
                 {t("form_image.from_computer_description")}
               </div>
@@ -67,7 +69,9 @@ export function ImageSourceDialog({
           >
             <ImageIcon className="h-12 w-12 text-primary" />
             <div className="text-center">
-              <div className="font-semibold">{t("form_image.from_gallery")}</div>
+              <div className="font-semibold">
+                {t("form_image.from_gallery")}
+              </div>
               <div className="text-xs text-muted-foreground mt-1">
                 {t("form_image.from_gallery_description")}
               </div>

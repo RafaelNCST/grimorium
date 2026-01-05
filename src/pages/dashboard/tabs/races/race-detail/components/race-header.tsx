@@ -40,7 +40,12 @@ export function RaceHeader({
   onDeleteModalOpen,
   onEditFormChange,
 }: PropsRaceHeader) {
-  const { t } = useTranslation(["common", "race-detail", "create-race", "races"]);
+  const { t } = useTranslation([
+    "common",
+    "race-detail",
+    "create-race",
+    "races",
+  ]);
 
   return (
     <div className="flex items-start justify-between">
@@ -65,14 +70,26 @@ export function RaceHeader({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={t("races:type.select_placeholder")} />
+                  <SelectValue
+                    placeholder={t("races:type.select_placeholder")}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Aquática">{t("races:types.aquatic.label")}</SelectItem>
-                  <SelectItem value="Terrestre">{t("races:types.terrestrial.label")}</SelectItem>
-                  <SelectItem value="Voadora">{t("races:types.flying.label")}</SelectItem>
-                  <SelectItem value="Espacial">{t("races:types.spatial.label")}</SelectItem>
-                  <SelectItem value="Espiritual">{t("races:types.ethereal.label")}</SelectItem>
+                  <SelectItem value="Aquática">
+                    {t("races:types.aquatic.label")}
+                  </SelectItem>
+                  <SelectItem value="Terrestre">
+                    {t("races:types.terrestrial.label")}
+                  </SelectItem>
+                  <SelectItem value="Voadora">
+                    {t("races:types.flying.label")}
+                  </SelectItem>
+                  <SelectItem value="Espacial">
+                    {t("races:types.spatial.label")}
+                  </SelectItem>
+                  <SelectItem value="Espiritual">
+                    {t("races:types.ethereal.label")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>

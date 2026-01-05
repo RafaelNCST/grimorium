@@ -97,9 +97,9 @@ export function GalleryView({
     const container = scrollContainerRef.current;
     if (!container || isLoadingMore || !hasMore) return;
 
-    const scrollTop = container.scrollTop;
-    const scrollHeight = container.scrollHeight;
-    const clientHeight = container.clientHeight;
+    const { scrollTop } = container;
+    const { scrollHeight } = container;
+    const { clientHeight } = container;
 
     // Load more when 80% scrolled
     if (scrollTop + clientHeight >= scrollHeight * 0.8) {

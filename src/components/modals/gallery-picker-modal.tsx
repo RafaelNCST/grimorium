@@ -133,7 +133,9 @@ export function GalleryPickerModal({
           galleryItems = await getGalleryItemsByBookId(bookId);
         } else {
           // Load all gallery items if no bookId provided
-          const { getAllGalleryItems } = await import("@/lib/db/gallery.service");
+          const { getAllGalleryItems } = await import(
+            "@/lib/db/gallery.service"
+          );
           galleryItems = await getAllGalleryItems();
         }
 
@@ -178,7 +180,10 @@ export function GalleryPickerModal({
         onOpenChange(false);
         setSearchTerm(""); // Reset search
       } catch (error) {
-        console.error("[GalleryPickerModal] Failed to load original image:", error);
+        console.error(
+          "[GalleryPickerModal] Failed to load original image:",
+          error
+        );
       }
     },
     [onSelect, onOpenChange]

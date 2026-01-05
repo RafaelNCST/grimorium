@@ -1,4 +1,5 @@
 import { useSortable, defaultAnimateLayoutChanges } from "@dnd-kit/sortable";
+
 import type { AnimateLayoutChanges } from "@dnd-kit/sortable";
 
 interface SortablePinnedCardProps {
@@ -20,20 +21,19 @@ const animateLayoutChanges: AnimateLayoutChanges = (args) => {
   return defaultAnimateLayoutChanges(args);
 };
 
-export function SortablePinnedCard({ id, children, isOver = false }: SortablePinnedCardProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    isDragging,
-  } = useSortable({
+export function SortablePinnedCard({
+  id,
+  children,
+  isOver = false,
+}: SortablePinnedCardProps) {
+  const { attributes, listeners, setNodeRef, isDragging } = useSortable({
     id,
     animateLayoutChanges,
   });
 
   const style: React.CSSProperties = {
     opacity: isDragging ? 0.3 : 1,
-    cursor: 'grab',
+    cursor: "grab",
   };
 
   return (
@@ -46,7 +46,7 @@ export function SortablePinnedCard({ id, children, isOver = false }: SortablePin
       <div
         ref={setNodeRef}
         style={style}
-        className={`relative ${isOver ? 'ring-2 ring-primary/30 rounded-lg' : ''}`}
+        className={`relative ${isOver ? "ring-2 ring-primary/30 rounded-lg" : ""}`}
         {...attributes}
         {...listeners}
       >

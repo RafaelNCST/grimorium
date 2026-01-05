@@ -3,13 +3,13 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { getCharactersByBookId } from "@/lib/db/characters.service";
 import { getFactionsByBookId } from "@/lib/db/factions.service";
 import { getItemsByBookId } from "@/lib/db/items.service";
 import { getPlotArcsByBookId, getPlotArcById } from "@/lib/db/plot.service";
 import { getRegionsByBookId } from "@/lib/db/regions.service";
 import { canFinishArc } from "@/lib/utils/arc-validation";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { usePlotStore } from "@/stores/plot-store";
 import type { IPlotArc, IPlotEvent } from "@/types/plot-types";
 

@@ -25,8 +25,8 @@ export interface IGalleryItem {
 
   // Hybrid storage
   thumbnailBase64?: string; // DEPRECATED: para compatibilidade temporária
-  thumbnailPath: string;    // Path para thumbnail no filesystem
-  originalPath: string;     // For fullscreen/download
+  thumbnailPath: string; // Path para thumbnail no filesystem
+  originalPath: string; // For fullscreen/download
 
   // Metadata
   originalFilename: string;

@@ -1,11 +1,17 @@
-import { Document, Page, Text, View, StyleSheet, pdf } from "@react-pdf/renderer";
-
-import i18n from "@/lib/i18n";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  pdf,
+} from "@react-pdf/renderer";
 
 import type {
   ExportConfig,
   PageContent,
 } from "@/components/modals/export-preview-modal";
+import i18n from "@/lib/i18n";
 
 // Interfaces para exportação em lote
 export interface BatchExportConfig extends ExportConfig {
@@ -46,7 +52,11 @@ const getFontFamily = (fontValue: string): string => {
 };
 
 function formatChapterTitle(
-  format: "number-colon-title" | "number-dash-title" | "title-only" | "number-only",
+  format:
+    | "number-colon-title"
+    | "number-dash-title"
+    | "title-only"
+    | "number-only",
   chapterNumber: string,
   chapterTitle: string
 ): string {
@@ -74,8 +84,12 @@ const createStyles = (config: ExportConfig, includeTocStyles = false) => {
   // Sanitize values to prevent overflow in @react-pdf/renderer
   // Ensure values are valid numbers
   const titleSize = Number.isFinite(config.titleSize) ? config.titleSize : 16;
-  const contentSize = Number.isFinite(config.contentSize) ? config.contentSize : 12;
-  const lineSpacing = Number.isFinite(config.contentLineSpacing) ? config.contentLineSpacing : 1.5;
+  const contentSize = Number.isFinite(config.contentSize)
+    ? config.contentSize
+    : 12;
+  const lineSpacing = Number.isFinite(config.contentLineSpacing)
+    ? config.contentLineSpacing
+    : 1.5;
 
   // CRITICAL: Very conservative limits to prevent pdfkit overflow errors
   // Max font size: 16pt (safe limit tested with react-pdf/renderer)
@@ -87,9 +101,10 @@ const createStyles = (config: ExportConfig, includeTocStyles = false) => {
   const clampedLineHeight = Math.min(Math.max(lineSpacing, 1.0), 1.7);
 
   // Final safety check: ensure fontSize * lineHeight stays within safe bounds
-  const safeLineHeight = safeContentSize * clampedLineHeight > 27
-    ? Math.max(27 / safeContentSize, 1.0)
-    : clampedLineHeight;
+  const safeLineHeight =
+    safeContentSize * clampedLineHeight > 27
+      ? Math.max(27 / safeContentSize, 1.0)
+      : clampedLineHeight;
 
   const baseStyles = {
     page: {
@@ -191,7 +206,9 @@ const ChapterPDF = ({
         {lines.map((line, index) => (
           <Text
             key={`line-${index}`}
-            style={line.trim().length === 0 ? styles.emptyLine : styles.paragraph}
+            style={
+              line.trim().length === 0 ? styles.emptyLine : styles.paragraph
+            }
           >
             {line.trim().length === 0 ? " " : line}
           </Text>
@@ -248,7 +265,9 @@ const BatchChaptersPDF = ({ chapters, config }: BatchChaptersPDFProps) => {
           size={config.pageFormat.toUpperCase() as "A4" | "LETTER"}
           style={styles.page}
         >
-          <Text style={styles.tocTitle}>{i18n.t("chapters:export.tableOfContents")}</Text>
+          <Text style={styles.tocTitle}>
+            {i18n.t("chapters:export.tableOfContents")}
+          </Text>
           {chapters.map((ch, index) => (
             <View key={`toc-${index}`} style={styles.tocItem}>
               <Text>
@@ -300,7 +319,9 @@ const BatchChaptersPDF = ({ chapters, config }: BatchChaptersPDFProps) => {
                 <Text
                   key={`line-${chapterIndex}-${lineIndex}`}
                   style={
-                    line.trim().length === 0 ? styles.emptyLine : styles.paragraph
+                    line.trim().length === 0
+                      ? styles.emptyLine
+                      : styles.paragraph
                   }
                 >
                   {line.trim().length === 0 ? " " : line}
@@ -331,7 +352,9 @@ const BatchChaptersPDF = ({ chapters, config }: BatchChaptersPDFProps) => {
             return (
               <View
                 key={`chapter-${chapterIndex}`}
-                style={{ marginBottom: isLastChapter ? 0 : config.chapterSpacing }}
+                style={{
+                  marginBottom: isLastChapter ? 0 : config.chapterSpacing,
+                }}
               >
                 {/* Título do capítulo */}
                 {config.showChapterTitles && (
@@ -349,7 +372,9 @@ const BatchChaptersPDF = ({ chapters, config }: BatchChaptersPDFProps) => {
                   <Text
                     key={`line-${chapterIndex}-${lineIndex}`}
                     style={
-                      line.trim().length === 0 ? styles.emptyLine : styles.paragraph
+                      line.trim().length === 0
+                        ? styles.emptyLine
+                        : styles.paragraph
                     }
                   >
                     {line.trim().length === 0 ? " " : line}

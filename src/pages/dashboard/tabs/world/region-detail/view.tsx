@@ -270,7 +270,9 @@ export function RegionDetailView({
 
           {/* Name */}
           <div className="space-y-2">
-            <Label className={`text-sm font-medium ${errors.name ? "text-destructive" : "text-primary"}`}>
+            <Label
+              className={`text-sm font-medium ${errors.name ? "text-destructive" : "text-primary"}`}
+            >
               {t("region-detail:fields.name")}
               <span className="text-destructive ml-1">*</span>
             </Label>
@@ -329,7 +331,9 @@ export function RegionDetailView({
 
           {/* Scale Picker */}
           <div className="space-y-2">
-            <Label className={`text-sm font-medium ${errors.scale ? "text-destructive" : "text-primary"}`}>
+            <Label
+              className={`text-sm font-medium ${errors.scale ? "text-destructive" : "text-primary"}`}
+            >
               {t("region-detail:fields.scale")}
               <span className="text-destructive ml-1">*</span>
             </Label>
@@ -350,7 +354,9 @@ export function RegionDetailView({
 
           {/* Summary */}
           <div className="space-y-2">
-            <Label className={`text-sm font-medium ${errors.summary ? "text-destructive" : "text-primary"}`}>
+            <Label
+              className={`text-sm font-medium ${errors.summary ? "text-destructive" : "text-primary"}`}
+            >
               {t("region-detail:fields.summary")}
               <span className="text-destructive ml-1">*</span>
             </Label>
@@ -443,665 +449,625 @@ export function RegionDetailView({
     );
   };
 
-
   // Render advanced fields content
   const renderAdvancedFields = () => (
-      <div className="space-y-6">
-        {/* Environment Section */}
-        <>
-          <div className="space-y-4">
-              <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-                {t("world:create_region.environment_section")}
-              </h4>
+    <div className="space-y-6">
+      {/* Environment Section */}
+      <div className="space-y-4">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+          {t("world:create_region.environment_section")}
+        </h4>
 
-              {/* Climate */}
-              <div className="space-y-2">
-                <Label className="text-primary">
-                  {t("world:create_region.climate_label")}
-                </Label>
-                {isEditing ? (
-                  <>
-                    <Textarea
-                      value={editData.climate || ""}
-                      onChange={(e) =>
-                        onEditDataChange("climate", e.target.value)
-                      }
-                      placeholder={t("world:create_region.climate_placeholder")}
-                      maxLength={500}
-                      rows={4}
-                      className="resize-none"
-                    />
-                    <div className="flex justify-end text-xs text-muted-foreground">
-                      <span>{editData.climate?.length || 0}/500</span>
-                    </div>
-                  </>
-                ) : (
-                  <DisplayTextarea value={region.climate} />
-                )}
-              </div>
-
-              {/* Season Picker */}
-              <div className="space-y-2">
-                {!isEditing && (
-                  <Label className="text-primary">
-                    {t("world:create_region.current_season_label")}
-                  </Label>
-                )}
-                {isEditing ? (
-                  <SeasonPicker
-                    value={editData.currentSeason}
-                    customSeasonName={editData.customSeasonName}
-                    onSeasonChange={(season) =>
-                      onEditDataChange("currentSeason", season)
-                    }
-                    onCustomNameChange={(name) =>
-                      onEditDataChange("customSeasonName", name)
-                    }
-                  />
-                ) : (
-                  <DisplaySelectGrid
-                    value={region.currentSeason}
-                    options={REGION_SEASONS.map(
-                      (season): DisplaySelectGridOption => ({
-                        value: season.value,
-                        label:
-                          season.value === "custom" && region.customSeasonName
-                            ? region.customSeasonName
-                            : t(`world:seasons.${season.value}`),
-                        description: t(season.description),
-                        icon: season.icon,
-                        backgroundColor:
-                          season.value === "spring"
-                            ? "green-500/20"
-                            : season.value === "summer"
-                              ? "red-500/20"
-                              : season.value === "autumn"
-                                ? "orange-500/20"
-                                : season.value === "winter"
-                                  ? "blue-500/20"
-                                  : "purple-500/20",
-                        borderColor:
-                          season.value === "spring"
-                            ? "green-500/30"
-                            : season.value === "summer"
-                              ? "red-500/30"
-                              : season.value === "autumn"
-                                ? "orange-500/30"
-                                : season.value === "winter"
-                                  ? "blue-500/30"
-                                  : "purple-500/30",
-                      })
-                    )}
-                  />
-                )}
-              </div>
-
-              {/* General Description */}
-              <div className="space-y-2">
-                <Label className="text-primary">
-                  {t("world:create_region.general_description_label")}
-                </Label>
-                {isEditing ? (
-                  <>
-                    <Textarea
-                      value={editData.generalDescription || ""}
-                      onChange={(e) =>
-                        onEditDataChange("generalDescription", e.target.value)
-                      }
-                      placeholder={t(
-                        "world:create_region.general_description_placeholder"
-                      )}
-                      rows={5}
-                      maxLength={1000}
-                      className="resize-none"
-                    />
-                    <div className="flex justify-end text-xs text-muted-foreground">
-                      <span>
-                        {editData.generalDescription?.length || 0}/1000
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <DisplayTextarea value={region.generalDescription} />
-                )}
-              </div>
-
-              {/* Region Anomalies */}
-              {isEditing && (
-                <div className="space-y-2">
-                  <Label className="text-primary">
-                    {t("world:create_region.region_anomalies_label")}
-                  </Label>
-                  <FormListInput
-                    label=""
-                    placeholder={t("world:create_region.anomaly_placeholder")}
-                    buttonText={t("world:create_region.add_anomaly")}
-                    value={
-                      editData.regionAnomalies
-                        ? safeJsonParse(editData.regionAnomalies)
-                        : []
-                    }
-                    onChange={(value) =>
-                      onEditDataChange("regionAnomalies", JSON.stringify(value))
-                    }
-                    labelClassName="text-sm font-medium text-primary"
-                  />
-                </div>
-              )}
-              {!isEditing && (
-                <DisplayStringList
-                  label={t("world:create_region.region_anomalies_label")}
-                  items={safeJsonParse(region.regionAnomalies)}
-                  open={openSections.regionAnomalies}
-                  onOpenChange={() => toggleSection("regionAnomalies")}
-                />
-              )}
-            </div>
-
-          {/* Separator between Environment and Information */}
-          <Separator />
-        </>
-
-        {/* Information Section */}
-        <>
-          <div className="space-y-4">
-              <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-                {t("world:create_region.information_section")}
-              </h4>
-
-              {/* Resident Factions */}
-              {isEditing ? (
-                <div className="space-y-2">
-                  <Label className="text-primary">
-                    {t("world:create_region.resident_factions_label")}
-                  </Label>
-                  <FormEntityMultiSelectAuto
-                    key={`resident-factions-${refreshKey}`}
-                    entityType="faction"
-                    bookId={bookId}
-                    label=""
-                    placeholder={t(
-                      "world:create_region.resident_factions_placeholder"
-                    )}
-                    emptyText={t("world:create_region.no_factions_warning")}
-                    noSelectionText={t(
-                      "world:create_region.no_factions_selected"
-                    )}
-                    searchPlaceholder={t("world:create_region.search_faction")}
-                    value={
-                      editData.residentFactions
-                        ? safeJsonParse(editData.residentFactions)
-                        : []
-                    }
-                    onChange={(value) =>
-                      onEditDataChange(
-                        "residentFactions",
-                        JSON.stringify(value)
-                      )
-                    }
-                    labelClassName="text-sm font-medium text-primary"
-                  />
-                </div>
-              ) : (
-                <DisplayEntityList
-                  label={t("world:create_region.resident_factions_label")}
-                  entities={
-                    safeJsonParse(region.residentFactions)
-                      .map((factionId: string): DisplayEntityItem | null => {
-                        const faction = factions.find(
-                          (f) => f.id === factionId
-                        );
-                        return faction
-                          ? {
-                              id: faction.id,
-                              name: faction.name,
-                              image: faction.image,
-                            }
-                          : null;
-                      })
-                      .filter(Boolean) as DisplayEntityItem[]
-                  }
-                  open={openSections.residentFactions}
-                  onOpenChange={() => toggleSection("residentFactions")}
-                />
-              )}
-
-              {/* Dominant Factions */}
-              {isEditing ? (
-                <div className="space-y-2">
-                  <Label className="text-primary">
-                    {t("world:create_region.dominant_factions_label")}
-                  </Label>
-                  <FormEntityMultiSelectAuto
-                    key={`dominant-factions-${refreshKey}`}
-                    entityType="faction"
-                    bookId={bookId}
-                    label=""
-                    placeholder={t(
-                      "world:create_region.dominant_factions_placeholder"
-                    )}
-                    emptyText={t("world:create_region.no_factions_warning")}
-                    noSelectionText={t(
-                      "world:create_region.no_factions_selected"
-                    )}
-                    searchPlaceholder={t("world:create_region.search_faction")}
-                    value={
-                      editData.dominantFactions
-                        ? safeJsonParse(editData.dominantFactions)
-                        : []
-                    }
-                    onChange={(value) =>
-                      onEditDataChange(
-                        "dominantFactions",
-                        JSON.stringify(value)
-                      )
-                    }
-                    labelClassName="text-sm font-medium text-primary"
-                  />
-                </div>
-              ) : (
-                <DisplayEntityList
-                  label={t("world:create_region.dominant_factions_label")}
-                  entities={
-                    safeJsonParse(region.dominantFactions)
-                      .map((factionId: string): DisplayEntityItem | null => {
-                        const faction = factions.find(
-                          (f) => f.id === factionId
-                        );
-                        return faction
-                          ? {
-                              id: faction.id,
-                              name: faction.name,
-                              image: faction.image,
-                            }
-                          : null;
-                      })
-                      .filter(Boolean) as DisplayEntityItem[]
-                  }
-                  open={openSections.dominantFactions}
-                  onOpenChange={() => toggleSection("dominantFactions")}
-                />
-              )}
-
-              {/* Important Characters */}
-              {isEditing ? (
-                <div className="space-y-2">
-                  <Label className="text-primary">
-                    {t("world:create_region.important_characters_label")}
-                  </Label>
-                  <FormEntityMultiSelectAuto
-                    key={`important-characters-${refreshKey}`}
-                    entityType="character"
-                    bookId={bookId}
-                    label=""
-                    placeholder={t(
-                      "world:create_region.important_characters_placeholder"
-                    )}
-                    emptyText={t("world:create_region.no_characters_warning")}
-                    noSelectionText={t(
-                      "world:create_region.no_characters_selected"
-                    )}
-                    searchPlaceholder={t(
-                      "world:create_region.search_character"
-                    )}
-                    value={
-                      editData.importantCharacters
-                        ? safeJsonParse(editData.importantCharacters)
-                        : []
-                    }
-                    onChange={(value) =>
-                      onEditDataChange(
-                        "importantCharacters",
-                        JSON.stringify(value)
-                      )
-                    }
-                    labelClassName="text-sm font-medium text-primary"
-                  />
-                </div>
-              ) : (
-                <DisplayEntityList
-                  label={t("world:create_region.important_characters_label")}
-                  entities={
-                    safeJsonParse(region.importantCharacters)
-                      .map(
-                        (characterId: string): DisplayEntityItem | null => {
-                          const character = characters.find(
-                            (c) => c.id === characterId
-                          );
-                          return character
-                            ? {
-                                id: character.id,
-                                name: character.name,
-                                image: character.image,
-                              }
-                            : null;
-                        }
-                      )
-                      .filter(Boolean) as DisplayEntityItem[]
-                  }
-                  open={openSections.importantCharacters}
-                  onOpenChange={() => toggleSection("importantCharacters")}
-                />
-              )}
-
-              {/* Races Found */}
-              {isEditing ? (
-                <div className="space-y-2">
-                  <Label className="text-primary">
-                    {t("world:create_region.races_found_label")}
-                  </Label>
-                  <FormEntityMultiSelectAuto
-                    key={`races-found-${refreshKey}`}
-                    entityType="race"
-                    bookId={bookId}
-                    label=""
-                    placeholder={t(
-                      "world:create_region.races_found_placeholder"
-                    )}
-                    emptyText={t("world:create_region.no_races_warning")}
-                    noSelectionText={t("world:create_region.no_races_selected")}
-                    searchPlaceholder={t("world:create_region.search_race")}
-                    value={
-                      editData.racesFound
-                        ? safeJsonParse(editData.racesFound)
-                        : []
-                    }
-                    onChange={(value) =>
-                      onEditDataChange("racesFound", JSON.stringify(value))
-                    }
-                    labelClassName="text-sm font-medium text-primary"
-                  />
-                </div>
-              ) : (
-                <DisplayEntityList
-                  label={t("world:create_region.races_found_label")}
-                  entities={
-                    safeJsonParse(region.racesFound)
-                      .map((raceId: string): DisplayEntityItem | null => {
-                        const race = races.find((r) => r.id === raceId);
-                        return race
-                          ? {
-                              id: race.id,
-                              name: race.name,
-                              image: race.image,
-                            }
-                          : null;
-                      })
-                      .filter(Boolean) as DisplayEntityItem[]
-                  }
-                  open={openSections.racesFound}
-                  onOpenChange={() => toggleSection("racesFound")}
-                />
-              )}
-
-              {/* Items Found */}
-              {isEditing ? (
-                <div className="space-y-2">
-                  <Label className="text-primary">
-                    {t("world:create_region.items_found_label")}
-                  </Label>
-                  <FormEntityMultiSelectAuto
-                    key={`items-found-${refreshKey}`}
-                    entityType="item"
-                    bookId={bookId}
-                    label=""
-                    placeholder={t(
-                      "world:create_region.items_found_placeholder"
-                    )}
-                    emptyText={t("world:create_region.no_items_warning")}
-                    noSelectionText={t("world:create_region.no_items_selected")}
-                    searchPlaceholder={t("world:create_region.search_item")}
-                    value={
-                      editData.itemsFound
-                        ? safeJsonParse(editData.itemsFound)
-                        : []
-                    }
-                    onChange={(value) =>
-                      onEditDataChange("itemsFound", JSON.stringify(value))
-                    }
-                    labelClassName="text-sm font-medium text-primary"
-                  />
-                </div>
-              ) : (
-                <DisplayEntityList
-                  label={t("world:create_region.items_found_label")}
-                  entities={
-                    safeJsonParse(region.itemsFound)
-                      .map((itemId: string): DisplayEntityItem | null => {
-                        const item = items.find((i) => i.id === itemId);
-                        return item
-                          ? {
-                              id: item.id,
-                              name: item.name,
-                              image: item.image,
-                            }
-                          : null;
-                      })
-                      .filter(Boolean) as DisplayEntityItem[]
-                  }
-                  open={openSections.itemsFound}
-                  onOpenChange={() => toggleSection("itemsFound")}
-                />
-              )}
-            </div>
-
-          {/* Separator between Information and Narrative */}
-          <Separator />
-        </>
-
-        {/* Narrative Section */}
-        <div className="space-y-4">
-            <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-              {t("world:create_region.narrative_section")}
-            </h4>
-
-            {/* Narrative Purpose */}
-            <div className="space-y-2">
-              <Label className="text-primary">
-                {t("world:create_region.narrative_purpose_label")}
-              </Label>
-              {isEditing ? (
-                <>
-                  <Textarea
-                    value={editData.narrativePurpose || ""}
-                    onChange={(e) =>
-                      onEditDataChange("narrativePurpose", e.target.value)
-                    }
-                    placeholder={t(
-                      "world:create_region.narrative_purpose_placeholder"
-                    )}
-                    rows={3}
-                    maxLength={500}
-                    className="resize-none"
-                  />
-                  <div className="flex justify-end text-xs text-muted-foreground">
-                    <span>{editData.narrativePurpose?.length || 0}/500</span>
-                  </div>
-                </>
-              ) : (
-                <DisplayTextarea value={region.narrativePurpose} />
-              )}
-            </div>
-
-            {/* Unique Characteristics */}
-            <div className="space-y-2">
-              <Label className="text-primary">
-                {t("world:create_region.unique_characteristics_label")}
-              </Label>
-              {isEditing ? (
-                <>
-                  <Textarea
-                    value={editData.uniqueCharacteristics || ""}
-                    onChange={(e) =>
-                      onEditDataChange("uniqueCharacteristics", e.target.value)
-                    }
-                    placeholder={t(
-                      "world:create_region.unique_characteristics_placeholder"
-                    )}
-                    rows={3}
-                    maxLength={500}
-                    className="resize-none"
-                  />
-                  <div className="flex justify-end text-xs text-muted-foreground">
-                    <span>
-                      {editData.uniqueCharacteristics?.length || 0}
-                      /500
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <DisplayTextarea value={region.uniqueCharacteristics} />
-              )}
-            </div>
-
-            {/* Political Importance */}
-            <div className="space-y-2">
-              <Label className="text-primary">
-                {t("world:create_region.political_importance_label")}
-              </Label>
-              {isEditing ? (
-                <>
-                  <Textarea
-                    value={editData.politicalImportance || ""}
-                    onChange={(e) =>
-                      onEditDataChange("politicalImportance", e.target.value)
-                    }
-                    placeholder={t(
-                      "world:create_region.political_importance_placeholder"
-                    )}
-                    rows={3}
-                    maxLength={500}
-                    className="resize-none"
-                  />
-                  <div className="flex justify-end text-xs text-muted-foreground">
-                    <span>{editData.politicalImportance?.length || 0}/500</span>
-                  </div>
-                </>
-              ) : (
-                <DisplayTextarea value={region.politicalImportance} />
-              )}
-            </div>
-
-            {/* Religious Importance */}
-            <div className="space-y-2">
-              <Label className="text-primary">
-                {t("world:create_region.religious_importance_label")}
-              </Label>
-              {isEditing ? (
-                <>
-                  <Textarea
-                    value={editData.religiousImportance || ""}
-                    onChange={(e) =>
-                      onEditDataChange("religiousImportance", e.target.value)
-                    }
-                    placeholder={t(
-                      "world:create_region.religious_importance_placeholder"
-                    )}
-                    rows={3}
-                    maxLength={500}
-                    className="resize-none"
-                  />
-                  <div className="flex justify-end text-xs text-muted-foreground">
-                    <span>{editData.religiousImportance?.length || 0}/500</span>
-                  </div>
-                </>
-              ) : (
-                <DisplayTextarea value={region.religiousImportance} />
-              )}
-            </div>
-
-            {/* World Perception */}
-            <div className="space-y-2">
-              <Label className="text-primary">
-                {t("world:create_region.world_perception_label")}
-              </Label>
-              {isEditing ? (
-                <>
-                  <Textarea
-                    value={editData.worldPerception || ""}
-                    onChange={(e) =>
-                      onEditDataChange("worldPerception", e.target.value)
-                    }
-                    placeholder={t(
-                      "world:create_region.world_perception_placeholder"
-                    )}
-                    rows={3}
-                    maxLength={500}
-                    className="resize-none"
-                  />
-                  <div className="flex justify-end text-xs text-muted-foreground">
-                    <span>{editData.worldPerception?.length || 0}/500</span>
-                  </div>
-                </>
-              ) : (
-                <DisplayTextarea value={region.worldPerception} />
-              )}
-            </div>
-
-            {/* Region Mysteries */}
-            {isEditing && (
-              <div className="space-y-2">
-                <Label className="text-primary">
-                  {t("world:create_region.region_mysteries_label")}
-                </Label>
-                <FormListInput
-                  label=""
-                  placeholder={t("world:create_region.mystery_placeholder")}
-                  buttonText={t("world:create_region.add_mystery")}
-                  value={
-                    editData.regionMysteries
-                      ? safeJsonParse(editData.regionMysteries)
-                      : []
-                  }
-                  onChange={(value) =>
-                    onEditDataChange("regionMysteries", JSON.stringify(value))
-                  }
-                  labelClassName="text-sm font-medium text-primary"
-                />
-              </div>
-            )}
-            {!isEditing && (
-              <DisplayStringList
-                label={t("world:create_region.region_mysteries_label")}
-                items={safeJsonParse(region.regionMysteries)}
-                open={openSections.regionMysteries}
-                onOpenChange={() => toggleSection("regionMysteries")}
+        {/* Climate */}
+        <div className="space-y-2">
+          <Label className="text-primary">
+            {t("world:create_region.climate_label")}
+          </Label>
+          {isEditing ? (
+            <>
+              <Textarea
+                value={editData.climate || ""}
+                onChange={(e) => onEditDataChange("climate", e.target.value)}
+                placeholder={t("world:create_region.climate_placeholder")}
+                maxLength={500}
+                rows={4}
+                className="resize-none"
               />
-            )}
-
-            {/* Inspirations */}
-            {isEditing && (
-              <div className="space-y-2">
-                <Label className="text-primary">
-                  {t("world:create_region.inspirations_label")}
-                </Label>
-                <FormListInput
-                  label=""
-                  placeholder={t("world:create_region.inspiration_placeholder")}
-                  buttonText={t("world:create_region.add_inspiration")}
-                  value={
-                    editData.inspirations
-                      ? safeJsonParse(editData.inspirations)
-                      : []
-                  }
-                  onChange={(value) =>
-                    onEditDataChange("inspirations", JSON.stringify(value))
-                  }
-                  labelClassName="text-sm font-medium text-primary"
-                />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.climate?.length || 0}/500</span>
               </div>
-            )}
-            {!isEditing && (
-              <DisplayStringList
-                label={t("world:create_region.inspirations_label")}
-                items={safeJsonParse(region.inspirations)}
-                open={openSections.inspirations}
-                onOpenChange={() => toggleSection("inspirations")}
-              />
-            )}
+            </>
+          ) : (
+            <DisplayTextarea value={region.climate} />
+          )}
         </div>
+
+        {/* Season Picker */}
+        <div className="space-y-2">
+          {!isEditing && (
+            <Label className="text-primary">
+              {t("world:create_region.current_season_label")}
+            </Label>
+          )}
+          {isEditing ? (
+            <SeasonPicker
+              value={editData.currentSeason}
+              customSeasonName={editData.customSeasonName}
+              onSeasonChange={(season) =>
+                onEditDataChange("currentSeason", season)
+              }
+              onCustomNameChange={(name) =>
+                onEditDataChange("customSeasonName", name)
+              }
+            />
+          ) : (
+            <DisplaySelectGrid
+              value={region.currentSeason}
+              options={REGION_SEASONS.map(
+                (season): DisplaySelectGridOption => ({
+                  value: season.value,
+                  label:
+                    season.value === "custom" && region.customSeasonName
+                      ? region.customSeasonName
+                      : t(`world:seasons.${season.value}`),
+                  description: t(season.description),
+                  icon: season.icon,
+                  backgroundColor:
+                    season.value === "spring"
+                      ? "green-500/20"
+                      : season.value === "summer"
+                        ? "red-500/20"
+                        : season.value === "autumn"
+                          ? "orange-500/20"
+                          : season.value === "winter"
+                            ? "blue-500/20"
+                            : "purple-500/20",
+                  borderColor:
+                    season.value === "spring"
+                      ? "green-500/30"
+                      : season.value === "summer"
+                        ? "red-500/30"
+                        : season.value === "autumn"
+                          ? "orange-500/30"
+                          : season.value === "winter"
+                            ? "blue-500/30"
+                            : "purple-500/30",
+                })
+              )}
+            />
+          )}
+        </div>
+
+        {/* General Description */}
+        <div className="space-y-2">
+          <Label className="text-primary">
+            {t("world:create_region.general_description_label")}
+          </Label>
+          {isEditing ? (
+            <>
+              <Textarea
+                value={editData.generalDescription || ""}
+                onChange={(e) =>
+                  onEditDataChange("generalDescription", e.target.value)
+                }
+                placeholder={t(
+                  "world:create_region.general_description_placeholder"
+                )}
+                rows={5}
+                maxLength={1000}
+                className="resize-none"
+              />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.generalDescription?.length || 0}/1000</span>
+              </div>
+            </>
+          ) : (
+            <DisplayTextarea value={region.generalDescription} />
+          )}
+        </div>
+
+        {/* Region Anomalies */}
+        {isEditing && (
+          <div className="space-y-2">
+            <Label className="text-primary">
+              {t("world:create_region.region_anomalies_label")}
+            </Label>
+            <FormListInput
+              label=""
+              placeholder={t("world:create_region.anomaly_placeholder")}
+              buttonText={t("world:create_region.add_anomaly")}
+              value={
+                editData.regionAnomalies
+                  ? safeJsonParse(editData.regionAnomalies)
+                  : []
+              }
+              onChange={(value) =>
+                onEditDataChange("regionAnomalies", JSON.stringify(value))
+              }
+              labelClassName="text-sm font-medium text-primary"
+            />
+          </div>
+        )}
+        {!isEditing && (
+          <DisplayStringList
+            label={t("world:create_region.region_anomalies_label")}
+            items={safeJsonParse(region.regionAnomalies)}
+            open={openSections.regionAnomalies}
+            onOpenChange={() => toggleSection("regionAnomalies")}
+          />
+        )}
       </div>
-    );
+
+      {/* Separator between Environment and Information */}
+      <Separator />
+
+      {/* Information Section */}
+      <div className="space-y-4">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+          {t("world:create_region.information_section")}
+        </h4>
+
+        {/* Resident Factions */}
+        {isEditing ? (
+          <div className="space-y-2">
+            <Label className="text-primary">
+              {t("world:create_region.resident_factions_label")}
+            </Label>
+            <FormEntityMultiSelectAuto
+              key={`resident-factions-${refreshKey}`}
+              entityType="faction"
+              bookId={bookId}
+              label=""
+              placeholder={t(
+                "world:create_region.resident_factions_placeholder"
+              )}
+              emptyText={t("world:create_region.no_factions_warning")}
+              noSelectionText={t("world:create_region.no_factions_selected")}
+              searchPlaceholder={t("world:create_region.search_faction")}
+              value={
+                editData.residentFactions
+                  ? safeJsonParse(editData.residentFactions)
+                  : []
+              }
+              onChange={(value) =>
+                onEditDataChange("residentFactions", JSON.stringify(value))
+              }
+              labelClassName="text-sm font-medium text-primary"
+            />
+          </div>
+        ) : (
+          <DisplayEntityList
+            label={t("world:create_region.resident_factions_label")}
+            entities={
+              safeJsonParse(region.residentFactions)
+                .map((factionId: string): DisplayEntityItem | null => {
+                  const faction = factions.find((f) => f.id === factionId);
+                  return faction
+                    ? {
+                        id: faction.id,
+                        name: faction.name,
+                        image: faction.image,
+                      }
+                    : null;
+                })
+                .filter(Boolean) as DisplayEntityItem[]
+            }
+            open={openSections.residentFactions}
+            onOpenChange={() => toggleSection("residentFactions")}
+          />
+        )}
+
+        {/* Dominant Factions */}
+        {isEditing ? (
+          <div className="space-y-2">
+            <Label className="text-primary">
+              {t("world:create_region.dominant_factions_label")}
+            </Label>
+            <FormEntityMultiSelectAuto
+              key={`dominant-factions-${refreshKey}`}
+              entityType="faction"
+              bookId={bookId}
+              label=""
+              placeholder={t(
+                "world:create_region.dominant_factions_placeholder"
+              )}
+              emptyText={t("world:create_region.no_factions_warning")}
+              noSelectionText={t("world:create_region.no_factions_selected")}
+              searchPlaceholder={t("world:create_region.search_faction")}
+              value={
+                editData.dominantFactions
+                  ? safeJsonParse(editData.dominantFactions)
+                  : []
+              }
+              onChange={(value) =>
+                onEditDataChange("dominantFactions", JSON.stringify(value))
+              }
+              labelClassName="text-sm font-medium text-primary"
+            />
+          </div>
+        ) : (
+          <DisplayEntityList
+            label={t("world:create_region.dominant_factions_label")}
+            entities={
+              safeJsonParse(region.dominantFactions)
+                .map((factionId: string): DisplayEntityItem | null => {
+                  const faction = factions.find((f) => f.id === factionId);
+                  return faction
+                    ? {
+                        id: faction.id,
+                        name: faction.name,
+                        image: faction.image,
+                      }
+                    : null;
+                })
+                .filter(Boolean) as DisplayEntityItem[]
+            }
+            open={openSections.dominantFactions}
+            onOpenChange={() => toggleSection("dominantFactions")}
+          />
+        )}
+
+        {/* Important Characters */}
+        {isEditing ? (
+          <div className="space-y-2">
+            <Label className="text-primary">
+              {t("world:create_region.important_characters_label")}
+            </Label>
+            <FormEntityMultiSelectAuto
+              key={`important-characters-${refreshKey}`}
+              entityType="character"
+              bookId={bookId}
+              label=""
+              placeholder={t(
+                "world:create_region.important_characters_placeholder"
+              )}
+              emptyText={t("world:create_region.no_characters_warning")}
+              noSelectionText={t("world:create_region.no_characters_selected")}
+              searchPlaceholder={t("world:create_region.search_character")}
+              value={
+                editData.importantCharacters
+                  ? safeJsonParse(editData.importantCharacters)
+                  : []
+              }
+              onChange={(value) =>
+                onEditDataChange("importantCharacters", JSON.stringify(value))
+              }
+              labelClassName="text-sm font-medium text-primary"
+            />
+          </div>
+        ) : (
+          <DisplayEntityList
+            label={t("world:create_region.important_characters_label")}
+            entities={
+              safeJsonParse(region.importantCharacters)
+                .map((characterId: string): DisplayEntityItem | null => {
+                  const character = characters.find(
+                    (c) => c.id === characterId
+                  );
+                  return character
+                    ? {
+                        id: character.id,
+                        name: character.name,
+                        image: character.image,
+                      }
+                    : null;
+                })
+                .filter(Boolean) as DisplayEntityItem[]
+            }
+            open={openSections.importantCharacters}
+            onOpenChange={() => toggleSection("importantCharacters")}
+          />
+        )}
+
+        {/* Races Found */}
+        {isEditing ? (
+          <div className="space-y-2">
+            <Label className="text-primary">
+              {t("world:create_region.races_found_label")}
+            </Label>
+            <FormEntityMultiSelectAuto
+              key={`races-found-${refreshKey}`}
+              entityType="race"
+              bookId={bookId}
+              label=""
+              placeholder={t("world:create_region.races_found_placeholder")}
+              emptyText={t("world:create_region.no_races_warning")}
+              noSelectionText={t("world:create_region.no_races_selected")}
+              searchPlaceholder={t("world:create_region.search_race")}
+              value={
+                editData.racesFound ? safeJsonParse(editData.racesFound) : []
+              }
+              onChange={(value) =>
+                onEditDataChange("racesFound", JSON.stringify(value))
+              }
+              labelClassName="text-sm font-medium text-primary"
+            />
+          </div>
+        ) : (
+          <DisplayEntityList
+            label={t("world:create_region.races_found_label")}
+            entities={
+              safeJsonParse(region.racesFound)
+                .map((raceId: string): DisplayEntityItem | null => {
+                  const race = races.find((r) => r.id === raceId);
+                  return race
+                    ? {
+                        id: race.id,
+                        name: race.name,
+                        image: race.image,
+                      }
+                    : null;
+                })
+                .filter(Boolean) as DisplayEntityItem[]
+            }
+            open={openSections.racesFound}
+            onOpenChange={() => toggleSection("racesFound")}
+          />
+        )}
+
+        {/* Items Found */}
+        {isEditing ? (
+          <div className="space-y-2">
+            <Label className="text-primary">
+              {t("world:create_region.items_found_label")}
+            </Label>
+            <FormEntityMultiSelectAuto
+              key={`items-found-${refreshKey}`}
+              entityType="item"
+              bookId={bookId}
+              label=""
+              placeholder={t("world:create_region.items_found_placeholder")}
+              emptyText={t("world:create_region.no_items_warning")}
+              noSelectionText={t("world:create_region.no_items_selected")}
+              searchPlaceholder={t("world:create_region.search_item")}
+              value={
+                editData.itemsFound ? safeJsonParse(editData.itemsFound) : []
+              }
+              onChange={(value) =>
+                onEditDataChange("itemsFound", JSON.stringify(value))
+              }
+              labelClassName="text-sm font-medium text-primary"
+            />
+          </div>
+        ) : (
+          <DisplayEntityList
+            label={t("world:create_region.items_found_label")}
+            entities={
+              safeJsonParse(region.itemsFound)
+                .map((itemId: string): DisplayEntityItem | null => {
+                  const item = items.find((i) => i.id === itemId);
+                  return item
+                    ? {
+                        id: item.id,
+                        name: item.name,
+                        image: item.image,
+                      }
+                    : null;
+                })
+                .filter(Boolean) as DisplayEntityItem[]
+            }
+            open={openSections.itemsFound}
+            onOpenChange={() => toggleSection("itemsFound")}
+          />
+        )}
+      </div>
+
+      {/* Separator between Information and Narrative */}
+      <Separator />
+
+      {/* Narrative Section */}
+      <div className="space-y-4">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+          {t("world:create_region.narrative_section")}
+        </h4>
+
+        {/* Narrative Purpose */}
+        <div className="space-y-2">
+          <Label className="text-primary">
+            {t("world:create_region.narrative_purpose_label")}
+          </Label>
+          {isEditing ? (
+            <>
+              <Textarea
+                value={editData.narrativePurpose || ""}
+                onChange={(e) =>
+                  onEditDataChange("narrativePurpose", e.target.value)
+                }
+                placeholder={t(
+                  "world:create_region.narrative_purpose_placeholder"
+                )}
+                rows={3}
+                maxLength={500}
+                className="resize-none"
+              />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.narrativePurpose?.length || 0}/500</span>
+              </div>
+            </>
+          ) : (
+            <DisplayTextarea value={region.narrativePurpose} />
+          )}
+        </div>
+
+        {/* Unique Characteristics */}
+        <div className="space-y-2">
+          <Label className="text-primary">
+            {t("world:create_region.unique_characteristics_label")}
+          </Label>
+          {isEditing ? (
+            <>
+              <Textarea
+                value={editData.uniqueCharacteristics || ""}
+                onChange={(e) =>
+                  onEditDataChange("uniqueCharacteristics", e.target.value)
+                }
+                placeholder={t(
+                  "world:create_region.unique_characteristics_placeholder"
+                )}
+                rows={3}
+                maxLength={500}
+                className="resize-none"
+              />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>
+                  {editData.uniqueCharacteristics?.length || 0}
+                  /500
+                </span>
+              </div>
+            </>
+          ) : (
+            <DisplayTextarea value={region.uniqueCharacteristics} />
+          )}
+        </div>
+
+        {/* Political Importance */}
+        <div className="space-y-2">
+          <Label className="text-primary">
+            {t("world:create_region.political_importance_label")}
+          </Label>
+          {isEditing ? (
+            <>
+              <Textarea
+                value={editData.politicalImportance || ""}
+                onChange={(e) =>
+                  onEditDataChange("politicalImportance", e.target.value)
+                }
+                placeholder={t(
+                  "world:create_region.political_importance_placeholder"
+                )}
+                rows={3}
+                maxLength={500}
+                className="resize-none"
+              />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.politicalImportance?.length || 0}/500</span>
+              </div>
+            </>
+          ) : (
+            <DisplayTextarea value={region.politicalImportance} />
+          )}
+        </div>
+
+        {/* Religious Importance */}
+        <div className="space-y-2">
+          <Label className="text-primary">
+            {t("world:create_region.religious_importance_label")}
+          </Label>
+          {isEditing ? (
+            <>
+              <Textarea
+                value={editData.religiousImportance || ""}
+                onChange={(e) =>
+                  onEditDataChange("religiousImportance", e.target.value)
+                }
+                placeholder={t(
+                  "world:create_region.religious_importance_placeholder"
+                )}
+                rows={3}
+                maxLength={500}
+                className="resize-none"
+              />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.religiousImportance?.length || 0}/500</span>
+              </div>
+            </>
+          ) : (
+            <DisplayTextarea value={region.religiousImportance} />
+          )}
+        </div>
+
+        {/* World Perception */}
+        <div className="space-y-2">
+          <Label className="text-primary">
+            {t("world:create_region.world_perception_label")}
+          </Label>
+          {isEditing ? (
+            <>
+              <Textarea
+                value={editData.worldPerception || ""}
+                onChange={(e) =>
+                  onEditDataChange("worldPerception", e.target.value)
+                }
+                placeholder={t(
+                  "world:create_region.world_perception_placeholder"
+                )}
+                rows={3}
+                maxLength={500}
+                className="resize-none"
+              />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.worldPerception?.length || 0}/500</span>
+              </div>
+            </>
+          ) : (
+            <DisplayTextarea value={region.worldPerception} />
+          )}
+        </div>
+
+        {/* Region Mysteries */}
+        {isEditing && (
+          <div className="space-y-2">
+            <Label className="text-primary">
+              {t("world:create_region.region_mysteries_label")}
+            </Label>
+            <FormListInput
+              label=""
+              placeholder={t("world:create_region.mystery_placeholder")}
+              buttonText={t("world:create_region.add_mystery")}
+              value={
+                editData.regionMysteries
+                  ? safeJsonParse(editData.regionMysteries)
+                  : []
+              }
+              onChange={(value) =>
+                onEditDataChange("regionMysteries", JSON.stringify(value))
+              }
+              labelClassName="text-sm font-medium text-primary"
+            />
+          </div>
+        )}
+        {!isEditing && (
+          <DisplayStringList
+            label={t("world:create_region.region_mysteries_label")}
+            items={safeJsonParse(region.regionMysteries)}
+            open={openSections.regionMysteries}
+            onOpenChange={() => toggleSection("regionMysteries")}
+          />
+        )}
+
+        {/* Inspirations */}
+        {isEditing && (
+          <div className="space-y-2">
+            <Label className="text-primary">
+              {t("world:create_region.inspirations_label")}
+            </Label>
+            <FormListInput
+              label=""
+              placeholder={t("world:create_region.inspiration_placeholder")}
+              buttonText={t("world:create_region.add_inspiration")}
+              value={
+                editData.inspirations
+                  ? safeJsonParse(editData.inspirations)
+                  : []
+              }
+              onChange={(value) =>
+                onEditDataChange("inspirations", JSON.stringify(value))
+              }
+              labelClassName="text-sm font-medium text-primary"
+            />
+          </div>
+        )}
+        {!isEditing && (
+          <DisplayStringList
+            label={t("world:create_region.inspirations_label")}
+            items={safeJsonParse(region.inspirations)}
+            open={openSections.inspirations}
+            onOpenChange={() => toggleSection("inspirations")}
+          />
+        )}
+      </div>
+    </div>
+  );
 
   // Validation message
   const validationMessage = hasRequiredFieldsEmpty ? (
@@ -1271,11 +1237,19 @@ export function RegionDetailView({
                 isCollapsible: true,
                 defaultOpen: false,
                 isVisible: sectionVisibility["chapter-metrics"] !== false,
-                onVisibilityToggle: () => onSectionVisibilityToggle("chapter-metrics"),
-                emptyState: !isEditing && hasChapterMetrics === false ? "empty-view" : null,
+                onVisibilityToggle: () =>
+                  onSectionVisibilityToggle("chapter-metrics"),
+                emptyState:
+                  !isEditing && hasChapterMetrics === false
+                    ? "empty-view"
+                    : null,
                 emptyIcon: BookOpen,
-                emptyTitle: t("chapter-metrics:entity_section.empty_state_title"),
-                emptyDescription: t("chapter-metrics:entity_section.no_mentions.region"),
+                emptyTitle: t(
+                  "chapter-metrics:entity_section.empty_state_title"
+                ),
+                emptyDescription: t(
+                  "chapter-metrics:entity_section.no_mentions.region"
+                ),
               },
             ]}
           />

@@ -15,8 +15,6 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import type { PlotArcStatus } from "@/types/plot-types";
-
 import type { EntityMention } from "@/components/modals/create-chapter-modal";
 import {
   ExportPreviewModal,
@@ -35,6 +33,7 @@ import {
 } from "@/components/ui/tooltip";
 import { generateChapterPDF } from "@/lib/services/export-pdf.service";
 import { useBookEditorSettingsStore } from "@/stores/book-editor-settings-store";
+import type { PlotArcStatus } from "@/types/plot-types";
 
 type ChapterStatus =
   | "draft"
@@ -96,7 +95,9 @@ export function ChapterCard({
 }: ChapterCardProps) {
   const { t } = useTranslation("chapter-card");
   const { dashboardId } = useParams({ strict: false });
-  const getBookSettings = useBookEditorSettingsStore((state) => state.getBookSettings);
+  const getBookSettings = useBookEditorSettingsStore(
+    (state) => state.getBookSettings
+  );
   const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
 

@@ -1,18 +1,20 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 
-import { FileText, FileDown, Loader2, AlertTriangle, Info, CheckCircle2, XCircle } from "lucide-react";
+import {
+  FileText,
+  FileDown,
+  Loader2,
+  AlertTriangle,
+  Info,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,7 +25,17 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -31,19 +43,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import type { ExportConfig } from "./export-preview-modal";
 import {
   generateBatchChaptersPDF,
   type BatchExportConfig,
   type ChapterContent,
 } from "@/lib/services/export-pdf.service";
 import { generateBatchChaptersWord } from "@/lib/services/export-word.service";
+
+import type { ExportConfig } from "./export-preview-modal";
+
 import { save } from "@tauri-apps/plugin-dialog";
 import { writeFile } from "@tauri-apps/plugin-fs";
 
@@ -107,7 +117,9 @@ export function BatchExportModal({
   const { t } = useTranslation("chapters");
 
   // Range selection
-  const [fromChapter, setFromChapter] = useState<number>(chapters[0]?.number || 1);
+  const [fromChapter, setFromChapter] = useState<number>(
+    chapters[0]?.number || 1
+  );
   const [toChapter, setToChapter] = useState<number>(
     chapters[chapters.length - 1]?.number || 1
   );
@@ -140,20 +152,26 @@ export function BatchExportModal({
   // Preview states
   const [loadedChapters, setLoadedChapters] = useState<ChapterContent[]>([]);
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
-  const [loadingProgress, setLoadingProgress] = useState({ current: 0, total: 0 });
+  const [loadingProgress, setLoadingProgress] = useState({
+    current: 0,
+    total: 0,
+  });
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [numPages, setNumPages] = useState(0);
   const [isExporting, setIsExporting] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [showEmptyChaptersModal, setShowEmptyChaptersModal] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [feedbackType, setFeedbackType] = useState<"success" | "error">("success");
+  const [feedbackType, setFeedbackType] = useState<"success" | "error">(
+    "success"
+  );
   const [feedbackMessage, setFeedbackMessage] = useState("");
 
   // Validate range
-  const isValidRange = useMemo(() => {
-    return toChapter >= fromChapter;
-  }, [fromChapter, toChapter]);
+  const isValidRange = useMemo(
+    () => toChapter >= fromChapter,
+    [fromChapter, toChapter]
+  );
 
   // Get selected chapters
   const selectedChapters = useMemo(() => {
@@ -164,9 +182,10 @@ export function BatchExportModal({
   }, [fromChapter, toChapter, chapters, isValidRange]);
 
   // Calculate statistics
-  const totalWords = useMemo(() => {
-    return selectedChapters.reduce((sum, ch) => sum + (ch.wordCount || 0), 0);
-  }, [selectedChapters]);
+  const totalWords = useMemo(
+    () => selectedChapters.reduce((sum, ch) => sum + (ch.wordCount || 0), 0),
+    [selectedChapters]
+  );
 
   const estimatedPages = useMemo(() => {
     const wordsPerPage = config.contentSize <= 12 ? 250 : 200;
@@ -176,16 +195,20 @@ export function BatchExportModal({
   const tooManyChapters = selectedChapters.length > MAX_BATCH_CHAPTERS;
 
   // Detect empty chapters
-  const emptyChapters = useMemo(() => {
-    return loadedChapters.filter((ch) => !ch.content || ch.content.trim() === "");
-  }, [loadedChapters]);
+  const emptyChapters = useMemo(
+    () =>
+      loadedChapters.filter((ch) => !ch.content || ch.content.trim() === ""),
+    [loadedChapters]
+  );
 
   // Filter chapters for export (exclude empty if option is disabled)
   const chaptersToExport = useMemo(() => {
     if (includeEmptyChapters) {
       return loadedChapters;
     }
-    return loadedChapters.filter((ch) => ch.content && ch.content.trim() !== "");
+    return loadedChapters.filter(
+      (ch) => ch.content && ch.content.trim() !== ""
+    );
   }, [loadedChapters, includeEmptyChapters]);
 
   // Config change handler
@@ -237,7 +260,10 @@ export function BatchExportModal({
           chapterSpacing,
         };
 
-        const blob = await generateBatchChaptersPDF(filteredContents, batchConfig);
+        const blob = await generateBatchChaptersPDF(
+          filteredContents,
+          batchConfig
+        );
 
         // Cleanup old URL
         if (pdfPreviewUrl) {
@@ -249,7 +275,9 @@ export function BatchExportModal({
         setPreviewError(null);
       } catch (error) {
         console.error("Error generating preview:", error);
-        setPreviewError(error instanceof Error ? error.message : "Erro ao gerar preview");
+        setPreviewError(
+          error instanceof Error ? error.message : "Erro ao gerar preview"
+        );
       } finally {
         setIsGeneratingPreview(false);
       }
@@ -272,13 +300,14 @@ export function BatchExportModal({
   ]);
 
   // Cleanup on unmount
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (pdfPreviewUrl) {
         URL.revokeObjectURL(pdfPreviewUrl);
       }
-    };
-  }, [pdfPreviewUrl]);
+    },
+    [pdfPreviewUrl]
+  );
 
   // Reset states when modal opens
   useEffect(() => {
@@ -301,7 +330,10 @@ export function BatchExportModal({
         chapterSpacing,
       };
 
-      const blob = await generateBatchChaptersPDF(chaptersToExport, batchConfig);
+      const blob = await generateBatchChaptersPDF(
+        chaptersToExport,
+        batchConfig
+      );
       const uint8Array = new Uint8Array(await blob.arrayBuffer());
 
       const fileName = `Capitulos_${fromChapter}_a_${toChapter}.pdf`;
@@ -348,7 +380,10 @@ export function BatchExportModal({
         chapterSpacing,
       };
 
-      const blob = await generateBatchChaptersWord(chaptersToExport, batchConfig);
+      const blob = await generateBatchChaptersWord(
+        chaptersToExport,
+        batchConfig
+      );
       const uint8Array = new Uint8Array(await blob.arrayBuffer());
 
       const fileName = `Capitulos_${fromChapter}_a_${toChapter}.docx`;
@@ -403,7 +438,9 @@ export function BatchExportModal({
                     <Alert className="border-destructive/50 text-destructive">
                       <Info className="h-4 w-4 !text-destructive" />
                       <AlertDescription>
-                        {t("batchExport.tooManyChapters", { max: MAX_BATCH_CHAPTERS })}
+                        {t("batchExport.tooManyChapters", {
+                          max: MAX_BATCH_CHAPTERS,
+                        })}
                       </AlertDescription>
                     </Alert>
                   )}
@@ -415,7 +452,9 @@ export function BatchExportModal({
                         {emptyChapters.length <= 3 ? (
                           <>
                             {t("batchExport.emptyChapters", {
-                              chapters: emptyChapters.map((ch) => `Cap ${ch.number}`).join(", "),
+                              chapters: emptyChapters
+                                .map((ch) => `Cap ${ch.number}`)
+                                .join(", "),
                             })}
                             {!includeEmptyChapters && (
                               <div className="mt-1 text-xs">
@@ -426,7 +465,9 @@ export function BatchExportModal({
                         ) : (
                           <div>
                             <div>
-                              {t("batchExport.emptyChaptersCount", { count: emptyChapters.length })}{" "}
+                              {t("batchExport.emptyChaptersCount", {
+                                count: emptyChapters.length,
+                              })}{" "}
                               <button
                                 onClick={() => setShowEmptyChaptersModal(true)}
                                 className="underline font-medium hover:text-destructive/80"
@@ -495,7 +536,12 @@ export function BatchExportModal({
                 {/* Validation */}
                 {isValidRange && selectedChapters.length > 0 && (
                   <div className="text-sm text-muted-foreground">
-                    {selectedChapters.length} {t("batchExport.selectedCount", { count: selectedChapters.length })} • {totalWords.toLocaleString()} {t("batchExport.totalWords", { count: totalWords })}
+                    {selectedChapters.length}{" "}
+                    {t("batchExport.selectedCount", {
+                      count: selectedChapters.length,
+                    })}{" "}
+                    • {totalWords.toLocaleString()}{" "}
+                    {t("batchExport.totalWords", { count: totalWords })}
                   </div>
                 )}
                 {!isValidRange && (
@@ -593,7 +639,9 @@ export function BatchExportModal({
 
               {/* Export Settings - Same as ExportPreviewModal */}
               <div className="space-y-3">
-                <Label className="text-base font-semibold">{t("singleExport.pageFormat")}</Label>
+                <Label className="text-base font-semibold">
+                  {t("singleExport.pageFormat")}
+                </Label>
                 <RadioGroup
                   value={config.pageFormat}
                   onValueChange={(value) =>
@@ -618,20 +666,31 @@ export function BatchExportModal({
               <Separator />
 
               <div className="space-y-3">
-                <Label className="text-base font-semibold">{t("singleExport.margins")}</Label>
+                <Label className="text-base font-semibold">
+                  {t("singleExport.margins")}
+                </Label>
                 <Select
                   value={config.margins}
                   onValueChange={(value) =>
-                    handleConfigChange("margins", value as keyof typeof MARGIN_PRESETS)
+                    handleConfigChange(
+                      "margins",
+                      value as keyof typeof MARGIN_PRESETS
+                    )
                   }
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="editorial">{t("singleExport.marginsEditorial")}</SelectItem>
-                    <SelectItem value="narrow">{t("singleExport.marginsNarrow")}</SelectItem>
-                    <SelectItem value="wide">{t("singleExport.marginsWide")}</SelectItem>
+                    <SelectItem value="editorial">
+                      {t("singleExport.marginsEditorial")}
+                    </SelectItem>
+                    <SelectItem value="narrow">
+                      {t("singleExport.marginsNarrow")}
+                    </SelectItem>
+                    <SelectItem value="wide">
+                      {t("singleExport.marginsWide")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -650,7 +709,11 @@ export function BatchExportModal({
                     onValueChange={(value) =>
                       handleConfigChange(
                         "titleFormat",
-                        value as "number-colon-title" | "number-dash-title" | "title-only" | "number-only"
+                        value as
+                          | "number-colon-title"
+                          | "number-dash-title"
+                          | "title-only"
+                          | "number-only"
                       )
                     }
                   >
@@ -664,8 +727,12 @@ export function BatchExportModal({
                       <SelectItem value="number-dash-title">
                         {t("singleExport.titleFormatNumberDash")}
                       </SelectItem>
-                      <SelectItem value="title-only">{t("singleExport.titleFormatTitleOnly")}</SelectItem>
-                      <SelectItem value="number-only">{t("singleExport.titleFormatNumberOnly")}</SelectItem>
+                      <SelectItem value="title-only">
+                        {t("singleExport.titleFormatTitleOnly")}
+                      </SelectItem>
+                      <SelectItem value="number-only">
+                        {t("singleExport.titleFormatNumberOnly")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -674,7 +741,9 @@ export function BatchExportModal({
                   <Label>{t("singleExport.font")}</Label>
                   <Select
                     value={config.titleFont}
-                    onValueChange={(value) => handleConfigChange("titleFont", value)}
+                    onValueChange={(value) =>
+                      handleConfigChange("titleFont", value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -698,7 +767,9 @@ export function BatchExportModal({
                   </div>
                   <Slider
                     value={[config.titleSize]}
-                    onValueChange={(value) => handleConfigChange("titleSize", value[0])}
+                    onValueChange={(value) =>
+                      handleConfigChange("titleSize", value[0])
+                    }
                     min={TITLE_SIZE_RANGE.min}
                     max={TITLE_SIZE_RANGE.max}
                     step={2}
@@ -716,7 +787,10 @@ export function BatchExportModal({
                   <RadioGroup
                     value={config.titleAlignment}
                     onValueChange={(value) =>
-                      handleConfigChange("titleAlignment", value as "left" | "center")
+                      handleConfigChange(
+                        "titleAlignment",
+                        value as "left" | "center"
+                      )
                     }
                   >
                     <div className="flex items-center space-x-2">
@@ -756,7 +830,9 @@ export function BatchExportModal({
                   </div>
                   <Slider
                     value={[config.titleSpacing]}
-                    onValueChange={(value) => handleConfigChange("titleSpacing", value[0])}
+                    onValueChange={(value) =>
+                      handleConfigChange("titleSpacing", value[0])
+                    }
                     min={20}
                     max={80}
                     step={5}
@@ -781,7 +857,9 @@ export function BatchExportModal({
                   <Label>{t("singleExport.font")}</Label>
                   <Select
                     value={config.contentFont}
-                    onValueChange={(value) => handleConfigChange("contentFont", value)}
+                    onValueChange={(value) =>
+                      handleConfigChange("contentFont", value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -805,7 +883,9 @@ export function BatchExportModal({
                   </div>
                   <Slider
                     value={[config.contentSize]}
-                    onValueChange={(value) => handleConfigChange("contentSize", value[0])}
+                    onValueChange={(value) =>
+                      handleConfigChange("contentSize", value[0])
+                    }
                     min={CONTENT_SIZE_RANGE.min}
                     max={CONTENT_SIZE_RANGE.max}
                     step={1}
@@ -862,7 +942,10 @@ export function BatchExportModal({
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="center" id="content-center" />
-                      <Label htmlFor="content-center" className="cursor-pointer">
+                      <Label
+                        htmlFor="content-center"
+                        className="cursor-pointer"
+                      >
                         {t("singleExport.alignmentCenter")}
                       </Label>
                     </div>
@@ -874,7 +957,10 @@ export function BatchExportModal({
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="justify" id="content-justify" />
-                      <Label htmlFor="content-justify" className="cursor-pointer">
+                      <Label
+                        htmlFor="content-justify"
+                        className="cursor-pointer"
+                      >
                         {t("singleExport.alignmentJustify")}
                       </Label>
                     </div>
@@ -889,7 +975,9 @@ export function BatchExportModal({
             {isGeneratingPreview && (
               <div className="flex flex-col items-center justify-center h-full">
                 <Loader2 className="w-8 h-8 animate-spin mb-4" />
-                <p className="text-sm mb-2">{t("batchExport.generatingPreview")}</p>
+                <p className="text-sm mb-2">
+                  {t("batchExport.generatingPreview")}
+                </p>
                 <p className="text-xs text-muted-foreground mb-4">
                   {t("batchExport.loadingChapter", {
                     current: loadingProgress.current,
@@ -897,7 +985,9 @@ export function BatchExportModal({
                   })}
                 </p>
                 <Progress
-                  value={(loadingProgress.current / loadingProgress.total) * 100}
+                  value={
+                    (loadingProgress.current / loadingProgress.total) * 100
+                  }
                   className="w-64"
                 />
               </div>
@@ -906,14 +996,19 @@ export function BatchExportModal({
             {!isGeneratingPreview && previewError && (
               <div className="flex flex-col items-center justify-center h-full">
                 <AlertTriangle className="w-12 h-12 text-destructive mb-4" />
-                <p className="text-sm font-medium mb-2">{t("batchExport.errorGeneratingPreview")}</p>
+                <p className="text-sm font-medium mb-2">
+                  {t("batchExport.errorGeneratingPreview")}
+                </p>
                 <p className="text-xs text-muted-foreground">{previewError}</p>
               </div>
             )}
 
             {!isGeneratingPreview && !previewError && pdfPreviewUrl && (
               <div className="flex-1 overflow-y-auto p-4 flex justify-center items-start">
-                <div className="relative flex-shrink-0" style={{ width: "597px" }}>
+                <div
+                  className="relative flex-shrink-0"
+                  style={{ width: "597px" }}
+                >
                   <div className="flex flex-col gap-2 mb-4">
                     <div className="text-sm font-medium text-center">
                       {numPages > 0
@@ -932,7 +1027,9 @@ export function BatchExportModal({
                       }}
                       onLoadError={(error) => {
                         console.error("Error loading PDF:", error);
-                        setPreviewError(`${t("batchExport.errorGeneratingPreview")}: ${error.message}`);
+                        setPreviewError(
+                          `${t("batchExport.errorGeneratingPreview")}: ${error.message}`
+                        );
                       }}
                       loading={
                         <div className="flex flex-col items-center gap-4 justify-center py-20">
@@ -944,34 +1041,43 @@ export function BatchExportModal({
                       }
                     >
                       {numPages > 0 &&
-                        Array.from(new Array(Math.min(10, numPages)), (_, index) => (
-                          <div key={`page_${index + 1}`} className="flex flex-col gap-2">
-                            <div className="shadow-xl bg-white border border-border">
-                              <Page
-                                pageNumber={index + 1}
-                                scale={1.0}
-                                loading={
-                                  <div
-                                    className="flex items-center justify-center p-8 bg-white"
-                                    style={{
-                                      width: `${PAGE_FORMATS[config.pageFormat].width}px`,
-                                      height: `${PAGE_FORMATS[config.pageFormat].height}px`,
-                                    }}
-                                  >
-                                    <Loader2 className="w-6 h-6 animate-spin" />
-                                  </div>
-                                }
-                              />
+                        Array.from(
+                          new Array(Math.min(10, numPages)),
+                          (_, index) => (
+                            <div
+                              key={`page_${index + 1}`}
+                              className="flex flex-col gap-2"
+                            >
+                              <div className="shadow-xl bg-white border border-border">
+                                <Page
+                                  pageNumber={index + 1}
+                                  scale={1.0}
+                                  loading={
+                                    <div
+                                      className="flex items-center justify-center p-8 bg-white"
+                                      style={{
+                                        width: `${PAGE_FORMATS[config.pageFormat].width}px`,
+                                        height: `${PAGE_FORMATS[config.pageFormat].height}px`,
+                                      }}
+                                    >
+                                      <Loader2 className="w-6 h-6 animate-spin" />
+                                    </div>
+                                  }
+                                />
+                              </div>
+                              <div className="text-center text-xs text-muted-foreground">
+                                {t("singleExport.page")} {index + 1}{" "}
+                                {t("singleExport.of")} {numPages}
+                              </div>
                             </div>
-                            <div className="text-center text-xs text-muted-foreground">
-                              {t("singleExport.page")} {index + 1} {t("singleExport.of")} {numPages}
-                            </div>
-                          </div>
-                        ))}
+                          )
+                        )}
                     </Document>
                     {numPages > 10 && (
                       <div className="mt-4 p-3 bg-muted rounded-md text-center text-sm">
-                        {t("batchExport.additionalPages", { count: numPages - 10 })}
+                        {t("batchExport.additionalPages", {
+                          count: numPages - 10,
+                        })}
                       </div>
                     )}
                   </div>
@@ -995,7 +1101,9 @@ export function BatchExportModal({
           <Button
             variant="magical"
             onClick={handleExportWord}
-            disabled={!isValidRange || isExporting || loadedChapters.length === 0}
+            disabled={
+              !isValidRange || isExporting || loadedChapters.length === 0
+            }
           >
             {isExporting ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -1007,7 +1115,9 @@ export function BatchExportModal({
           <Button
             variant="magical"
             onClick={handleExportPDF}
-            disabled={!isValidRange || isExporting || loadedChapters.length === 0}
+            disabled={
+              !isValidRange || isExporting || loadedChapters.length === 0
+            }
           >
             {isExporting ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -1020,7 +1130,10 @@ export function BatchExportModal({
       </DialogContent>
 
       {/* Empty Chapters Modal */}
-      <Dialog open={showEmptyChaptersModal} onOpenChange={setShowEmptyChaptersModal}>
+      <Dialog
+        open={showEmptyChaptersModal}
+        onOpenChange={setShowEmptyChaptersModal}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -1044,7 +1157,10 @@ export function BatchExportModal({
             </div>
           </div>
           <DialogFooter>
-            <Button variant="secondary" onClick={() => setShowEmptyChaptersModal(false)}>
+            <Button
+              variant="secondary"
+              onClick={() => setShowEmptyChaptersModal(false)}
+            >
               {t("batchExport.emptyChaptersModalClose")}
             </Button>
           </DialogFooter>
@@ -1061,12 +1177,16 @@ export function BatchExportModal({
               ) : (
                 <XCircle className="w-5 h-5 text-red-500" />
               )}
-              {feedbackType === "success" ? t("feedback.exportSuccess") : t("feedback.exportError")}
+              {feedbackType === "success"
+                ? t("feedback.exportSuccess")
+                : t("feedback.exportError")}
             </AlertDialogTitle>
             <AlertDialogDescription>{feedbackMessage}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction variant="secondary">{t("feedback.ok")}</AlertDialogAction>
+            <AlertDialogAction variant="secondary">
+              {t("feedback.ok")}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

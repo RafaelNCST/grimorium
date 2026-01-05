@@ -343,14 +343,13 @@ export function FormEntityMultiSelectAuto({
     onChange(newIds, newEntities);
   };
 
-  const getAvatarShape = (type: EntityType): string => {
-    return type === "character" ? "rounded-full" : "rounded-sm";
-  };
+  const getAvatarShape = (type: EntityType): string =>
+    type === "character" ? "rounded-full" : "rounded-sm";
 
   const EntityAvatar = ({
     image,
     name,
-    size
+    size,
   }: {
     image?: string;
     name: string;

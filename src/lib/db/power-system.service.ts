@@ -9,6 +9,8 @@ import {
   BlockContent,
 } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
 
+import { safeDBOperation } from "./safe-db-operation";
+import { safeJSONParse, blockContentSchema } from "./safe-json-parse";
 import {
   DBPowerSystem,
   DBPowerGroup,
@@ -19,8 +21,6 @@ import {
 } from "./types";
 
 import { getDB } from "./index";
-import { safeDBOperation } from "./safe-db-operation";
-import { safeJSONParse, blockContentSchema } from "./safe-json-parse";
 
 // ============================================================================
 // CONVERSION FUNCTIONS
@@ -82,7 +82,11 @@ function dbPowerBlockToPowerBlock(db: DBPowerBlock): IPowerBlock {
     sectionId: db.section_id,
     type: db.type as BlockType,
     orderIndex: db.order_index,
-    content: safeJSONParse(db.content_json, blockContentSchema, {}) as BlockContent,
+    content: safeJSONParse(
+      db.content_json,
+      blockContentSchema,
+      {}
+    ) as BlockContent,
     createdAt: db.created_at,
     updatedAt: db.updated_at,
   };
@@ -110,36 +114,36 @@ export async function getPowerSystemsByBookId(
   bookId: string
 ): Promise<IPowerSystem[]> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const result = await db.select<DBPowerSystem[]>(
-      "SELECT * FROM power_systems WHERE book_id = $1 ORDER BY created_at DESC",
-      [bookId]
-    );
-    return result.map(dbPowerSystemToPowerSystem);
-  } catch (error) {
-    console.error("Error fetching power systems:", error);
-    throw error;
-  }
-}, 'getPowerSystemsByBookId');
+    try {
+      const db = await getDB();
+      const result = await db.select<DBPowerSystem[]>(
+        "SELECT * FROM power_systems WHERE book_id = $1 ORDER BY created_at DESC",
+        [bookId]
+      );
+      return result.map(dbPowerSystemToPowerSystem);
+    } catch (error) {
+      console.error("Error fetching power systems:", error);
+      throw error;
+    }
+  }, "getPowerSystemsByBookId");
 }
 
 export async function getPowerSystemById(
   systemId: string
 ): Promise<IPowerSystem | null> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const result = await db.select<DBPowerSystem[]>(
-      "SELECT * FROM power_systems WHERE id = $1",
-      [systemId]
-    );
-    return result.length > 0 ? dbPowerSystemToPowerSystem(result[0]) : null;
-  } catch (error) {
-    console.error("Error fetching power system:", error);
-    throw error;
-  }
-}, 'getPowerSystemById');
+    try {
+      const db = await getDB();
+      const result = await db.select<DBPowerSystem[]>(
+        "SELECT * FROM power_systems WHERE id = $1",
+        [systemId]
+      );
+      return result.length > 0 ? dbPowerSystemToPowerSystem(result[0]) : null;
+    } catch (error) {
+      console.error("Error fetching power system:", error);
+      throw error;
+    }
+  }, "getPowerSystemById");
 }
 
 export async function createPowerSystem(
@@ -148,23 +152,23 @@ export async function createPowerSystem(
   iconImage?: string
 ): Promise<string> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const id = crypto.randomUUID();
-    const now = Date.now();
+    try {
+      const db = await getDB();
+      const id = crypto.randomUUID();
+      const now = Date.now();
 
-    await db.execute(
-      `INSERT INTO power_systems (id, book_id, name, icon_image, created_at, updated_at)
+      await db.execute(
+        `INSERT INTO power_systems (id, book_id, name, icon_image, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, $6)`,
-      [id, bookId, name, iconImage || null, now, now]
-    );
+        [id, bookId, name, iconImage || null, now, now]
+      );
 
-    return id;
-  } catch (error) {
-    console.error("Error creating power system:", error);
-    throw error;
-  }
-}, 'createPowerSystem');
+      return id;
+    } catch (error) {
+      console.error("Error creating power system:", error);
+      throw error;
+    }
+  }, "createPowerSystem");
 }
 
 export async function updatePowerSystem(
@@ -173,68 +177,68 @@ export async function updatePowerSystem(
   iconImage?: string
 ): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const now = Date.now();
+    try {
+      const db = await getDB();
+      const now = Date.now();
 
-    await db.execute(
-      "UPDATE power_systems SET name = $1, icon_image = $2, updated_at = $3 WHERE id = $4",
-      [name, iconImage || null, now, systemId]
-    );
-  } catch (error) {
-    console.error("Error updating power system:", error);
-    throw error;
-  }
-}, 'updatePowerSystem');
+      await db.execute(
+        "UPDATE power_systems SET name = $1, icon_image = $2, updated_at = $3 WHERE id = $4",
+        [name, iconImage || null, now, systemId]
+      );
+    } catch (error) {
+      console.error("Error updating power system:", error);
+      throw error;
+    }
+  }, "updatePowerSystem");
 }
 
 export async function deletePowerSystem(systemId: string): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    // Delete all related data (cascade)
-    // Get all pages
-    const pages = await db.select<DBPowerPage[]>(
-      "SELECT id FROM power_pages WHERE system_id = $1",
-      [systemId]
-    );
-
-    // For each page, get sections and delete blocks
-    for (const page of pages) {
-      const sections = await db.select<DBPowerSection[]>(
-        "SELECT id FROM power_sections WHERE page_id = $1",
-        [page.id]
+      // Delete all related data (cascade)
+      // Get all pages
+      const pages = await db.select<DBPowerPage[]>(
+        "SELECT id FROM power_pages WHERE system_id = $1",
+        [systemId]
       );
 
-      for (const section of sections) {
-        await db.execute("DELETE FROM power_blocks WHERE section_id = $1", [
-          section.id,
+      // For each page, get sections and delete blocks
+      for (const page of pages) {
+        const sections = await db.select<DBPowerSection[]>(
+          "SELECT id FROM power_sections WHERE page_id = $1",
+          [page.id]
+        );
+
+        for (const section of sections) {
+          await db.execute("DELETE FROM power_blocks WHERE section_id = $1", [
+            section.id,
+          ]);
+        }
+
+        await db.execute("DELETE FROM power_sections WHERE page_id = $1", [
+          page.id,
         ]);
       }
 
-      await db.execute("DELETE FROM power_sections WHERE page_id = $1", [
-        page.id,
+      // Delete pages
+      await db.execute("DELETE FROM power_pages WHERE system_id = $1", [
+        systemId,
       ]);
+
+      // Delete groups
+      await db.execute("DELETE FROM power_groups WHERE system_id = $1", [
+        systemId,
+      ]);
+
+      // Finally delete the system
+      await db.execute("DELETE FROM power_systems WHERE id = $1", [systemId]);
+    } catch (error) {
+      console.error("Error deleting power system:", error);
+      throw error;
     }
-
-    // Delete pages
-    await db.execute("DELETE FROM power_pages WHERE system_id = $1", [
-      systemId,
-    ]);
-
-    // Delete groups
-    await db.execute("DELETE FROM power_groups WHERE system_id = $1", [
-      systemId,
-    ]);
-
-    // Finally delete the system
-    await db.execute("DELETE FROM power_systems WHERE id = $1", [systemId]);
-  } catch (error) {
-    console.error("Error deleting power system:", error);
-    throw error;
-  }
-}, 'deletePowerSystem');
+  }, "deletePowerSystem");
 }
 
 // ============================================================================
@@ -245,18 +249,18 @@ export async function getPowerGroupsBySystemId(
   systemId: string
 ): Promise<IPowerGroup[]> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const result = await db.select<DBPowerGroup[]>(
-      "SELECT * FROM power_groups WHERE system_id = $1 ORDER BY order_index ASC",
-      [systemId]
-    );
-    return result.map(dbPowerGroupToPowerGroup);
-  } catch (error) {
-    console.error("Error fetching power groups:", error);
-    throw error;
-  }
-}, 'getPowerGroupsBySystemId');
+    try {
+      const db = await getDB();
+      const result = await db.select<DBPowerGroup[]>(
+        "SELECT * FROM power_groups WHERE system_id = $1 ORDER BY order_index ASC",
+        [systemId]
+      );
+      return result.map(dbPowerGroupToPowerGroup);
+    } catch (error) {
+      console.error("Error fetching power groups:", error);
+      throw error;
+    }
+  }, "getPowerGroupsBySystemId");
 }
 
 export async function createPowerGroup(
@@ -265,23 +269,23 @@ export async function createPowerGroup(
   orderIndex: number
 ): Promise<string> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const id = crypto.randomUUID();
-    const now = Date.now();
+    try {
+      const db = await getDB();
+      const id = crypto.randomUUID();
+      const now = Date.now();
 
-    await db.execute(
-      `INSERT INTO power_groups (id, system_id, name, order_index, created_at)
+      await db.execute(
+        `INSERT INTO power_groups (id, system_id, name, order_index, created_at)
        VALUES ($1, $2, $3, $4, $5)`,
-      [id, systemId, name, orderIndex, now]
-    );
+        [id, systemId, name, orderIndex, now]
+      );
 
-    return id;
-  } catch (error) {
-    console.error("Error creating power group:", error);
-    throw error;
-  }
-}, 'createPowerGroup');
+      return id;
+    } catch (error) {
+      console.error("Error creating power group:", error);
+      throw error;
+    }
+  }, "createPowerGroup");
 }
 
 export async function updatePowerGroup(
@@ -289,57 +293,57 @@ export async function updatePowerGroup(
   name: string
 ): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    await db.execute("UPDATE power_groups SET name = $1 WHERE id = $2", [
-      name,
-      groupId,
-    ]);
-  } catch (error) {
-    console.error("Error updating power group:", error);
-    throw error;
-  }
-}, 'updatePowerGroup');
+      await db.execute("UPDATE power_groups SET name = $1 WHERE id = $2", [
+        name,
+        groupId,
+      ]);
+    } catch (error) {
+      console.error("Error updating power group:", error);
+      throw error;
+    }
+  }, "updatePowerGroup");
 }
 
 export async function deletePowerGroup(groupId: string): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    // Set all pages in this group to ungrouped (null group_id)
-    await db.execute(
-      "UPDATE power_pages SET group_id = NULL WHERE group_id = $1",
-      [groupId]
-    );
+      // Set all pages in this group to ungrouped (null group_id)
+      await db.execute(
+        "UPDATE power_pages SET group_id = NULL WHERE group_id = $1",
+        [groupId]
+      );
 
-    // Delete the group
-    await db.execute("DELETE FROM power_groups WHERE id = $1", [groupId]);
-  } catch (error) {
-    console.error("Error deleting power group:", error);
-    throw error;
-  }
-}, 'deletePowerGroup');
+      // Delete the group
+      await db.execute("DELETE FROM power_groups WHERE id = $1", [groupId]);
+    } catch (error) {
+      console.error("Error deleting power group:", error);
+      throw error;
+    }
+  }, "deletePowerGroup");
 }
 
 export async function reorderPowerGroups(groupIds: string[]): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    // Update each group's order_index based on its position in the array
-    for (let i = 0; i < groupIds.length; i++) {
-      await db.execute(
-        "UPDATE power_groups SET order_index = $1 WHERE id = $2",
-        [i, groupIds[i]]
-      );
+      // Update each group's order_index based on its position in the array
+      for (let i = 0; i < groupIds.length; i++) {
+        await db.execute(
+          "UPDATE power_groups SET order_index = $1 WHERE id = $2",
+          [i, groupIds[i]]
+        );
+      }
+    } catch (error) {
+      console.error("Error reordering power groups:", error);
+      throw error;
     }
-  } catch (error) {
-    console.error("Error reordering power groups:", error);
-    throw error;
-  }
-}, 'reorderPowerGroups');
+  }, "reorderPowerGroups");
 }
 
 // ============================================================================
@@ -350,36 +354,36 @@ export async function getPowerPagesBySystemId(
   systemId: string
 ): Promise<IPowerPage[]> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const result = await db.select<DBPowerPage[]>(
-      "SELECT * FROM power_pages WHERE system_id = $1 ORDER BY order_index ASC",
-      [systemId]
-    );
-    return result.map(dbPowerPageToPowerPage);
-  } catch (error) {
-    console.error("Error fetching power pages:", error);
-    throw error;
-  }
-}, 'getPowerPagesBySystemId');
+    try {
+      const db = await getDB();
+      const result = await db.select<DBPowerPage[]>(
+        "SELECT * FROM power_pages WHERE system_id = $1 ORDER BY order_index ASC",
+        [systemId]
+      );
+      return result.map(dbPowerPageToPowerPage);
+    } catch (error) {
+      console.error("Error fetching power pages:", error);
+      throw error;
+    }
+  }, "getPowerPagesBySystemId");
 }
 
 export async function getPowerPageById(
   pageId: string
 ): Promise<IPowerPage | null> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const result = await db.select<DBPowerPage[]>(
-      "SELECT * FROM power_pages WHERE id = $1",
-      [pageId]
-    );
-    return result.length > 0 ? dbPowerPageToPowerPage(result[0]) : null;
-  } catch (error) {
-    console.error("Error fetching power page:", error);
-    throw error;
-  }
-}, 'getPowerPageById');
+    try {
+      const db = await getDB();
+      const result = await db.select<DBPowerPage[]>(
+        "SELECT * FROM power_pages WHERE id = $1",
+        [pageId]
+      );
+      return result.length > 0 ? dbPowerPageToPowerPage(result[0]) : null;
+    } catch (error) {
+      console.error("Error fetching power page:", error);
+      throw error;
+    }
+  }, "getPowerPageById");
 }
 
 export async function createPowerPage(
@@ -389,23 +393,23 @@ export async function createPowerPage(
   orderIndex: number
 ): Promise<string> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const id = crypto.randomUUID();
-    const now = Date.now();
+    try {
+      const db = await getDB();
+      const id = crypto.randomUUID();
+      const now = Date.now();
 
-    await db.execute(
-      `INSERT INTO power_pages (id, system_id, group_id, name, order_index, created_at, updated_at)
+      await db.execute(
+        `INSERT INTO power_pages (id, system_id, group_id, name, order_index, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [id, systemId, groupId || null, name, orderIndex, now, now]
-    );
+        [id, systemId, groupId || null, name, orderIndex, now, now]
+      );
 
-    return id;
-  } catch (error) {
-    console.error("Error creating power page:", error);
-    throw error;
-  }
-}, 'createPowerPage');
+      return id;
+    } catch (error) {
+      console.error("Error creating power page:", error);
+      throw error;
+    }
+  }, "createPowerPage");
 }
 
 export async function updatePowerPage(
@@ -413,19 +417,19 @@ export async function updatePowerPage(
   name: string
 ): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const now = Date.now();
+    try {
+      const db = await getDB();
+      const now = Date.now();
 
-    await db.execute(
-      "UPDATE power_pages SET name = $1, updated_at = $2 WHERE id = $3",
-      [name, now, pageId]
-    );
-  } catch (error) {
-    console.error("Error updating power page:", error);
-    throw error;
-  }
-}, 'updatePowerPage');
+      await db.execute(
+        "UPDATE power_pages SET name = $1, updated_at = $2 WHERE id = $3",
+        [name, now, pageId]
+      );
+    } catch (error) {
+      console.error("Error updating power page:", error);
+      throw error;
+    }
+  }, "updatePowerPage");
 }
 
 export async function movePowerPage(
@@ -433,194 +437,196 @@ export async function movePowerPage(
   newGroupId: string | undefined
 ): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const now = Date.now();
+    try {
+      const db = await getDB();
+      const now = Date.now();
 
-    await db.execute(
-      "UPDATE power_pages SET group_id = $1, updated_at = $2 WHERE id = $3",
-      [newGroupId || null, now, pageId]
-    );
-  } catch (error) {
-    console.error("Error moving power page:", error);
-    throw error;
-  }
-}, 'movePowerPage');
+      await db.execute(
+        "UPDATE power_pages SET group_id = $1, updated_at = $2 WHERE id = $3",
+        [newGroupId || null, now, pageId]
+      );
+    } catch (error) {
+      console.error("Error moving power page:", error);
+      throw error;
+    }
+  }, "movePowerPage");
 }
 
 export async function deletePowerPage(pageId: string): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    // Get all sections for this page
-    const sections = await db.select<DBPowerSection[]>(
-      "SELECT id FROM power_sections WHERE page_id = $1",
-      [pageId]
-    );
+      // Get all sections for this page
+      const sections = await db.select<DBPowerSection[]>(
+        "SELECT id FROM power_sections WHERE page_id = $1",
+        [pageId]
+      );
 
-    // Delete all blocks for each section
-    for (const section of sections) {
-      await db.execute("DELETE FROM power_blocks WHERE section_id = $1", [
-        section.id,
+      // Delete all blocks for each section
+      for (const section of sections) {
+        await db.execute("DELETE FROM power_blocks WHERE section_id = $1", [
+          section.id,
+        ]);
+      }
+
+      // Delete all sections
+      await db.execute("DELETE FROM power_sections WHERE page_id = $1", [
+        pageId,
       ]);
+
+      // Delete the page
+      await db.execute("DELETE FROM power_pages WHERE id = $1", [pageId]);
+    } catch (error) {
+      console.error("Error deleting power page:", error);
+      throw error;
     }
-
-    // Delete all sections
-    await db.execute("DELETE FROM power_sections WHERE page_id = $1", [pageId]);
-
-    // Delete the page
-    await db.execute("DELETE FROM power_pages WHERE id = $1", [pageId]);
-  } catch (error) {
-    console.error("Error deleting power page:", error);
-    throw error;
-  }
-}, 'deletePowerPage');
+  }, "deletePowerPage");
 }
 
 export async function reorderPowerPages(pageIds: string[]): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    // Update each page's order_index based on its position in the array
-    for (let i = 0; i < pageIds.length; i++) {
-      await db.execute(
-        "UPDATE power_pages SET order_index = $1 WHERE id = $2",
-        [i, pageIds[i]]
-      );
+      // Update each page's order_index based on its position in the array
+      for (let i = 0; i < pageIds.length; i++) {
+        await db.execute(
+          "UPDATE power_pages SET order_index = $1 WHERE id = $2",
+          [i, pageIds[i]]
+        );
+      }
+    } catch (error) {
+      console.error("Error reordering power pages:", error);
+      throw error;
     }
-  } catch (error) {
-    console.error("Error reordering power pages:", error);
-    throw error;
-  }
-}, 'reorderPowerPages');
+  }, "reorderPowerPages");
 }
 
 export async function duplicatePowerPage(pageId: string): Promise<string> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    // 1. Get the original page
-    const originalPage = await getPowerPageById(pageId);
-    if (!originalPage) {
-      throw new Error(`Page with id ${pageId} not found`);
-    }
+      // 1. Get the original page
+      const originalPage = await getPowerPageById(pageId);
+      if (!originalPage) {
+        throw new Error(`Page with id ${pageId} not found`);
+      }
 
-    // 2. Get all pages in the same context (same group or ungrouped)
-    const allPages = await db.select<DBPowerPage[]>(
-      originalPage.groupId
-        ? "SELECT * FROM power_pages WHERE system_id = $1 AND group_id = $2 ORDER BY order_index ASC"
-        : "SELECT * FROM power_pages WHERE system_id = $1 AND group_id IS NULL ORDER BY order_index ASC",
-      originalPage.groupId
-        ? [originalPage.systemId, originalPage.groupId]
-        : [originalPage.systemId]
-    );
+      // 2. Get all pages in the same context (same group or ungrouped)
+      const allPages = await db.select<DBPowerPage[]>(
+        originalPage.groupId
+          ? "SELECT * FROM power_pages WHERE system_id = $1 AND group_id = $2 ORDER BY order_index ASC"
+          : "SELECT * FROM power_pages WHERE system_id = $1 AND group_id IS NULL ORDER BY order_index ASC",
+        originalPage.groupId
+          ? [originalPage.systemId, originalPage.groupId]
+          : [originalPage.systemId]
+      );
 
-    // 3. Generate unique name with copy number
-    const baseName = originalPage.name;
-    let copyNumber = 1;
-    let newName = `${baseName} (${copyNumber})`;
+      // 3. Generate unique name with copy number
+      const baseName = originalPage.name;
+      let copyNumber = 1;
+      let newName = `${baseName} (${copyNumber})`;
 
-    // Check if name already exists and increment
-    const existingNames = new Set(allPages.map((p) => p.name));
-    while (existingNames.has(newName)) {
-      copyNumber++;
-      newName = `${baseName} (${copyNumber})`;
-    }
+      // Check if name already exists and increment
+      const existingNames = new Set(allPages.map((p) => p.name));
+      while (existingNames.has(newName)) {
+        copyNumber++;
+        newName = `${baseName} (${copyNumber})`;
+      }
 
-    // 4. Create new page with orderIndex right after original
-    const newPageId = crypto.randomUUID();
-    const now = Date.now();
-    const newOrderIndex = originalPage.orderIndex + 1;
+      // 4. Create new page with orderIndex right after original
+      const newPageId = crypto.randomUUID();
+      const now = Date.now();
+      const newOrderIndex = originalPage.orderIndex + 1;
 
-    await db.execute(
-      `INSERT INTO power_pages (id, system_id, group_id, name, order_index, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [
-        newPageId,
-        originalPage.systemId,
-        originalPage.groupId || null,
-        newName,
-        newOrderIndex,
-        now,
-        now,
-      ]
-    );
-
-    // 5. Update order_index of pages that come after the original
-    await db.execute(
-      originalPage.groupId
-        ? `UPDATE power_pages
-           SET order_index = order_index + 1
-           WHERE system_id = $1 AND group_id = $2 AND order_index > $3 AND id != $4`
-        : `UPDATE power_pages
-           SET order_index = order_index + 1
-           WHERE system_id = $1 AND group_id IS NULL AND order_index > $2 AND id != $3`,
-      originalPage.groupId
-        ? [
-            originalPage.systemId,
-            originalPage.groupId,
-            originalPage.orderIndex,
-            newPageId,
-          ]
-        : [originalPage.systemId, originalPage.orderIndex, newPageId]
-    );
-
-    // 6. Get all sections from the original page
-    const originalSections = await getPowerSectionsByPageId(pageId);
-
-    // 7. Copy sections and blocks
-    for (const originalSection of originalSections) {
-      const newSectionId = crypto.randomUUID();
-
-      // Create new section
       await db.execute(
-        `INSERT INTO power_sections (id, page_id, title, order_index, collapsed, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        `INSERT INTO power_pages (id, system_id, group_id, name, order_index, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [
-          newSectionId,
           newPageId,
-          originalSection.title,
-          originalSection.orderIndex,
-          originalSection.collapsed ? 1 : 0,
+          originalPage.systemId,
+          originalPage.groupId || null,
+          newName,
+          newOrderIndex,
           now,
           now,
         ]
       );
 
-      // Get all blocks from the original section
-      const originalBlocks = await getPowerBlocksBySectionId(
-        originalSection.id
+      // 5. Update order_index of pages that come after the original
+      await db.execute(
+        originalPage.groupId
+          ? `UPDATE power_pages
+           SET order_index = order_index + 1
+           WHERE system_id = $1 AND group_id = $2 AND order_index > $3 AND id != $4`
+          : `UPDATE power_pages
+           SET order_index = order_index + 1
+           WHERE system_id = $1 AND group_id IS NULL AND order_index > $2 AND id != $3`,
+        originalPage.groupId
+          ? [
+              originalPage.systemId,
+              originalPage.groupId,
+              originalPage.orderIndex,
+              newPageId,
+            ]
+          : [originalPage.systemId, originalPage.orderIndex, newPageId]
       );
 
-      // Copy blocks
-      for (const originalBlock of originalBlocks) {
-        const newBlockId = crypto.randomUUID();
+      // 6. Get all sections from the original page
+      const originalSections = await getPowerSectionsByPageId(pageId);
 
+      // 7. Copy sections and blocks
+      for (const originalSection of originalSections) {
+        const newSectionId = crypto.randomUUID();
+
+        // Create new section
         await db.execute(
-          `INSERT INTO power_blocks (id, section_id, type, order_index, content_json, created_at, updated_at)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          `INSERT INTO power_sections (id, page_id, title, order_index, collapsed, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
           [
-            newBlockId,
             newSectionId,
-            originalBlock.type,
-            originalBlock.orderIndex,
-            JSON.stringify(originalBlock.content),
+            newPageId,
+            originalSection.title,
+            originalSection.orderIndex,
+            originalSection.collapsed ? 1 : 0,
             now,
             now,
           ]
         );
-      }
-    }
 
-    return newPageId;
-  } catch (error) {
-    console.error("Error duplicating power page:", error);
-    throw error;
-  }
-}, 'duplicatePowerPage');
+        // Get all blocks from the original section
+        const originalBlocks = await getPowerBlocksBySectionId(
+          originalSection.id
+        );
+
+        // Copy blocks
+        for (const originalBlock of originalBlocks) {
+          const newBlockId = crypto.randomUUID();
+
+          await db.execute(
+            `INSERT INTO power_blocks (id, section_id, type, order_index, content_json, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [
+              newBlockId,
+              newSectionId,
+              originalBlock.type,
+              originalBlock.orderIndex,
+              JSON.stringify(originalBlock.content),
+              now,
+              now,
+            ]
+          );
+        }
+      }
+
+      return newPageId;
+    } catch (error) {
+      console.error("Error duplicating power page:", error);
+      throw error;
+    }
+  }, "duplicatePowerPage");
 }
 
 // ============================================================================
@@ -631,36 +637,36 @@ export async function getPowerSectionsByPageId(
   pageId: string
 ): Promise<IPowerSection[]> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const result = await db.select<DBPowerSection[]>(
-      "SELECT * FROM power_sections WHERE page_id = $1 ORDER BY order_index ASC",
-      [pageId]
-    );
-    return result.map(dbPowerSectionToPowerSection);
-  } catch (error) {
-    console.error("Error fetching power sections:", error);
-    throw error;
-  }
-}, 'getPowerSectionsByPageId');
+    try {
+      const db = await getDB();
+      const result = await db.select<DBPowerSection[]>(
+        "SELECT * FROM power_sections WHERE page_id = $1 ORDER BY order_index ASC",
+        [pageId]
+      );
+      return result.map(dbPowerSectionToPowerSection);
+    } catch (error) {
+      console.error("Error fetching power sections:", error);
+      throw error;
+    }
+  }, "getPowerSectionsByPageId");
 }
 
 export async function getPowerSectionById(
   sectionId: string
 ): Promise<IPowerSection | null> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const result = await db.select<DBPowerSection[]>(
-      "SELECT * FROM power_sections WHERE id = $1",
-      [sectionId]
-    );
-    return result.length > 0 ? dbPowerSectionToPowerSection(result[0]) : null;
-  } catch (error) {
-    console.error("Error fetching power section:", error);
-    throw error;
-  }
-}, 'getPowerSectionById');
+    try {
+      const db = await getDB();
+      const result = await db.select<DBPowerSection[]>(
+        "SELECT * FROM power_sections WHERE id = $1",
+        [sectionId]
+      );
+      return result.length > 0 ? dbPowerSectionToPowerSection(result[0]) : null;
+    } catch (error) {
+      console.error("Error fetching power section:", error);
+      throw error;
+    }
+  }, "getPowerSectionById");
 }
 
 export async function createPowerSection(
@@ -669,23 +675,23 @@ export async function createPowerSection(
   orderIndex: number
 ): Promise<string> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const id = crypto.randomUUID();
-    const now = Date.now();
+    try {
+      const db = await getDB();
+      const id = crypto.randomUUID();
+      const now = Date.now();
 
-    await db.execute(
-      `INSERT INTO power_sections (id, page_id, title, order_index, collapsed, created_at, updated_at)
+      await db.execute(
+        `INSERT INTO power_sections (id, page_id, title, order_index, collapsed, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [id, pageId, title, orderIndex, 0, now, now]
-    );
+        [id, pageId, title, orderIndex, 0, now, now]
+      );
 
-    return id;
-  } catch (error) {
-    console.error("Error creating power section:", error);
-    throw error;
-  }
-}, 'createPowerSection');
+      return id;
+    } catch (error) {
+      console.error("Error creating power section:", error);
+      throw error;
+    }
+  }, "createPowerSection");
 }
 
 export async function updatePowerSection(
@@ -693,19 +699,19 @@ export async function updatePowerSection(
   title: string
 ): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const now = Date.now();
+    try {
+      const db = await getDB();
+      const now = Date.now();
 
-    await db.execute(
-      "UPDATE power_sections SET title = $1, updated_at = $2 WHERE id = $3",
-      [title, now, sectionId]
-    );
-  } catch (error) {
-    console.error("Error updating power section:", error);
-    throw error;
-  }
-}, 'updatePowerSection');
+      await db.execute(
+        "UPDATE power_sections SET title = $1, updated_at = $2 WHERE id = $3",
+        [title, now, sectionId]
+      );
+    } catch (error) {
+      console.error("Error updating power section:", error);
+      throw error;
+    }
+  }, "updatePowerSection");
 }
 
 export async function toggleSectionCollapse(
@@ -713,59 +719,59 @@ export async function toggleSectionCollapse(
   collapsed: boolean
 ): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const now = Date.now();
+    try {
+      const db = await getDB();
+      const now = Date.now();
 
-    await db.execute(
-      "UPDATE power_sections SET collapsed = $1, updated_at = $2 WHERE id = $3",
-      [collapsed ? 1 : 0, now, sectionId]
-    );
-  } catch (error) {
-    console.error("Error toggling section collapse:", error);
-    throw error;
-  }
-}, 'toggleSectionCollapse');
+      await db.execute(
+        "UPDATE power_sections SET collapsed = $1, updated_at = $2 WHERE id = $3",
+        [collapsed ? 1 : 0, now, sectionId]
+      );
+    } catch (error) {
+      console.error("Error toggling section collapse:", error);
+      throw error;
+    }
+  }, "toggleSectionCollapse");
 }
 
 export async function deletePowerSection(sectionId: string): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    // Delete all blocks in this section
-    await db.execute("DELETE FROM power_blocks WHERE section_id = $1", [
-      sectionId,
-    ]);
+      // Delete all blocks in this section
+      await db.execute("DELETE FROM power_blocks WHERE section_id = $1", [
+        sectionId,
+      ]);
 
-    // Delete the section
-    await db.execute("DELETE FROM power_sections WHERE id = $1", [sectionId]);
-  } catch (error) {
-    console.error("Error deleting power section:", error);
-    throw error;
-  }
-}, 'deletePowerSection');
+      // Delete the section
+      await db.execute("DELETE FROM power_sections WHERE id = $1", [sectionId]);
+    } catch (error) {
+      console.error("Error deleting power section:", error);
+      throw error;
+    }
+  }, "deletePowerSection");
 }
 
 export async function reorderPowerSections(
   sectionIds: string[]
 ): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    // Update each section's order_index based on its position in the array
-    for (let i = 0; i < sectionIds.length; i++) {
-      await db.execute(
-        "UPDATE power_sections SET order_index = $1 WHERE id = $2",
-        [i, sectionIds[i]]
-      );
+      // Update each section's order_index based on its position in the array
+      for (let i = 0; i < sectionIds.length; i++) {
+        await db.execute(
+          "UPDATE power_sections SET order_index = $1 WHERE id = $2",
+          [i, sectionIds[i]]
+        );
+      }
+    } catch (error) {
+      console.error("Error reordering power sections:", error);
+      throw error;
     }
-  } catch (error) {
-    console.error("Error reordering power sections:", error);
-    throw error;
-  }
-}, 'reorderPowerSections');
+  }, "reorderPowerSections");
 }
 
 // ============================================================================
@@ -776,18 +782,18 @@ export async function getPowerBlocksBySectionId(
   sectionId: string
 ): Promise<IPowerBlock[]> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const result = await db.select<DBPowerBlock[]>(
-      "SELECT * FROM power_blocks WHERE section_id = $1 ORDER BY order_index ASC",
-      [sectionId]
-    );
-    return result.map(dbPowerBlockToPowerBlock);
-  } catch (error) {
-    console.error("Error fetching power blocks:", error);
-    throw error;
-  }
-}, 'getPowerBlocksBySectionId');
+    try {
+      const db = await getDB();
+      const result = await db.select<DBPowerBlock[]>(
+        "SELECT * FROM power_blocks WHERE section_id = $1 ORDER BY order_index ASC",
+        [sectionId]
+      );
+      return result.map(dbPowerBlockToPowerBlock);
+    } catch (error) {
+      console.error("Error fetching power blocks:", error);
+      throw error;
+    }
+  }, "getPowerBlocksBySectionId");
 }
 
 export async function createPowerBlock(
@@ -797,23 +803,23 @@ export async function createPowerBlock(
   orderIndex: number
 ): Promise<string> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const id = crypto.randomUUID();
-    const now = Date.now();
+    try {
+      const db = await getDB();
+      const id = crypto.randomUUID();
+      const now = Date.now();
 
-    await db.execute(
-      `INSERT INTO power_blocks (id, section_id, type, order_index, content_json, created_at, updated_at)
+      await db.execute(
+        `INSERT INTO power_blocks (id, section_id, type, order_index, content_json, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [id, sectionId, type, orderIndex, JSON.stringify(content), now, now]
-    );
+        [id, sectionId, type, orderIndex, JSON.stringify(content), now, now]
+      );
 
-    return id;
-  } catch (error) {
-    console.error("Error creating power block:", error);
-    throw error;
-  }
-}, 'createPowerBlock');
+      return id;
+    } catch (error) {
+      console.error("Error creating power block:", error);
+      throw error;
+    }
+  }, "createPowerBlock");
 }
 
 export async function updatePowerBlock(
@@ -821,51 +827,51 @@ export async function updatePowerBlock(
   content: BlockContent
 ): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const now = Date.now();
+    try {
+      const db = await getDB();
+      const now = Date.now();
 
-    await db.execute(
-      "UPDATE power_blocks SET content_json = $1, updated_at = $2 WHERE id = $3",
-      [JSON.stringify(content), now, blockId]
-    );
-  } catch (error) {
-    console.error("Error updating power block:", error);
-    throw error;
-  }
-}, 'updatePowerBlock');
+      await db.execute(
+        "UPDATE power_blocks SET content_json = $1, updated_at = $2 WHERE id = $3",
+        [JSON.stringify(content), now, blockId]
+      );
+    } catch (error) {
+      console.error("Error updating power block:", error);
+      throw error;
+    }
+  }, "updatePowerBlock");
 }
 
 export async function deletePowerBlock(blockId: string): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    await db.execute("DELETE FROM power_blocks WHERE id = $1", [blockId]);
-  } catch (error) {
-    console.error("Error deleting power block:", error);
-    throw error;
-  }
-}, 'deletePowerBlock');
+      await db.execute("DELETE FROM power_blocks WHERE id = $1", [blockId]);
+    } catch (error) {
+      console.error("Error deleting power block:", error);
+      throw error;
+    }
+  }, "deletePowerBlock");
 }
 
 export async function reorderPowerBlocks(blockIds: string[]): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    // Update each block's order_index based on its position in the array
-    for (let i = 0; i < blockIds.length; i++) {
-      await db.execute(
-        "UPDATE power_blocks SET order_index = $1 WHERE id = $2",
-        [i, blockIds[i]]
-      );
+      // Update each block's order_index based on its position in the array
+      for (let i = 0; i < blockIds.length; i++) {
+        await db.execute(
+          "UPDATE power_blocks SET order_index = $1 WHERE id = $2",
+          [i, blockIds[i]]
+        );
+      }
+    } catch (error) {
+      console.error("Error reordering power blocks:", error);
+      throw error;
     }
-  } catch (error) {
-    console.error("Error reordering power blocks:", error);
-    throw error;
-  }
-}, 'reorderPowerBlocks');
+  }, "reorderPowerBlocks");
 }
 
 // ============================================================================
@@ -876,18 +882,18 @@ export async function getPowerLinksByCharacterId(
   characterId: string
 ): Promise<IPowerCharacterLink[]> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const result = await db.select<DBPowerCharacterLink[]>(
-      "SELECT * FROM power_character_links WHERE character_id = $1 ORDER BY created_at DESC",
-      [characterId]
-    );
-    return result.map(dbPowerCharacterLinkToPowerCharacterLink);
-  } catch (error) {
-    console.error("Error fetching power links by character:", error);
-    throw error;
-  }
-}, 'getPowerLinksByCharacterId');
+    try {
+      const db = await getDB();
+      const result = await db.select<DBPowerCharacterLink[]>(
+        "SELECT * FROM power_character_links WHERE character_id = $1 ORDER BY created_at DESC",
+        [characterId]
+      );
+      return result.map(dbPowerCharacterLinkToPowerCharacterLink);
+    } catch (error) {
+      console.error("Error fetching power links by character:", error);
+      throw error;
+    }
+  }, "getPowerLinksByCharacterId");
 }
 
 /**
@@ -955,36 +961,36 @@ export async function getPowerLinksByPageId(
   pageId: string
 ): Promise<IPowerCharacterLink[]> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const result = await db.select<DBPowerCharacterLink[]>(
-      "SELECT * FROM power_character_links WHERE page_id = $1 ORDER BY created_at DESC",
-      [pageId]
-    );
-    return result.map(dbPowerCharacterLinkToPowerCharacterLink);
-  } catch (error) {
-    console.error("Error fetching power links by page:", error);
-    throw error;
-  }
-}, 'getPowerLinksByPageId');
+    try {
+      const db = await getDB();
+      const result = await db.select<DBPowerCharacterLink[]>(
+        "SELECT * FROM power_character_links WHERE page_id = $1 ORDER BY created_at DESC",
+        [pageId]
+      );
+      return result.map(dbPowerCharacterLinkToPowerCharacterLink);
+    } catch (error) {
+      console.error("Error fetching power links by page:", error);
+      throw error;
+    }
+  }, "getPowerLinksByPageId");
 }
 
 export async function getPowerLinksBySectionId(
   sectionId: string
 ): Promise<IPowerCharacterLink[]> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const result = await db.select<DBPowerCharacterLink[]>(
-      "SELECT * FROM power_character_links WHERE section_id = $1 ORDER BY created_at DESC",
-      [sectionId]
-    );
-    return result.map(dbPowerCharacterLinkToPowerCharacterLink);
-  } catch (error) {
-    console.error("Error fetching power links by section:", error);
-    throw error;
-  }
-}, 'getPowerLinksBySectionId');
+    try {
+      const db = await getDB();
+      const result = await db.select<DBPowerCharacterLink[]>(
+        "SELECT * FROM power_character_links WHERE section_id = $1 ORDER BY created_at DESC",
+        [sectionId]
+      );
+      return result.map(dbPowerCharacterLinkToPowerCharacterLink);
+    } catch (error) {
+      console.error("Error fetching power links by section:", error);
+      throw error;
+    }
+  }, "getPowerLinksBySectionId");
 }
 
 export async function createPowerCharacterLink(
@@ -994,30 +1000,30 @@ export async function createPowerCharacterLink(
   customLabel?: string
 ): Promise<string> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const id = crypto.randomUUID();
-    const now = Date.now();
+    try {
+      const db = await getDB();
+      const id = crypto.randomUUID();
+      const now = Date.now();
 
-    await db.execute(
-      `INSERT INTO power_character_links (id, character_id, page_id, section_id, custom_label, created_at)
+      await db.execute(
+        `INSERT INTO power_character_links (id, character_id, page_id, section_id, custom_label, created_at)
        VALUES ($1, $2, $3, $4, $5, $6)`,
-      [
-        id,
-        characterId,
-        pageId || null,
-        sectionId || null,
-        customLabel || null,
-        now,
-      ]
-    );
+        [
+          id,
+          characterId,
+          pageId || null,
+          sectionId || null,
+          customLabel || null,
+          now,
+        ]
+      );
 
-    return id;
-  } catch (error) {
-    console.error("Error creating power character link:", error);
-    throw error;
-  }
-}, 'createPowerCharacterLink');
+      return id;
+    } catch (error) {
+      console.error("Error creating power character link:", error);
+      throw error;
+    }
+  }, "createPowerCharacterLink");
 }
 
 export async function updatePowerCharacterLinkLabel(
@@ -1025,53 +1031,53 @@ export async function updatePowerCharacterLinkLabel(
   customLabel: string
 ): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    await db.execute(
-      "UPDATE power_character_links SET custom_label = $1 WHERE id = $2",
-      [customLabel || null, linkId]
-    );
-  } catch (error) {
-    console.error("Error updating power character link label:", error);
-    throw error;
-  }
-}, 'updatePowerCharacterLinkLabel');
+      await db.execute(
+        "UPDATE power_character_links SET custom_label = $1 WHERE id = $2",
+        [customLabel || null, linkId]
+      );
+    } catch (error) {
+      console.error("Error updating power character link label:", error);
+      throw error;
+    }
+  }, "updatePowerCharacterLinkLabel");
 }
 
 export async function deletePowerCharacterLink(linkId: string): Promise<void> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    await db.execute("DELETE FROM power_character_links WHERE id = $1", [
-      linkId,
-    ]);
-  } catch (error) {
-    console.error("Error deleting power character link:", error);
-    throw error;
-  }
-}, 'deletePowerCharacterLink');
+      await db.execute("DELETE FROM power_character_links WHERE id = $1", [
+        linkId,
+      ]);
+    } catch (error) {
+      console.error("Error deleting power character link:", error);
+      throw error;
+    }
+  }, "deletePowerCharacterLink");
 }
 
 export async function getPowerLinkById(
   linkId: string
 ): Promise<IPowerCharacterLink | null> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
-    const result = await db.select<DBPowerCharacterLink[]>(
-      "SELECT * FROM power_character_links WHERE id = $1",
-      [linkId]
-    );
-    return result.length > 0
-      ? dbPowerCharacterLinkToPowerCharacterLink(result[0])
-      : null;
-  } catch (error) {
-    console.error("Error fetching power link by ID:", error);
-    throw error;
-  }
-}, 'getPowerLinkById');
+    try {
+      const db = await getDB();
+      const result = await db.select<DBPowerCharacterLink[]>(
+        "SELECT * FROM power_character_links WHERE id = $1",
+        [linkId]
+      );
+      return result.length > 0
+        ? dbPowerCharacterLinkToPowerCharacterLink(result[0])
+        : null;
+    } catch (error) {
+      console.error("Error fetching power link by ID:", error);
+      throw error;
+    }
+  }, "getPowerLinkById");
 }
 
 export async function checkPowerLinkExists(
@@ -1080,29 +1086,29 @@ export async function checkPowerLinkExists(
   sectionId?: string
 ): Promise<boolean> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    if (pageId) {
-      const result = await db.select<DBPowerCharacterLink[]>(
-        "SELECT * FROM power_character_links WHERE character_id = $1 AND page_id = $2",
-        [characterId, pageId]
-      );
-      return result.length > 0;
-    } else if (sectionId) {
-      const result = await db.select<DBPowerCharacterLink[]>(
-        "SELECT * FROM power_character_links WHERE character_id = $1 AND section_id = $2",
-        [characterId, sectionId]
-      );
-      return result.length > 0;
+      if (pageId) {
+        const result = await db.select<DBPowerCharacterLink[]>(
+          "SELECT * FROM power_character_links WHERE character_id = $1 AND page_id = $2",
+          [characterId, pageId]
+        );
+        return result.length > 0;
+      } else if (sectionId) {
+        const result = await db.select<DBPowerCharacterLink[]>(
+          "SELECT * FROM power_character_links WHERE character_id = $1 AND section_id = $2",
+          [characterId, sectionId]
+        );
+        return result.length > 0;
+      }
+
+      return false;
+    } catch (error) {
+      console.error("Error checking power link existence:", error);
+      throw error;
     }
-
-    return false;
-  } catch (error) {
-    console.error("Error checking power link existence:", error);
-    throw error;
-  }
-}, 'checkPowerLinkExists');
+  }, "checkPowerLinkExists");
 }
 
 /**
@@ -1117,47 +1123,47 @@ export async function getLinkedCharacterIdsInPageHierarchy(
   pageId: string
 ): Promise<string[]> {
   return safeDBOperation(async () => {
-  try {
-    const db = await getDB();
+    try {
+      const db = await getDB();
 
-    // Get character IDs linked directly to the page
-    const pageLinks = await db.select<DBPowerCharacterLink[]>(
-      "SELECT character_id FROM power_character_links WHERE page_id = $1",
-      [pageId]
-    );
-
-    // Get all sections of this page
-    const sections = await db.select<DBPowerSection[]>(
-      "SELECT id FROM power_sections WHERE page_id = $1",
-      [pageId]
-    );
-
-    const sectionIds = sections.map((s) => s.id);
-
-    // Get character IDs linked to any section of this page
-    let sectionLinks: DBPowerCharacterLink[] = [];
-    if (sectionIds.length > 0) {
-      const placeholders = sectionIds.map(() => "?").join(",");
-      sectionLinks = await db.select<DBPowerCharacterLink[]>(
-        `SELECT DISTINCT character_id FROM power_character_links WHERE section_id IN (${placeholders})`,
-        sectionIds
+      // Get character IDs linked directly to the page
+      const pageLinks = await db.select<DBPowerCharacterLink[]>(
+        "SELECT character_id FROM power_character_links WHERE page_id = $1",
+        [pageId]
       );
+
+      // Get all sections of this page
+      const sections = await db.select<DBPowerSection[]>(
+        "SELECT id FROM power_sections WHERE page_id = $1",
+        [pageId]
+      );
+
+      const sectionIds = sections.map((s) => s.id);
+
+      // Get character IDs linked to any section of this page
+      let sectionLinks: DBPowerCharacterLink[] = [];
+      if (sectionIds.length > 0) {
+        const placeholders = sectionIds.map(() => "?").join(",");
+        sectionLinks = await db.select<DBPowerCharacterLink[]>(
+          `SELECT DISTINCT character_id FROM power_character_links WHERE section_id IN (${placeholders})`,
+          sectionIds
+        );
+      }
+
+      // Combine and deduplicate character IDs
+      const allCharacterIds = new Set<string>();
+      pageLinks.forEach((link) => allCharacterIds.add(link.character_id));
+      sectionLinks.forEach((link) => allCharacterIds.add(link.character_id));
+
+      return Array.from(allCharacterIds);
+    } catch (error) {
+      console.error(
+        "Error getting linked character IDs in page hierarchy:",
+        error
+      );
+      throw error;
     }
-
-    // Combine and deduplicate character IDs
-    const allCharacterIds = new Set<string>();
-    pageLinks.forEach((link) => allCharacterIds.add(link.character_id));
-    sectionLinks.forEach((link) => allCharacterIds.add(link.character_id));
-
-    return Array.from(allCharacterIds);
-  } catch (error) {
-    console.error(
-      "Error getting linked character IDs in page hierarchy:",
-      error
-    );
-    throw error;
-  }
-}, 'getLinkedCharacterIdsInPageHierarchy');
+  }, "getLinkedCharacterIdsInPageHierarchy");
 }
 
 /**
@@ -1173,21 +1179,21 @@ export async function getLinkedCharacterIdsInSectionHierarchy(
   sectionId: string
 ): Promise<string[]> {
   return safeDBOperation(async () => {
-  try {
-    // Get the section to find its parent page
-    const section = await getPowerSectionById(sectionId);
-    if (!section) {
-      throw new Error(`Section with id ${sectionId} not found`);
-    }
+    try {
+      // Get the section to find its parent page
+      const section = await getPowerSectionById(sectionId);
+      if (!section) {
+        throw new Error(`Section with id ${sectionId} not found`);
+      }
 
-    // Use the page hierarchy function since we want all links in the page
-    return await getLinkedCharacterIdsInPageHierarchy(section.pageId);
-  } catch (error) {
-    console.error(
-      "Error getting linked character IDs in section hierarchy:",
-      error
-    );
-    throw error;
-  }
-}, 'getLinkedCharacterIdsInSectionHierarchy');
+      // Use the page hierarchy function since we want all links in the page
+      return await getLinkedCharacterIdsInPageHierarchy(section.pageId);
+    } catch (error) {
+      console.error(
+        "Error getting linked character IDs in section hierarchy:",
+        error
+      );
+      throw error;
+    }
+  }, "getLinkedCharacterIdsInSectionHierarchy");
 }

@@ -69,9 +69,14 @@ const createRegionFormSchema = (t: (key: string) => string) =>
       .min(1, t("forms:validation.scale_required"))
       .refine(
         (val) =>
-          ["local", "continental", "planetary", "galactic", "universal", "multiversal"].includes(
-            val
-          ),
+          [
+            "local",
+            "continental",
+            "planetary",
+            "galactic",
+            "universal",
+            "multiversal",
+          ].includes(val),
         { message: t("forms:validation.scale_invalid") }
       ),
     summary: z

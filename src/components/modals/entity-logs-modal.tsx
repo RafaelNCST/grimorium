@@ -27,8 +27,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
-import type { IEntityLog, EntityType, ImportanceLevel } from "@/types/entity-log-types";
 import {
   getEntityLogs,
   createEntityLog,
@@ -37,6 +35,13 @@ import {
   reorderEntityLogs,
   getNextOrderIndex,
 } from "@/lib/db/entity-logs.service";
+import { cn } from "@/lib/utils";
+import type {
+  IEntityLog,
+  EntityType,
+  ImportanceLevel,
+} from "@/types/entity-log-types";
+
 import { CreateEditLogModal } from "./create-edit-log-modal";
 
 interface EntityLogsModalProps {
@@ -76,7 +81,12 @@ interface SortableLogItemProps {
   activeId: string | null;
 }
 
-function SortableLogItem({ log, onEdit, onDelete, activeId }: SortableLogItemProps) {
+function SortableLogItem({
+  log,
+  onEdit,
+  onDelete,
+  activeId,
+}: SortableLogItemProps) {
   const { t } = useTranslation("entity-logs");
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useSortable({ id: log.id });
@@ -98,9 +108,10 @@ function SortableLogItem({ log, onEdit, onDelete, activeId }: SortableLogItemPro
   const ImportanceIcon = importanceConfig.icon;
 
   // Format moment display
-  const momentDisplay = log.momentType === "chapter"
-    ? `${t("fields.chapter")} ${log.chapterNumber}`
-    : `Pré-história: ${log.prehistoryPeriod}`;
+  const momentDisplay =
+    log.momentType === "chapter"
+      ? `${t("fields.chapter")} ${log.chapterNumber}`
+      : `Pré-história: ${log.prehistoryPeriod}`;
 
   return (
     <div
@@ -124,7 +135,9 @@ function SortableLogItem({ log, onEdit, onDelete, activeId }: SortableLogItemPro
         </div>
 
         {/* Description */}
-        <p className="text-sm text-foreground break-words pl-6">{log.description}</p>
+        <p className="text-sm text-foreground break-words pl-6">
+          {log.description}
+        </p>
       </div>
 
       {/* Actions */}
@@ -288,9 +301,7 @@ export function EntityLogsModal({
               <FileText className="h-5 w-5" />
               {t("modal.title")}
             </DialogTitle>
-            <DialogDescription>
-              {t("modal.description")}
-            </DialogDescription>
+            <DialogDescription>{t("modal.description")}</DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto pr-2 mb-0">

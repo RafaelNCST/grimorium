@@ -1,14 +1,11 @@
 import { IFaction } from "@/types/faction-types";
 
-import { DBFaction } from "./types";
-
-import { getDB } from "./index";
-import { safeDBOperation } from "./safe-db-operation";
 import {
   cleanCommonEntityReferences,
   removeFromJSONArray,
   removeFromNestedJSONArray,
 } from "./cleanup-helpers";
+import { safeDBOperation } from "./safe-db-operation";
 import {
   safeParseEntityRefs,
   safeParseStringArray,
@@ -20,6 +17,9 @@ import {
   locationArraySchema,
   unknownObjectSchema,
 } from "./safe-json-parse";
+import { DBFaction } from "./types";
+
+import { getDB } from "./index";
 
 // Convert IFaction to DBFaction
 function factionToDBFaction(bookId: string, faction: IFaction): DBFaction {
@@ -102,12 +102,17 @@ function factionToDBFaction(bookId: string, faction: IFaction): DBFaction {
       : undefined,
 
     // UI State
-    ui_state: faction.uiState ? (() => {
-      const stringified = JSON.stringify(faction.uiState);
-      console.log('[factionToDBFaction] faction.uiState:', faction.uiState);
-      console.log('[factionToDBFaction] stringified ui_state:', stringified);
-      return stringified;
-    })() : undefined,
+    ui_state: faction.uiState
+      ? (() => {
+          const stringified = JSON.stringify(faction.uiState);
+          console.log("[factionToDBFaction] faction.uiState:", faction.uiState);
+          console.log(
+            "[factionToDBFaction] stringified ui_state:",
+            stringified
+          );
+          return stringified;
+        })()
+      : undefined,
 
     // Metadata
     created_at: faction.createdAt
@@ -206,9 +211,12 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
     // UI State
     uiState: dbFaction.ui_state
       ? (() => {
-          console.log('[dbFactionToFaction] dbFaction.ui_state (RAW):', dbFaction.ui_state);
+          console.log(
+            "[dbFactionToFaction] dbFaction.ui_state (RAW):",
+            dbFaction.ui_state
+          );
           const parsed = safeParseUnknownObject(dbFaction.ui_state);
-          console.log('[dbFactionToFaction] parsed uiState:', parsed);
+          console.log("[dbFactionToFaction] parsed uiState:", parsed);
           return parsed;
         })()
       : undefined,
@@ -226,7 +234,7 @@ export async function getFactionsByBookId(bookId: string): Promise<IFaction[]> {
       [bookId]
     );
     return result.map(dbFactionToFaction);
-  }, 'getFactionsByBookId');
+  }, "getFactionsByBookId");
 }
 
 export async function getFactionById(id: string): Promise<IFaction | null> {
@@ -237,7 +245,7 @@ export async function getFactionById(id: string): Promise<IFaction | null> {
       [id]
     );
     return result.length > 0 ? dbFactionToFaction(result[0]) : null;
-  }, 'getFactionById');
+  }, "getFactionById");
 }
 
 export async function createFaction(
@@ -248,8 +256,8 @@ export async function createFaction(
     const db = await getDB();
     const dbFaction = factionToDBFaction(bookId, faction);
 
-  await db.execute(
-    `INSERT INTO factions (
+    await db.execute(
+      `INSERT INTO factions (
       id, book_id, name, summary, status, faction_type, image,
       alignment, influence, public_reputation,
       dominated_areas, main_base, areas_of_interest,
@@ -267,50 +275,50 @@ export async function createFaction(
       $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27,
       $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40
     )`,
-    [
-      dbFaction.id,
-      dbFaction.book_id,
-      dbFaction.name,
-      dbFaction.summary,
-      dbFaction.status,
-      dbFaction.faction_type,
-      dbFaction.image,
-      dbFaction.alignment,
-      dbFaction.influence,
-      dbFaction.public_reputation,
-      dbFaction.dominated_areas,
-      dbFaction.main_base,
-      dbFaction.areas_of_interest,
-      dbFaction.government_form,
-      dbFaction.rules_and_laws,
-      dbFaction.main_resources,
-      dbFaction.economy,
-      dbFaction.symbols_and_secrets,
-      dbFaction.currencies,
-      dbFaction.military_power,
-      dbFaction.political_power,
-      dbFaction.cultural_power,
-      dbFaction.economic_power,
-      dbFaction.faction_motto,
-      dbFaction.traditions_and_rituals,
-      dbFaction.beliefs_and_values,
-      dbFaction.languages_used,
-      dbFaction.uniform_and_aesthetics,
-      dbFaction.races,
-      dbFaction.foundation_date,
-      dbFaction.foundation_history_summary,
-      dbFaction.founders,
-      dbFaction.chronology,
-      dbFaction.organization_objectives,
-      dbFaction.narrative_importance,
-      dbFaction.inspirations,
-      dbFaction.timeline,
-      dbFaction.hierarchy,
-      dbFaction.ui_state,
-      dbFaction.created_at,
-    ]
-  );
-  }, 'createFaction');
+      [
+        dbFaction.id,
+        dbFaction.book_id,
+        dbFaction.name,
+        dbFaction.summary,
+        dbFaction.status,
+        dbFaction.faction_type,
+        dbFaction.image,
+        dbFaction.alignment,
+        dbFaction.influence,
+        dbFaction.public_reputation,
+        dbFaction.dominated_areas,
+        dbFaction.main_base,
+        dbFaction.areas_of_interest,
+        dbFaction.government_form,
+        dbFaction.rules_and_laws,
+        dbFaction.main_resources,
+        dbFaction.economy,
+        dbFaction.symbols_and_secrets,
+        dbFaction.currencies,
+        dbFaction.military_power,
+        dbFaction.political_power,
+        dbFaction.cultural_power,
+        dbFaction.economic_power,
+        dbFaction.faction_motto,
+        dbFaction.traditions_and_rituals,
+        dbFaction.beliefs_and_values,
+        dbFaction.languages_used,
+        dbFaction.uniform_and_aesthetics,
+        dbFaction.races,
+        dbFaction.foundation_date,
+        dbFaction.foundation_history_summary,
+        dbFaction.founders,
+        dbFaction.chronology,
+        dbFaction.organization_objectives,
+        dbFaction.narrative_importance,
+        dbFaction.inspirations,
+        dbFaction.timeline,
+        dbFaction.hierarchy,
+        dbFaction.ui_state,
+        dbFaction.created_at,
+      ]
+    );
+  }, "createFaction");
 }
 
 export async function updateFaction(
@@ -343,8 +351,8 @@ export async function updateFaction(
 
     const dbFaction = factionToDBFaction(current[0].book_id, fullFaction);
 
-  await db.execute(
-    `UPDATE factions SET
+    await db.execute(
+      `UPDATE factions SET
       name = $1, summary = $2, status = $3, faction_type = $4, image = $5,
       alignment = $6, influence = $7, public_reputation = $8,
       dominated_areas = $9, main_base = $10, areas_of_interest = $11,
@@ -357,48 +365,48 @@ export async function updateFaction(
       organization_objectives = $32, narrative_importance = $33, inspirations = $34,
       timeline = $35, hierarchy = $36, ui_state = $37
     WHERE id = $38`,
-    [
-      dbFaction.name,
-      dbFaction.summary,
-      dbFaction.status,
-      dbFaction.faction_type,
-      dbFaction.image,
-      dbFaction.alignment,
-      dbFaction.influence,
-      dbFaction.public_reputation,
-      dbFaction.dominated_areas,
-      dbFaction.main_base,
-      dbFaction.areas_of_interest,
-      dbFaction.government_form,
-      dbFaction.rules_and_laws,
-      dbFaction.main_resources,
-      dbFaction.economy,
-      dbFaction.symbols_and_secrets,
-      dbFaction.currencies,
-      dbFaction.military_power,
-      dbFaction.political_power,
-      dbFaction.cultural_power,
-      dbFaction.economic_power,
-      dbFaction.faction_motto,
-      dbFaction.traditions_and_rituals,
-      dbFaction.beliefs_and_values,
-      dbFaction.languages_used,
-      dbFaction.uniform_and_aesthetics,
-      dbFaction.races,
-      dbFaction.foundation_date,
-      dbFaction.foundation_history_summary,
-      dbFaction.founders,
-      dbFaction.chronology,
-      dbFaction.organization_objectives,
-      dbFaction.narrative_importance,
-      dbFaction.inspirations,
-      dbFaction.timeline,
-      dbFaction.hierarchy,
-      dbFaction.ui_state,
-      id,
-    ]
-  );
-  }, 'updateFaction');
+      [
+        dbFaction.name,
+        dbFaction.summary,
+        dbFaction.status,
+        dbFaction.faction_type,
+        dbFaction.image,
+        dbFaction.alignment,
+        dbFaction.influence,
+        dbFaction.public_reputation,
+        dbFaction.dominated_areas,
+        dbFaction.main_base,
+        dbFaction.areas_of_interest,
+        dbFaction.government_form,
+        dbFaction.rules_and_laws,
+        dbFaction.main_resources,
+        dbFaction.economy,
+        dbFaction.symbols_and_secrets,
+        dbFaction.currencies,
+        dbFaction.military_power,
+        dbFaction.political_power,
+        dbFaction.cultural_power,
+        dbFaction.economic_power,
+        dbFaction.faction_motto,
+        dbFaction.traditions_and_rituals,
+        dbFaction.beliefs_and_values,
+        dbFaction.languages_used,
+        dbFaction.uniform_and_aesthetics,
+        dbFaction.races,
+        dbFaction.foundation_date,
+        dbFaction.foundation_history_summary,
+        dbFaction.founders,
+        dbFaction.chronology,
+        dbFaction.organization_objectives,
+        dbFaction.narrative_importance,
+        dbFaction.inspirations,
+        dbFaction.timeline,
+        dbFaction.hierarchy,
+        dbFaction.ui_state,
+        id,
+      ]
+    );
+  }, "updateFaction");
 }
 
 export async function deleteFaction(id: string): Promise<void> {
@@ -429,6 +437,5 @@ export async function deleteFaction(id: string): Promise<void> {
 
     // 5. Finally, delete the faction (CASCADE will handle versions)
     await db.execute("DELETE FROM factions WHERE id = $1", [id]);
-  }, 'deleteFaction');
+  }, "deleteFaction");
 }
-

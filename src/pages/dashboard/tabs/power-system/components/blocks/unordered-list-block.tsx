@@ -25,6 +25,7 @@ import {
   type IPowerBlock,
   type UnorderedListContent,
 } from "../../types/power-system-types";
+
 import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 
 interface UnorderedListBlockProps {

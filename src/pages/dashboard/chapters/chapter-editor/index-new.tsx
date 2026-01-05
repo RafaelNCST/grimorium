@@ -16,8 +16,8 @@ import {
 } from "@/lib/db/plot.service";
 import { checkAndShowArcWarning } from "@/lib/helpers/chapter-arc-warning";
 import { useBookEditorSettingsStore } from "@/stores/book-editor-settings-store";
-import { useChaptersStore } from "@/stores/chapters-store";
 import { useChapterOrderWarningStore } from "@/stores/chapter-order-warning-store";
+import { useChaptersStore } from "@/stores/chapters-store";
 import type { IPlotArc } from "@/types/plot-types";
 
 import { AllAnnotationsSidebar } from "./components/AllAnnotationsSidebar";
@@ -114,7 +114,8 @@ function ChapterEditorContent() {
   const [showStatsDetailModal, setShowStatsDetailModal] = useState(false);
 
   // Entity Reference Panel state
-  const [showEntityReferencePanel, setShowEntityReferencePanel] = useState(false);
+  const [showEntityReferencePanel, setShowEntityReferencePanel] =
+    useState(false);
   const [entityRefListVisible, setEntityRefListVisible] = useState(true);
 
   // Session timer hook (GLOBAL - não reseta ao trocar de capítulo)
@@ -171,10 +172,10 @@ function ChapterEditorContent() {
         // IMPORTANTE: Se o capítulo está no cache mas sem conteúdo (apenas navegação),
         // busca do banco para obter o conteúdo completo
         // Verifica: content vazio OU (content string vazia E wordCount = 0)
-        const isNavigationDataOnly = loadedChapter && (
-          !loadedChapter.content ||
-          (loadedChapter.content === "" && loadedChapter.wordCount === 0)
-        );
+        const isNavigationDataOnly =
+          loadedChapter &&
+          (!loadedChapter.content ||
+            (loadedChapter.content === "" && loadedChapter.wordCount === 0));
 
         // Se não estiver no cache OU for apenas dados de navegação (sem conteúdo), busca do banco
         if (!loadedChapter || isNavigationDataOnly) {
@@ -255,7 +256,8 @@ function ChapterEditorContent() {
     setIsSaving(true);
 
     // Check if chapter number changed
-    const chapterNumberChanged = currentChapter.chapterNumber !== originalChapterNumberRef.current;
+    const chapterNumberChanged =
+      currentChapter.chapterNumber !== originalChapterNumberRef.current;
 
     // Calculate stats
     const trimmed = currentChapter.content.trim();
@@ -545,13 +547,17 @@ function ChapterEditorContent() {
   const handleUpdateAnnotations = (updatedAnnotations: Annotation[]) => {
     // DEFENSIVE: Log annotation updates to track potential bugs
     if (updatedAnnotations.length === 0 && chapter.annotations.length > 0) {
-      console.warn('[ChapterEditor] WARNING: Trying to replace', chapter.annotations.length, 'annotations with empty array!');
+      console.warn(
+        "[ChapterEditor] WARNING: Trying to replace",
+        chapter.annotations.length,
+        "annotations with empty array!"
+      );
       console.trace(); // Log stack trace to see where this is being called from
     }
 
-    console.log('[ChapterEditor] Updating annotations:', {
+    console.log("[ChapterEditor] Updating annotations:", {
       before: chapter.annotations.length,
-      after: updatedAnnotations.length
+      after: updatedAnnotations.length,
     });
 
     setChapter((prev) => ({
@@ -684,13 +690,14 @@ function ChapterEditorContent() {
   };
 
   // Change annotation color
-  const handleColorChange = (annotationId: string, color: import("./types").AnnotationColor) => {
+  const handleColorChange = (
+    annotationId: string,
+    color: import("./types").AnnotationColor
+  ) => {
     setChapter((prev) => ({
       ...prev,
       annotations: prev.annotations.map((ann) =>
-        ann.id === annotationId
-          ? { ...ann, color }
-          : ann
+        ann.id === annotationId ? { ...ann, color } : ann
       ),
     }));
   };
@@ -742,7 +749,11 @@ function ChapterEditorContent() {
   // Keyboard shortcut for entity reference panel (Ctrl+Shift+E)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "e") {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        e.shiftKey &&
+        e.key.toLowerCase() === "e"
+      ) {
         e.preventDefault();
         handleShowEntityReference();
       }
@@ -792,10 +803,12 @@ function ChapterEditorContent() {
         className="flex-1 transition-all duration-300 flex flex-col overflow-hidden"
         style={{
           marginRight: showEntityReferencePanel
-            ? (entityRefListVisible ? "1000px" : "600px")
+            ? entityRefListVisible
+              ? "1000px"
+              : "600px"
             : hasSidebarOpen
               ? "384px"
-              : "0"
+              : "0",
         }}
       >
         {/* Header */}

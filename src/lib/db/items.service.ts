@@ -1,16 +1,16 @@
-import { DBItem } from "./types";
-
-import { getDB } from "./index";
-import { safeDBOperation } from "./safe-db-operation";
 import {
   cleanCommonEntityReferences,
   removeFromJSONArray,
   removeFromNestedJSONArray,
 } from "./cleanup-helpers";
+import { safeDBOperation } from "./safe-db-operation";
 import {
   safeParseStringArray,
   safeParseUnknownObject,
 } from "./safe-json-parse";
+import { DBItem } from "./types";
+
+import { getDB } from "./index";
 
 export interface IItem {
   id: string;
@@ -104,7 +104,7 @@ export async function getItemsByBookId(bookId: string): Promise<IItem[]> {
       [bookId]
     );
     return result.map(dbItemToItem);
-  }, 'getItemsByBookId');
+  }, "getItemsByBookId");
 }
 
 export async function getItemById(id: string): Promise<IItem | null> {
@@ -115,7 +115,7 @@ export async function getItemById(id: string): Promise<IItem | null> {
       [id]
     );
     return result.length > 0 ? dbItemToItem(result[0]) : null;
-  }, 'getItemById');
+  }, "getItemById");
 }
 
 export async function createItem(bookId: string, item: IItem): Promise<void> {
@@ -154,7 +154,7 @@ export async function createItem(bookId: string, item: IItem): Promise<void> {
         dbItem.updated_at,
       ]
     );
-  }, 'createItem');
+  }, "createItem");
 }
 
 export async function updateItem(
@@ -216,7 +216,7 @@ export async function updateItem(
         id,
       ]
     );
-  }, 'updateItem');
+  }, "updateItem");
 }
 
 export async function deleteItem(id: string): Promise<void> {
@@ -243,6 +243,5 @@ export async function deleteItem(id: string): Promise<void> {
 
     // 5. Finally, delete the item (CASCADE will handle versions)
     await db.execute("DELETE FROM items WHERE id = $1", [id]);
-  }, 'deleteItem');
+  }, "deleteItem");
 }
-

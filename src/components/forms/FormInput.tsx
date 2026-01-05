@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import { AlertCircle } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -79,7 +80,10 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
           {...props}
         />
         {hasError && (
-          <p className="text-sm text-destructive flex items-center gap-1" role="alert">
+          <p
+            className="text-sm text-destructive flex items-center gap-1"
+            role="alert"
+          >
             <AlertCircle className="h-4 w-4" />
             {error}
           </p>

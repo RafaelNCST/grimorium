@@ -36,8 +36,10 @@ import { PowerSlider } from "@/components/modals/create-faction-modal/components
 import { FACTION_INFLUENCE_OPTIONS } from "@/components/modals/create-faction-modal/constants/faction-influence";
 import { FACTION_REPUTATION_OPTIONS } from "@/components/modals/create-faction-modal/constants/faction-reputation";
 import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-status";
-import { FACTION_TYPE_OPTIONS } from "@/components/modals/create-faction-modal/constants/faction-types";
-import { FACTION_TYPES_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-types";
+import {
+  FACTION_TYPE_OPTIONS,
+  FACTION_TYPES_CONSTANT,
+} from "@/components/modals/create-faction-modal/constants/faction-types";
 import { DeleteEntityModal } from "@/components/modals/delete-entity-modal";
 import { Button } from "@/components/ui/button";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
@@ -46,10 +48,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  type IFactionFormData,
-  type IFaction,
-} from "@/types/faction-types";
+import { type IFactionFormData, type IFaction } from "@/types/faction-types";
 
 import { AddMemberModal } from "./components/add-member-modal";
 import { AlignmentMatrix } from "./components/alignment-matrix";
@@ -187,7 +186,9 @@ export function FactionDetailView({
   const translatedTypeOptions = FACTION_TYPE_OPTIONS.map((opt) => ({
     ...opt,
     label: t(`create-faction:${opt.label}`),
-    description: opt.description ? t(`create-faction:${opt.description}`) : undefined,
+    description: opt.description
+      ? t(`create-faction:${opt.description}`)
+      : undefined,
   }));
 
   // Handlers for hierarchy modals
@@ -258,7 +259,10 @@ export function FactionDetailView({
 
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="name" className={`text-sm font-medium ${errors.name ? "text-destructive" : "text-primary"}`}>
+            <Label
+              htmlFor="name"
+              className={`text-sm font-medium ${errors.name ? "text-destructive" : "text-primary"}`}
+            >
               {t("faction-detail:fields.name")}
               <span className="text-destructive ml-1">*</span>
             </Label>
@@ -405,7 +409,7 @@ export function FactionDetailView({
   const advancedFields = (
     <>
       {/* Internal Structure Section */}
-      {(
+      {
         <div className="space-y-4">
           <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
             {t("faction-detail:sections.internal_structure")}
@@ -435,7 +439,9 @@ export function FactionDetailView({
             </div>
           ) : (
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.government_form")}</Label>
+              <Label className="text-sm font-medium text-primary">
+                {t("faction-detail:fields.government_form")}
+              </Label>
               <DisplayTextarea value={faction.governmentForm} />
             </div>
           )}
@@ -446,9 +452,7 @@ export function FactionDetailView({
               value={editData.rulesAndLaws || []}
               onChange={(value) => onEditDataChange("rulesAndLaws", value)}
               label={t("faction-detail:fields.rules_and_laws")}
-              placeholder={t(
-                "create-faction:modal.rules_and_laws_placeholder"
-              )}
+              placeholder={t("create-faction:modal.rules_and_laws_placeholder")}
               buttonText={t("create-faction:modal.add_rule")}
               maxLength={200}
               inputSize="large"
@@ -467,9 +471,7 @@ export function FactionDetailView({
               value={editData.mainResources || []}
               onChange={(value) => onEditDataChange("mainResources", value)}
               label={t("faction-detail:fields.main_resources")}
-              placeholder={t(
-                "create-faction:modal.main_resources_placeholder"
-              )}
+              placeholder={t("create-faction:modal.main_resources_placeholder")}
               buttonText={t("create-faction:modal.add_resource")}
               maxLength={50}
               inputSize="small"
@@ -502,7 +504,9 @@ export function FactionDetailView({
             </div>
           ) : (
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.economy")}</Label>
+              <Label className="text-sm font-medium text-primary">
+                {t("faction-detail:fields.economy")}
+              </Label>
               <DisplayTextarea value={faction.economy} />
             </div>
           )}
@@ -531,7 +535,9 @@ export function FactionDetailView({
             </div>
           ) : (
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.symbols_and_secrets")}</Label>
+              <Label className="text-sm font-medium text-primary">
+                {t("faction-detail:fields.symbols_and_secrets")}
+              </Label>
               <DisplayTextarea value={faction.symbolsAndSecrets} />
             </div>
           )}
@@ -555,12 +561,12 @@ export function FactionDetailView({
             />
           )}
         </div>
-      )}
+      }
 
       <Separator className="my-6" />
 
       {/* Territory Section */}
-      {(
+      {
         <div className="space-y-4">
           <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
             {t("faction-detail:sections.territory")}
@@ -588,13 +594,21 @@ export function FactionDetailView({
             <DisplayEntityList
               label={t("faction-detail:fields.dominated_areas")}
               entities={(() => {
-                const regionIds = Array.isArray(faction.dominatedAreas) ? faction.dominatedAreas : [];
-                return regionIds.map((regionId: string) => {
-                  const region = mockRegions.find((r) => r.id === regionId);
-                  return region
-                    ? { id: region.id, name: region.name, image: region.image }
-                    : null;
-                }).filter(Boolean) as DisplayEntityItem[];
+                const regionIds = Array.isArray(faction.dominatedAreas)
+                  ? faction.dominatedAreas
+                  : [];
+                return regionIds
+                  .map((regionId: string) => {
+                    const region = mockRegions.find((r) => r.id === regionId);
+                    return region
+                      ? {
+                          id: region.id,
+                          name: region.name,
+                          image: region.image,
+                        }
+                      : null;
+                  })
+                  .filter(Boolean) as DisplayEntityItem[];
               })()}
             />
           )}
@@ -607,9 +621,7 @@ export function FactionDetailView({
               label={t("faction-detail:fields.main_base")}
               placeholder={t("create-faction:modal.main_base_placeholder")}
               emptyText={t("create-faction:modal.no_regions_warning")}
-              noSelectionText={t(
-                "create-faction:modal.no_main_base_selected"
-              )}
+              noSelectionText={t("create-faction:modal.no_main_base_selected")}
               searchPlaceholder={t("create-faction:modal.search_regions")}
               value={editData.mainBase || []}
               onChange={(value) => onEditDataChange("mainBase", value)}
@@ -620,13 +632,21 @@ export function FactionDetailView({
             <DisplayEntityList
               label={t("faction-detail:fields.main_base")}
               entities={(() => {
-                const regionIds = Array.isArray(faction.mainBase) ? faction.mainBase : [];
-                return regionIds.map((regionId: string) => {
-                  const region = mockRegions.find((r) => r.id === regionId);
-                  return region
-                    ? { id: region.id, name: region.name, image: region.image }
-                    : null;
-                }).filter(Boolean) as DisplayEntityItem[];
+                const regionIds = Array.isArray(faction.mainBase)
+                  ? faction.mainBase
+                  : [];
+                return regionIds
+                  .map((regionId: string) => {
+                    const region = mockRegions.find((r) => r.id === regionId);
+                    return region
+                      ? {
+                          id: region.id,
+                          name: region.name,
+                          image: region.image,
+                        }
+                      : null;
+                  })
+                  .filter(Boolean) as DisplayEntityItem[];
               })()}
             />
           )}
@@ -653,23 +673,31 @@ export function FactionDetailView({
             <DisplayEntityList
               label={t("faction-detail:fields.areas_of_interest")}
               entities={(() => {
-                const regionIds = Array.isArray(faction.areasOfInterest) ? faction.areasOfInterest : [];
-                return regionIds.map((regionId: string) => {
-                  const region = mockRegions.find((r) => r.id === regionId);
-                  return region
-                    ? { id: region.id, name: region.name, image: region.image }
-                    : null;
-                }).filter(Boolean) as DisplayEntityItem[];
+                const regionIds = Array.isArray(faction.areasOfInterest)
+                  ? faction.areasOfInterest
+                  : [];
+                return regionIds
+                  .map((regionId: string) => {
+                    const region = mockRegions.find((r) => r.id === regionId);
+                    return region
+                      ? {
+                          id: region.id,
+                          name: region.name,
+                          image: region.image,
+                        }
+                      : null;
+                  })
+                  .filter(Boolean) as DisplayEntityItem[];
               })()}
             />
           )}
         </div>
-      )}
+      }
 
       <Separator className="my-6" />
 
       {/* Culture Section */}
-      {(
+      {
         <div className="space-y-4">
           <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
             {t("faction-detail:sections.culture")}
@@ -699,14 +727,18 @@ export function FactionDetailView({
             </div>
           ) : faction.factionMotto ? (
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.faction_motto")}</Label>
+              <Label className="text-sm font-medium text-primary">
+                {t("faction-detail:fields.faction_motto")}
+              </Label>
               <p className="text-sm italic whitespace-pre-wrap">
                 &quot;{faction.factionMotto}&quot;
               </p>
             </div>
           ) : (
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.faction_motto")}</Label>
+              <Label className="text-sm font-medium text-primary">
+                {t("faction-detail:fields.faction_motto")}
+              </Label>
               <p className="text-sm italic text-muted-foreground/60">
                 {t("common:no_data")}
               </p>
@@ -740,9 +772,7 @@ export function FactionDetailView({
           {isEditing ? (
             <FormListInput
               value={editData.beliefsAndValues || []}
-              onChange={(value) =>
-                onEditDataChange("beliefsAndValues", value)
-              }
+              onChange={(value) => onEditDataChange("beliefsAndValues", value)}
               label={t("faction-detail:fields.beliefs_and_values")}
               placeholder={t(
                 "create-faction:modal.beliefs_and_values_placeholder"
@@ -765,9 +795,7 @@ export function FactionDetailView({
               value={editData.languagesUsed || []}
               onChange={(value) => onEditDataChange("languagesUsed", value)}
               label={t("faction-detail:fields.languages_used")}
-              placeholder={t(
-                "create-faction:modal.languages_used_placeholder"
-              )}
+              placeholder={t("create-faction:modal.languages_used_placeholder")}
               buttonText={t("create-faction:modal.add_language")}
               maxLength={50}
               inputSize="small"
@@ -804,7 +832,9 @@ export function FactionDetailView({
             </div>
           ) : (
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.uniform_and_aesthetics")}</Label>
+              <Label className="text-sm font-medium text-primary">
+                {t("faction-detail:fields.uniform_and_aesthetics")}
+              </Label>
               <DisplayTextarea value={faction.uniformAndAesthetics} />
             </div>
           )}
@@ -827,7 +857,9 @@ export function FactionDetailView({
             <DisplayEntityList
               label={t("faction-detail:fields.races")}
               entities={(() => {
-                const raceIds = Array.isArray(faction.races) ? faction.races : [];
+                const raceIds = Array.isArray(faction.races)
+                  ? faction.races
+                  : [];
                 return raceIds.map((raceId: string) => {
                   const race = mockRaces.find((r) => r.id === raceId);
                   return race
@@ -838,12 +870,12 @@ export function FactionDetailView({
             />
           )}
         </div>
-      )}
+      }
 
       <Separator className="my-6" />
 
       {/* History Section */}
-      {(
+      {
         <div className="space-y-4">
           <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
             {t("faction-detail:sections.history")}
@@ -871,7 +903,9 @@ export function FactionDetailView({
             </div>
           ) : (
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.foundation_date")}</Label>
+              <Label className="text-sm font-medium text-primary">
+                {t("faction-detail:fields.foundation_date")}
+              </Label>
               <DisplayText value={faction.foundationDate} />
             </div>
           )}
@@ -902,7 +936,9 @@ export function FactionDetailView({
             </div>
           ) : (
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.foundation_history_summary")}</Label>
+              <Label className="text-sm font-medium text-primary">
+                {t("faction-detail:fields.foundation_history_summary")}
+              </Label>
               <DisplayTextarea value={faction.foundationHistorySummary} />
             </div>
           )}
@@ -925,7 +961,9 @@ export function FactionDetailView({
             <DisplayEntityList
               label={t("faction-detail:fields.founders")}
               entities={(() => {
-                const founderIds = Array.isArray(faction.founders) ? faction.founders : [];
+                const founderIds = Array.isArray(faction.founders)
+                  ? faction.founders
+                  : [];
                 return founderIds.map((founderId: string) => {
                   const character = mockCharacters.find(
                     (c) => c.id === founderId
@@ -954,12 +992,12 @@ export function FactionDetailView({
             />
           </div>
         </div>
-      )}
+      }
 
       <Separator className="my-6" />
 
       {/* Relationships Section */}
-      {(
+      {
         <div className="space-y-4">
           <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
             {t("faction-detail:sections.relationships")}
@@ -1049,12 +1087,12 @@ export function FactionDetailView({
             </div>
           )}
         </div>
-      )}
+      }
 
       <Separator className="my-6" />
 
       {/* Narrative Section */}
-      {(
+      {
         <div className="space-y-4">
           <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
             {t("faction-detail:sections.narrative")}
@@ -1079,14 +1117,14 @@ export function FactionDetailView({
                 className="resize-none"
               />
               <div className="flex justify-end text-xs text-muted-foreground">
-                <span>
-                  {editData.organizationObjectives?.length || 0}/500
-                </span>
+                <span>{editData.organizationObjectives?.length || 0}/500</span>
               </div>
             </div>
           ) : (
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.organization_objectives")}</Label>
+              <Label className="text-sm font-medium text-primary">
+                {t("faction-detail:fields.organization_objectives")}
+              </Label>
               <DisplayTextarea value={faction.organizationObjectives} />
             </div>
           )}
@@ -1115,7 +1153,9 @@ export function FactionDetailView({
             </div>
           ) : (
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.narrative_importance")}</Label>
+              <Label className="text-sm font-medium text-primary">
+                {t("faction-detail:fields.narrative_importance")}
+              </Label>
               <DisplayTextarea value={faction.narrativeImportance} />
             </div>
           )}
@@ -1131,9 +1171,7 @@ export function FactionDetailView({
                 onChange={(e) =>
                   onEditDataChange("inspirations", e.target.value)
                 }
-                placeholder={t(
-                  "create-faction:modal.inspirations_placeholder"
-                )}
+                placeholder={t("create-faction:modal.inspirations_placeholder")}
                 rows={4}
                 maxLength={500}
                 className="resize-none"
@@ -1144,7 +1182,9 @@ export function FactionDetailView({
             </div>
           ) : (
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.inspirations")}</Label>
+              <Label className="text-sm font-medium text-primary">
+                {t("faction-detail:fields.inspirations")}
+              </Label>
               <DisplayTextarea value={faction.inspirations} />
             </div>
           )}
@@ -1208,7 +1248,7 @@ export function FactionDetailView({
             )}
           </div>
         </div>
-      )}
+      }
     </>
   );
 
@@ -1342,7 +1382,10 @@ export function FactionDetailView({
     defaultOpen: false,
     isVisible: sectionVisibility["chapter-metrics"] !== false,
     onVisibilityToggle: () =>
-      onSectionVisibilityChange("chapter-metrics", !sectionVisibility["chapter-metrics"]),
+      onSectionVisibilityChange(
+        "chapter-metrics",
+        !sectionVisibility["chapter-metrics"]
+      ),
     // Empty state (only for view mode - edit mode shows InfoAlert inside component)
     emptyState: !isEditing && hasChapterMetrics === false ? "empty-view" : null,
     emptyIcon: BookOpen,

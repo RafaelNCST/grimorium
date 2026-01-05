@@ -45,22 +45,19 @@ export async function generateThumbnail(
       ctx.drawImage(img, 0, 0, width, height);
 
       // Convert to PNG (lossless format - no quality loss)
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) {
-            reject(new Error("Failed to create blob"));
-            return;
-          }
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error("Failed to create blob"));
+          return;
+        }
 
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            resolve(reader.result as string);
-          };
-          reader.onerror = () => reject(new Error("Failed to read blob"));
-          reader.readAsDataURL(blob);
-        },
-        "image/png"
-      );
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          resolve(reader.result as string);
+        };
+        reader.onerror = () => reject(new Error("Failed to read blob"));
+        reader.readAsDataURL(blob);
+      }, "image/png");
     };
 
     img.onerror = () => reject(new Error("Failed to load image"));
@@ -198,7 +195,7 @@ export function bytesToDataURL(bytes: Uint8Array, mimeType: string): string {
  */
 export function dataURLToBytes(base64DataUrl: string): Uint8Array {
   // Remove o prefixo "data:image/jpeg;base64," para obter apenas o base64
-  const base64 = base64DataUrl.split(',')[1];
+  const base64 = base64DataUrl.split(",")[1];
 
   // Decodifica base64 para string binária
   const binaryString = atob(base64);
@@ -225,11 +222,8 @@ export async function saveThumbnailToFile(
   const { writeFile, BaseDirectory, mkdir, exists } = await import(
     "@tauri-apps/plugin-fs"
   );
-  const {
-    THUMBNAILS_DIRECTORY,
-    THUMBNAIL_FILE_PREFIX,
-    THUMBNAIL_FORMAT,
-  } = await import("../constants/gallery-constants");
+  const { THUMBNAILS_DIRECTORY, THUMBNAIL_FILE_PREFIX, THUMBNAIL_FORMAT } =
+    await import("../constants/gallery-constants");
 
   // Garantir que o diretório existe
   const dirExists = await exists(THUMBNAILS_DIRECTORY, {
@@ -267,7 +261,9 @@ export async function loadThumbnailAsDataURL(
   const { readFile, BaseDirectory } = await import("@tauri-apps/plugin-fs");
 
   // Ler arquivo do filesystem
-  const bytes = await readFile(thumbnailPath, { baseDir: BaseDirectory.AppData });
+  const bytes = await readFile(thumbnailPath, {
+    baseDir: BaseDirectory.AppData,
+  });
 
   // Converter para data URL (sempre PNG para thumbnails)
   return bytesToDataURL(bytes, "image/png");

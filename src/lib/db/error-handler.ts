@@ -9,10 +9,10 @@
  */
 
 export enum SQLiteErrorType {
-  DISK_FULL = 'SQLITE_FULL',
-  DATABASE_CORRUPT = 'SQLITE_CORRUPT',
-  DATABASE_LOCKED = 'SQLITE_BUSY',
-  GENERIC = 'GENERIC_ERROR'
+  DISK_FULL = "SQLITE_FULL",
+  DATABASE_CORRUPT = "SQLITE_CORRUPT",
+  DATABASE_LOCKED = "SQLITE_BUSY",
+  GENERIC = "GENERIC_ERROR",
 }
 
 export class DatabaseError extends Error {
@@ -22,7 +22,7 @@ export class DatabaseError extends Error {
     message: string
   ) {
     super(message);
-    this.name = 'DatabaseError';
+    this.name = "DatabaseError";
   }
 }
 
@@ -38,44 +38,44 @@ export function parseDatabaseError(error: unknown): DatabaseError {
 
   // Detectar corrupção do banco
   if (
-    errorMsgLower.includes('database disk image is malformed') ||
-    errorMsgLower.includes('sqlite_corrupt') ||
-    errorMsgLower.includes('database corruption') ||
-    errorMsgLower.includes('file is not a database') ||
-    errorMsgLower.includes('database or disk is full')
+    errorMsgLower.includes("database disk image is malformed") ||
+    errorMsgLower.includes("sqlite_corrupt") ||
+    errorMsgLower.includes("database corruption") ||
+    errorMsgLower.includes("file is not a database") ||
+    errorMsgLower.includes("database or disk is full")
   ) {
     return new DatabaseError(
       SQLiteErrorType.DATABASE_CORRUPT,
       error,
-      'O banco de dados está corrompido'
+      "O banco de dados está corrompido"
     );
   }
 
   // Detectar disco cheio
   if (
-    errorMsgLower.includes('disk i/o error') ||
-    errorMsgLower.includes('sqlite_full') ||
-    errorMsgLower.includes('database or disk is full') ||
-    errorMsgLower.includes('no space left on device') ||
-    errorMsgLower.includes('disk full')
+    errorMsgLower.includes("disk i/o error") ||
+    errorMsgLower.includes("sqlite_full") ||
+    errorMsgLower.includes("database or disk is full") ||
+    errorMsgLower.includes("no space left on device") ||
+    errorMsgLower.includes("disk full")
   ) {
     return new DatabaseError(
       SQLiteErrorType.DISK_FULL,
       error,
-      'Sem espaço em disco'
+      "Sem espaço em disco"
     );
   }
 
   // Detectar banco bloqueado
   if (
-    errorMsgLower.includes('sqlite_busy') ||
-    errorMsgLower.includes('database is locked') ||
-    errorMsgLower.includes('database locked')
+    errorMsgLower.includes("sqlite_busy") ||
+    errorMsgLower.includes("database is locked") ||
+    errorMsgLower.includes("database locked")
   ) {
     return new DatabaseError(
       SQLiteErrorType.DATABASE_LOCKED,
       error,
-      'Banco de dados bloqueado'
+      "Banco de dados bloqueado"
     );
   }
 
@@ -83,6 +83,6 @@ export function parseDatabaseError(error: unknown): DatabaseError {
   return new DatabaseError(
     SQLiteErrorType.GENERIC,
     error,
-    errorMsg || 'Erro desconhecido no banco de dados'
+    errorMsg || "Erro desconhecido no banco de dados"
   );
 }

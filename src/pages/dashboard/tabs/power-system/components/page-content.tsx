@@ -135,7 +135,9 @@ export function PageContent({
 }: PageContentProps) {
   const { t } = useTranslation("power-system");
 
-  const sortedSections = [...sections].sort((a, b) => a.orderIndex - b.orderIndex);
+  const sortedSections = [...sections].sort(
+    (a, b) => a.orderIndex - b.orderIndex
+  );
 
   const getBlocksForSection = (sectionId: string) =>
     blocks.filter((block) => block.sectionId === sectionId);

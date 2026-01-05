@@ -1,6 +1,6 @@
-import { TFunction } from 'i18next';
-import { AlertCircle } from 'lucide-react';
-import { SQLiteErrorType } from '@/lib/db/error-handler';
+import { TFunction } from "i18next";
+import { AlertCircle } from "lucide-react";
+
 import {
   AlertDialog,
   AlertDialogContent,
@@ -8,8 +8,9 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { SQLiteErrorType } from "@/lib/db/error-handler";
 
 interface DatabaseErrorModalViewProps {
   isOpen: boolean;
@@ -28,42 +29,39 @@ interface ErrorConfig {
 /**
  * Obtém a configuração de exibição baseada no tipo de erro
  */
-function getErrorConfig(
-  errorType: SQLiteErrorType,
-  t: TFunction
-): ErrorConfig {
+function getErrorConfig(errorType: SQLiteErrorType, t: TFunction): ErrorConfig {
   switch (errorType) {
     case SQLiteErrorType.DISK_FULL:
       return {
-        title: t('database.disk_full.title'),
-        description: t('database.disk_full.message'),
-        additionalInfo: t('database.disk_full.additionalInfo'),
-        actionLabel: t('database.disk_full.action'),
+        title: t("database.disk_full.title"),
+        description: t("database.disk_full.message"),
+        additionalInfo: t("database.disk_full.additionalInfo"),
+        actionLabel: t("database.disk_full.action"),
       };
 
     case SQLiteErrorType.DATABASE_CORRUPT:
       return {
-        title: t('database.corrupt.title'),
-        description: t('database.corrupt.message'),
-        additionalInfo: t('database.corrupt.additionalInfo'),
-        actionLabel: t('database.corrupt.action'),
+        title: t("database.corrupt.title"),
+        description: t("database.corrupt.message"),
+        additionalInfo: t("database.corrupt.additionalInfo"),
+        actionLabel: t("database.corrupt.action"),
       };
 
     case SQLiteErrorType.DATABASE_LOCKED:
       return {
-        title: t('database.locked.title'),
-        description: t('database.locked.message'),
-        additionalInfo: t('database.locked.additionalInfo'),
-        actionLabel: t('database.locked.action'),
+        title: t("database.locked.title"),
+        description: t("database.locked.message"),
+        additionalInfo: t("database.locked.additionalInfo"),
+        actionLabel: t("database.locked.action"),
       };
 
     case SQLiteErrorType.GENERIC:
     default:
       return {
-        title: t('database.generic.title'),
-        description: t('database.generic.message'),
-        additionalInfo: t('database.generic.additionalInfo'),
-        actionLabel: t('database.generic.action'),
+        title: t("database.generic.title"),
+        description: t("database.generic.message"),
+        additionalInfo: t("database.generic.additionalInfo"),
+        actionLabel: t("database.generic.action"),
       };
   }
 }
@@ -96,7 +94,11 @@ export function DatabaseErrorModalView({
           )}
         </AlertDialogHeader>
         <AlertDialogFooter className="mt-2">
-          <Button variant="destructive" onClick={onClose} className="w-full sm:w-auto">
+          <Button
+            variant="destructive"
+            onClick={onClose}
+            className="w-full sm:w-auto"
+          >
             {config.actionLabel}
           </Button>
         </AlertDialogFooter>

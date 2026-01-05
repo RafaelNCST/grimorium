@@ -4,11 +4,7 @@ import { useParams, useSearch, useNavigate } from "@tanstack/react-router";
 
 import { getThumbnailPath } from "@/lib/db/gallery.service";
 import { useGalleryStore } from "@/stores/gallery-store";
-import {
-  IGalleryItem,
-  IGalleryLink,
-  EntityType,
-} from "@/types/gallery-types";
+import { IGalleryItem, IGalleryLink, EntityType } from "@/types/gallery-types";
 
 import { EntityGalleryView } from "./view";
 

@@ -259,7 +259,9 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
       set((state) => ({
         items: state.items.filter((item) => !itemIds.includes(item.id)),
         totalCount: Math.max(0, state.totalCount - itemIds.length),
-        hasMore: state.items.length - itemIds.length < state.totalCount - itemIds.length,
+        hasMore:
+          state.items.length - itemIds.length <
+          state.totalCount - itemIds.length,
       }));
     } catch (error) {
       console.error("Error deleting gallery items:", error);

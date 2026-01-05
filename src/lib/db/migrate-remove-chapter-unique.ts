@@ -5,8 +5,9 @@
  * duplicate chapter numbers within the same book.
  */
 
-import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
+
+import { getDB } from "./index";
 
 /**
  * Check if the migration is needed
@@ -26,8 +27,8 @@ export async function needsChapterUniqueConstraintRemoval(): Promise<boolean> {
 
     const tableSql = result[0].sql;
     // Check if the UNIQUE constraint exists in the CREATE TABLE statement
-    return tableSql.includes('UNIQUE(book_id, chapter_number)');
-  }, 'needsChapterUniqueConstraintRemoval');
+    return tableSql.includes("UNIQUE(book_id, chapter_number)");
+  }, "needsChapterUniqueConstraintRemoval");
 }
 
 /**
@@ -38,15 +39,16 @@ export async function removeChapterUniqueConstraint(): Promise<void> {
   return safeDBOperation(async () => {
     const db = await getDB();
 
-    console.log('[Migration] Starting chapters UNIQUE constraint removal...');
+    console.log("[Migration] Starting chapters UNIQUE constraint removal...");
 
     // Step 0: Drop chapters_new if it exists (from failed previous migration)
     await db.execute(`DROP TABLE IF EXISTS chapters_new`, []);
 
-    console.log('[Migration] Cleaned up any previous migration attempts');
+    console.log("[Migration] Cleaned up any previous migration attempts");
 
     // Step 1: Create new table without UNIQUE constraint
-    await db.execute(`
+    await db.execute(
+      `
       CREATE TABLE chapters_new (
         id TEXT PRIMARY KEY,
         book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
@@ -63,13 +65,18 @@ export async function removeChapterUniqueConstraint(): Promise<void> {
         updated_at INTEGER NOT NULL,
         last_edited INTEGER NOT NULL
       )
-    `, []);
+    `,
+      []
+    );
 
-    console.log('[Migration] Created new chapters table without UNIQUE constraint');
+    console.log(
+      "[Migration] Created new chapters table without UNIQUE constraint"
+    );
 
     // Step 2: Copy all data from old table to new table
     // Explicitly specify columns to handle cases where old table has extra columns
-    await db.execute(`
+    await db.execute(
+      `
       INSERT INTO chapters_new (
         id, book_id, chapter_number, title, status, plot_arc_id, summary, content,
         word_count, character_count, character_count_with_spaces,
@@ -80,27 +87,41 @@ export async function removeChapterUniqueConstraint(): Promise<void> {
         word_count, character_count, character_count_with_spaces,
         created_at, updated_at, last_edited
       FROM chapters
-    `, []);
+    `,
+      []
+    );
 
-    console.log('[Migration] Copied all data to new table');
+    console.log("[Migration] Copied all data to new table");
 
     // Step 3: Drop old table
     await db.execute(`DROP TABLE chapters`, []);
 
-    console.log('[Migration] Dropped old chapters table');
+    console.log("[Migration] Dropped old chapters table");
 
     // Step 4: Rename new table to chapters
     await db.execute(`ALTER TABLE chapters_new RENAME TO chapters`, []);
 
-    console.log('[Migration] Renamed new table to chapters');
+    console.log("[Migration] Renamed new table to chapters");
 
     // Step 5: Recreate indexes
-    await db.execute(`CREATE INDEX IF NOT EXISTS idx_chapters_book_id ON chapters(book_id)`, []);
-    await db.execute(`CREATE INDEX IF NOT EXISTS idx_chapters_status ON chapters(status)`, []);
-    await db.execute(`CREATE INDEX IF NOT EXISTS idx_chapters_chapter_number ON chapters(chapter_number)`, []);
-    await db.execute(`CREATE INDEX IF NOT EXISTS idx_chapters_last_edited ON chapters(last_edited DESC)`, []);
+    await db.execute(
+      `CREATE INDEX IF NOT EXISTS idx_chapters_book_id ON chapters(book_id)`,
+      []
+    );
+    await db.execute(
+      `CREATE INDEX IF NOT EXISTS idx_chapters_status ON chapters(status)`,
+      []
+    );
+    await db.execute(
+      `CREATE INDEX IF NOT EXISTS idx_chapters_chapter_number ON chapters(chapter_number)`,
+      []
+    );
+    await db.execute(
+      `CREATE INDEX IF NOT EXISTS idx_chapters_last_edited ON chapters(last_edited DESC)`,
+      []
+    );
 
-    console.log('[Migration] Recreated indexes');
-    console.log('[Migration] Migration complete! UNIQUE constraint removed.');
-  }, 'removeChapterUniqueConstraint');
+    console.log("[Migration] Recreated indexes");
+    console.log("[Migration] Migration complete! UNIQUE constraint removed.");
+  }, "removeChapterUniqueConstraint");
 }

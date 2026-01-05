@@ -8,6 +8,8 @@ import { ITEM_CATEGORIES_CONSTANT } from "@/components/modals/create-item-modal/
 import { ITEM_STATUSES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-statuses";
 import { STORY_RARITIES_CONSTANT } from "@/components/modals/create-item-modal/constants/story-rarities";
 import { type ItemFormSchema } from "@/components/modals/create-item-modal/hooks/use-item-validation";
+import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   getItemById,
   getItemsByBookId,
@@ -15,13 +17,11 @@ import {
   type IItem,
 } from "@/lib/db/items.service";
 import { ItemSchema, ItemSchemaBase } from "@/lib/validation/item-schema";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useItemsStore } from "@/stores/items-store";
 import { type IFieldVisibility } from "@/types/character-types";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { ItemDetailView } from "./view";
-import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
 
 export default function ItemDetail() {
   const { itemId, dashboardId } = useParams({
@@ -63,8 +63,11 @@ export default function ItemDetail() {
     useState(false);
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
   const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
-  const [sectionVisibility, setSectionVisibility] = useState<Record<string, boolean>>({});
-  const sectionVisibilityRef = useRef<Record<string, boolean>>(sectionVisibility);
+  const [sectionVisibility, setSectionVisibility] = useState<
+    Record<string, boolean>
+  >({});
+  const sectionVisibilityRef =
+    useRef<Record<string, boolean>>(sectionVisibility);
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
     const stored = localStorage.getItem("itemDetailAdvancedSectionOpen");
     return stored ? JSON.parse(stored) : false;
@@ -83,8 +86,9 @@ export default function ItemDetail() {
   // Original states for comparison
   const [originalFieldVisibility, setOriginalFieldVisibility] =
     useState<IFieldVisibility>({});
-  const [originalSectionVisibility, setOriginalSectionVisibility] =
-    useState<Record<string, boolean>>({});
+  const [originalSectionVisibility, setOriginalSectionVisibility] = useState<
+    Record<string, boolean>
+  >({});
   const [isLoading, setIsLoading] = useState(true);
   const [allItems, setAllItems] = useState<IItem[]>([]);
 
@@ -231,7 +235,7 @@ export default function ItemDetail() {
 
     return {
       hasRequiredFieldsEmpty: missing.length > 0,
-      missingFields: missing
+      missingFields: missing,
     };
   }, [editData]);
 

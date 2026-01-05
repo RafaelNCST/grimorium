@@ -19,6 +19,7 @@ import {
   type IPowerBlock,
   type AttributesContent,
 } from "../../types/power-system-types";
+
 import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 
 // Define bar colors with vibrant shades similar to primary
@@ -172,11 +173,15 @@ export function AttributesBlock({
                 align="start"
                 sideOffset={15}
                 collisionPadding={20}
-                avoidCollisions={true}
+                avoidCollisions
               >
                 <div className="flex gap-2">
                   {(Object.keys(BAR_COLORS) as BarColor[]).map((color) => (
-                    <Tooltip key={color} delayDuration={300} open={tooltipsEnabled ? undefined : false}>
+                    <Tooltip
+                      key={color}
+                      delayDuration={300}
+                      open={tooltipsEnabled ? undefined : false}
+                    >
                       <TooltipTrigger asChild>
                         <button
                           type="button"

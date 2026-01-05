@@ -8,6 +8,8 @@ import {
   type ISectionVisibility,
   toggleSectionVisibility,
 } from "@/components/detail-page/visibility-helpers";
+import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { getCharactersByBookId } from "@/lib/db/characters.service";
 import { getFactionsByBookId } from "@/lib/db/factions.service";
 import { getItemsByBookId } from "@/lib/db/items.service";
@@ -24,12 +26,10 @@ import {
   type IRegion,
   type RegionScale,
 } from "@/pages/dashboard/tabs/world/types/region-types";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useRegionsStore } from "@/stores/regions-store";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { RegionDetailView } from "./view";
-import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
 
 export function RegionDetail() {
   const { dashboardId, regionId } = useParams({
@@ -44,7 +44,9 @@ export function RegionDetail() {
   const { t } = useTranslation(["region-detail", "common"]);
 
   // Store hook
-  const updateRegionInCache = useRegionsStore((state) => state.updateRegionInCache);
+  const updateRegionInCache = useRegionsStore(
+    (state) => state.updateRegionInCache
+  );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -655,12 +657,7 @@ export function RegionDetail() {
     setSectionVisibility(originalSectionVisibility);
     setErrors({});
     setIsEditing(false);
-  }, [
-    region,
-    originalTimeline,
-    originalSectionVisibility,
-    hasChanges,
-  ]);
+  }, [region, originalTimeline, originalSectionVisibility, hasChanges]);
 
   const handleConfirmCancel = useCallback(() => {
     setEditData(region);
@@ -670,11 +667,7 @@ export function RegionDetail() {
     setErrors({});
     setIsEditing(false);
     setShowUnsavedChangesDialog(false);
-  }, [
-    region,
-    originalTimeline,
-    originalSectionVisibility,
-  ]);
+  }, [region, originalTimeline, originalSectionVisibility]);
 
   const handleImageFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {

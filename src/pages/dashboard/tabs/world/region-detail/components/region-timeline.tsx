@@ -20,8 +20,6 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import {
   Accordion,
@@ -29,6 +27,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -348,7 +347,8 @@ export function RegionTimeline({
   useEffect(() => {
     const checkScroll = () => {
       if (scrollContainerCreateEraRef.current) {
-        const { scrollHeight, clientHeight } = scrollContainerCreateEraRef.current;
+        const { scrollHeight, clientHeight } =
+          scrollContainerCreateEraRef.current;
         setHasScrollCreateEra(scrollHeight > clientHeight);
       }
     };
@@ -369,7 +369,8 @@ export function RegionTimeline({
   useEffect(() => {
     const checkScroll = () => {
       if (scrollContainerEditEraRef.current) {
-        const { scrollHeight, clientHeight } = scrollContainerEditEraRef.current;
+        const { scrollHeight, clientHeight } =
+          scrollContainerEditEraRef.current;
         setHasScrollEditEra(scrollHeight > clientHeight);
       }
     };
@@ -615,28 +616,58 @@ export function RegionTimeline({
                                         event.itemsInvolved.length > 0) && (
                                         <div className="mt-3 pt-3 border-t border-border/30">
                                           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                                            {event.charactersInvolved.length > 0 && (
+                                            {event.charactersInvolved.length >
+                                              0 && (
                                               <div className="flex items-center gap-1">
                                                 <Users className="w-3 h-3" />
-                                                <span>{t("world:timeline.involved_characters")}: {event.charactersInvolved.length}</span>
+                                                <span>
+                                                  {t(
+                                                    "world:timeline.involved_characters"
+                                                  )}
+                                                  :{" "}
+                                                  {
+                                                    event.charactersInvolved
+                                                      .length
+                                                  }
+                                                </span>
                                               </div>
                                             )}
-                                            {event.factionsInvolved.length > 0 && (
+                                            {event.factionsInvolved.length >
+                                              0 && (
                                               <div className="flex items-center gap-1">
                                                 <Building className="w-3 h-3" />
-                                                <span>{t("world:timeline.involved_factions")}: {event.factionsInvolved.length}</span>
+                                                <span>
+                                                  {t(
+                                                    "world:timeline.involved_factions"
+                                                  )}
+                                                  :{" "}
+                                                  {
+                                                    event.factionsInvolved
+                                                      .length
+                                                  }
+                                                </span>
                                               </div>
                                             )}
                                             {event.racesInvolved.length > 0 && (
                                               <div className="flex items-center gap-1">
                                                 <Swords className="w-3 h-3" />
-                                                <span>{t("world:timeline.involved_races")}: {event.racesInvolved.length}</span>
+                                                <span>
+                                                  {t(
+                                                    "world:timeline.involved_races"
+                                                  )}
+                                                  : {event.racesInvolved.length}
+                                                </span>
                                               </div>
                                             )}
                                             {event.itemsInvolved.length > 0 && (
                                               <div className="flex items-center gap-1">
                                                 <Package className="w-3 h-3" />
-                                                <span>{t("world:timeline.items_involved")}: {event.itemsInvolved.length}</span>
+                                                <span>
+                                                  {t(
+                                                    "world:timeline.items_involved"
+                                                  )}
+                                                  : {event.itemsInvolved.length}
+                                                </span>
                                               </div>
                                             )}
                                           </div>
@@ -820,7 +851,9 @@ export function RegionTimeline({
                           startDate: e.target.value,
                         }))
                       }
-                      placeholder={t("forms:placeholders.region_event_start_date")}
+                      placeholder={t(
+                        "forms:placeholders.region_event_start_date"
+                      )}
                       maxLength={50}
                     />
                     <div className="flex justify-end text-xs text-muted-foreground">
@@ -840,7 +873,9 @@ export function RegionTimeline({
                           endDate: e.target.value,
                         }))
                       }
-                      placeholder={t("forms:placeholders.region_event_end_date")}
+                      placeholder={t(
+                        "forms:placeholders.region_event_end_date"
+                      )}
                       maxLength={50}
                     />
                     <div className="flex justify-end text-xs text-muted-foreground">
@@ -976,7 +1011,9 @@ export function RegionTimeline({
                     </h4>
                     <div className="flex flex-wrap gap-3">
                       {selectedEvent.charactersInvolved.map((id) => {
-                        const character = mockCharacters.find((c) => c.id === id);
+                        const character = mockCharacters.find(
+                          (c) => c.id === id
+                        );
                         return (
                           <div
                             key={id}
@@ -984,7 +1021,10 @@ export function RegionTimeline({
                           >
                             {character?.image ? (
                               <Avatar className="w-8 h-8 rounded-full">
-                                <AvatarImage src={character.image} alt={character.name} />
+                                <AvatarImage
+                                  src={character.image}
+                                  alt={character.name}
+                                />
                               </Avatar>
                             ) : (
                               <div className="w-8 h-8 rounded-full bg-purple-950/40 flex items-center justify-center">
@@ -1017,7 +1057,10 @@ export function RegionTimeline({
                           >
                             {faction?.image ? (
                               <Avatar className="w-8 h-8 rounded-sm">
-                                <AvatarImage src={faction.image} alt={faction.name} />
+                                <AvatarImage
+                                  src={faction.image}
+                                  alt={faction.name}
+                                />
                               </Avatar>
                             ) : (
                               <div className="w-8 h-8 rounded-sm bg-purple-950/40 flex items-center justify-center">
@@ -1150,96 +1193,101 @@ export function RegionTimeline({
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="era-name" className="text-primary">
-                {t("forms:labels.era_name")}{" "}
-                <span className="text-destructive">*</span>
-              </Label>
-              <div className="px-1">
-                <Input
-                  id="era-name"
-                  value={newEra.name}
-                  onChange={(e) =>
-                    setNewEra((prev) => ({ ...prev, name: e.target.value }))
-                  }
-                  placeholder={t("forms:placeholders.region_era_name")}
-                  maxLength={200}
-                />
-              </div>
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{newEra.name.length}/200</span>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="era-description" className="text-primary">
-                {t("forms:labels.description")}{" "}
-                <span className="text-destructive">*</span>
-              </Label>
-              <div className="px-1">
-                <Textarea
-                  id="era-description"
-                  value={newEra.description}
-                  onChange={(e) =>
-                    setNewEra((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                  placeholder={t("forms:placeholders.region_era_description")}
-                  rows={2}
-                  maxLength={500}
-                  className="resize-none"
-                />
-              </div>
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{newEra.description.length}/500</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="era-start" className="text-primary">
-                  {t("forms:labels.start")}{" "}
+                  {t("forms:labels.era_name")}{" "}
                   <span className="text-destructive">*</span>
                 </Label>
                 <div className="px-1">
                   <Input
-                    id="era-start"
-                    value={newEra.startDate}
+                    id="era-name"
+                    value={newEra.name}
+                    onChange={(e) =>
+                      setNewEra((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    placeholder={t("forms:placeholders.region_era_name")}
+                    maxLength={200}
+                  />
+                </div>
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{newEra.name.length}/200</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="era-description" className="text-primary">
+                  {t("forms:labels.description")}{" "}
+                  <span className="text-destructive">*</span>
+                </Label>
+                <div className="px-1">
+                  <Textarea
+                    id="era-description"
+                    value={newEra.description}
                     onChange={(e) =>
                       setNewEra((prev) => ({
                         ...prev,
-                        startDate: e.target.value,
+                        description: e.target.value,
                       }))
                     }
-                    placeholder={t("forms:placeholders.region_era_start_date")}
-                    maxLength={50}
+                    placeholder={t("forms:placeholders.region_era_description")}
+                    rows={2}
+                    maxLength={500}
+                    className="resize-none"
                   />
                 </div>
                 <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{newEra.startDate.length}/50</span>
+                  <span>{newEra.description.length}/500</span>
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="era-end" className="text-primary">
-                  {t("forms:labels.end")}{" "}
-                  <span className="text-destructive">*</span>
-                </Label>
-                <div className="px-1">
-                  <Input
-                    id="era-end"
-                    value={newEra.endDate}
-                    onChange={(e) =>
-                      setNewEra((prev) => ({ ...prev, endDate: e.target.value }))
-                    }
-                    placeholder={t("forms:placeholders.region_era_end_date")}
-                    maxLength={50}
-                  />
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="era-start" className="text-primary">
+                    {t("forms:labels.start")}{" "}
+                    <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="px-1">
+                    <Input
+                      id="era-start"
+                      value={newEra.startDate}
+                      onChange={(e) =>
+                        setNewEra((prev) => ({
+                          ...prev,
+                          startDate: e.target.value,
+                        }))
+                      }
+                      placeholder={t(
+                        "forms:placeholders.region_era_start_date"
+                      )}
+                      maxLength={50}
+                    />
+                  </div>
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{newEra.startDate.length}/50</span>
+                  </div>
                 </div>
-                <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{newEra.endDate.length}/50</span>
+                <div className="space-y-2">
+                  <Label htmlFor="era-end" className="text-primary">
+                    {t("forms:labels.end")}{" "}
+                    <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="px-1">
+                    <Input
+                      id="era-end"
+                      value={newEra.endDate}
+                      onChange={(e) =>
+                        setNewEra((prev) => ({
+                          ...prev,
+                          endDate: e.target.value,
+                        }))
+                      }
+                      placeholder={t("forms:placeholders.region_era_end_date")}
+                      maxLength={50}
+                    />
+                  </div>
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{newEra.endDate.length}/50</span>
+                  </div>
                 </div>
               </div>
-            </div>
             </div>
           </div>
 
@@ -1630,7 +1678,9 @@ export function RegionTimeline({
                           startDate: e.target.value,
                         }))
                       }
-                      placeholder={t("forms:placeholders.region_era_start_date")}
+                      placeholder={t(
+                        "forms:placeholders.region_era_start_date"
+                      )}
                       maxLength={50}
                     />
                   </div>
@@ -1648,7 +1698,10 @@ export function RegionTimeline({
                       id="edit-era-end"
                       value={editEra.endDate}
                       onChange={(e) =>
-                        setEditEra((prev) => ({ ...prev, endDate: e.target.value }))
+                        setEditEra((prev) => ({
+                          ...prev,
+                          endDate: e.target.value,
+                        }))
                       }
                       placeholder={t("forms:placeholders.region_era_end_date")}
                       maxLength={50}

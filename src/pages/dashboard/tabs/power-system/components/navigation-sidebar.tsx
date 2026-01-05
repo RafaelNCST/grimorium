@@ -444,64 +444,64 @@ export function NavigationSidebar({
                       onCreatePage={() => onCreatePage()}
                     />
 
-                        {/* Groups with Pages */}
-                        <SortableContext
-                          items={groupIds}
-                          strategy={verticalListSortingStrategy}
-                        >
-                          {sortedGroups.map((group) => {
-                            const groupPages = pages
-                              .filter((page) => page.groupId === group.id)
-                              .sort((a, b) => a.orderIndex - b.orderIndex);
-                            const isExpanded = expandedGroups.has(group.id);
+                    {/* Groups with Pages */}
+                    <SortableContext
+                      items={groupIds}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {sortedGroups.map((group) => {
+                        const groupPages = pages
+                          .filter((page) => page.groupId === group.id)
+                          .sort((a, b) => a.orderIndex - b.orderIndex);
+                        const isExpanded = expandedGroups.has(group.id);
 
-                            return (
-                              <div key={group.id} className="space-y-1">
-                                <SortableGroupItem
-                                  group={group}
-                                  isExpanded={isExpanded}
-                                  isEditMode={isEditMode}
-                                  isDragging={activeItem?.id === group.id}
-                                  isOver={overId === group.id}
-                                  onToggle={() => toggleGroup(group.id)}
-                                  onEdit={onEditGroup}
-                                  onDelete={onDeleteGroup}
-                                  onCreatePage={() => onCreatePage(group.id)}
-                                  onSelect={() => onItemSelect?.(group.id, "group")}
-                                />
-                                {isExpanded && (
-                                  <SortableContext
-                                    items={groupPages.map((p) => p.id)}
-                                    strategy={verticalListSortingStrategy}
-                                  >
-                                    <div className="ml-10 space-y-1">
-                                      {groupPages.map((page) => (
-                                        <SortablePageItem
-                                          key={page.id}
-                                          page={page}
-                                          isActive={page.id === currentPageId}
-                                          isEditMode={isEditMode}
-                                          isDragging={activeItem?.id === page.id}
-                                          isOver={overId === page.id}
-                                          onSelect={(pageId) => {
-                                            onPageSelect(pageId);
-                                            onItemSelect?.(pageId, "page");
-                                          }}
-                                          onEdit={onEditPage}
-                                          onDelete={onDeletePage}
-                                          onDuplicate={onDuplicatePage}
-                                        />
-                                      ))}
-                                    </div>
-                                  </SortableContext>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </SortableContext>
-                      </div>
-                    )}
+                        return (
+                          <div key={group.id} className="space-y-1">
+                            <SortableGroupItem
+                              group={group}
+                              isExpanded={isExpanded}
+                              isEditMode={isEditMode}
+                              isDragging={activeItem?.id === group.id}
+                              isOver={overId === group.id}
+                              onToggle={() => toggleGroup(group.id)}
+                              onEdit={onEditGroup}
+                              onDelete={onDeleteGroup}
+                              onCreatePage={() => onCreatePage(group.id)}
+                              onSelect={() => onItemSelect?.(group.id, "group")}
+                            />
+                            {isExpanded && (
+                              <SortableContext
+                                items={groupPages.map((p) => p.id)}
+                                strategy={verticalListSortingStrategy}
+                              >
+                                <div className="ml-10 space-y-1">
+                                  {groupPages.map((page) => (
+                                    <SortablePageItem
+                                      key={page.id}
+                                      page={page}
+                                      isActive={page.id === currentPageId}
+                                      isEditMode={isEditMode}
+                                      isDragging={activeItem?.id === page.id}
+                                      isOver={overId === page.id}
+                                      onSelect={(pageId) => {
+                                        onPageSelect(pageId);
+                                        onItemSelect?.(pageId, "page");
+                                      }}
+                                      onEdit={onEditPage}
+                                      onDelete={onDeletePage}
+                                      onDuplicate={onDuplicatePage}
+                                    />
+                                  ))}
+                                </div>
+                              </SortableContext>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </SortableContext>
                   </div>
+                )}
+              </div>
 
               {/* Drag Overlay */}
               <DragOverlay dropAnimation={null}>
@@ -795,7 +795,9 @@ function SortableGroupItem({
 
   // Only apply transform to the item being dragged, not to items being moved
   const style = {
-    transform: isSortableDragging ? CSS.Transform.toString(transform) : undefined,
+    transform: isSortableDragging
+      ? CSS.Transform.toString(transform)
+      : undefined,
     transition,
   };
 
@@ -1055,7 +1057,6 @@ function GroupItem({
           )}
         </>
       )}
-
     </div>
   );
 
@@ -1105,7 +1106,9 @@ function SortablePageItem({
 
   // Only apply transform to the item being dragged, not to items being moved
   const style = {
-    transform: isSortableDragging ? CSS.Transform.toString(transform) : undefined,
+    transform: isSortableDragging
+      ? CSS.Transform.toString(transform)
+      : undefined,
     transition,
   };
 
@@ -1352,7 +1355,6 @@ function PageItem({
           )}
         </>
       )}
-
     </div>
   );
 

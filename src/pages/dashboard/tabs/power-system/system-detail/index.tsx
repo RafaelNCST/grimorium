@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   getPowerGroupsBySystemId,
   getPowerPagesBySystemId,
@@ -26,7 +27,6 @@ import {
   movePowerPage,
   duplicatePowerPage,
 } from "@/lib/db/power-system.service";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { usePowerSystemStore } from "@/stores/power-system-store";
 import { usePowerSystemUIStore } from "@/stores/power-system-ui-store";
 
@@ -415,7 +415,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     try {
       await deletePowerGroup(groupId);
 
-      setGroups((prevGroups) => prevGroups.filter((group) => group.id !== groupId));
+      setGroups((prevGroups) =>
+        prevGroups.filter((group) => group.id !== groupId)
+      );
 
       // Update pages that belonged to this group (make them standalone)
       setPages((prevPages) =>
@@ -442,13 +444,18 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       }
 
       // Update state
-      setGroups((prevGroups) => prevGroups.filter((group) => group.id !== groupId));
-      setPages((prevPages) => prevPages.filter((page) => page.groupId !== groupId));
+      setGroups((prevGroups) =>
+        prevGroups.filter((group) => group.id !== groupId)
+      );
+      setPages((prevPages) =>
+        prevPages.filter((page) => page.groupId !== groupId)
+      );
 
       // If current page was in the deleted group, navigate to first available page
       if (currentPage && currentPage.groupId === groupId && systemId) {
         const remainingPages = pages.filter((page) => page.groupId !== groupId);
-        const newCurrentPage = remainingPages.length > 0 ? remainingPages[0] : null;
+        const newCurrentPage =
+          remainingPages.length > 0 ? remainingPages[0] : null;
         setCurrentPage(newCurrentPage);
         setCurrentPageId(systemId, newCurrentPage?.id || null);
       }
@@ -566,7 +573,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
         // Only navigate if the deleted page is the current page
         if (isCurrentPageBeingDeleted) {
           // Find the index of the deleted page
-          const deletedIndex = prevPages.findIndex((page) => page.id === pageId);
+          const deletedIndex = prevPages.findIndex(
+            (page) => page.id === pageId
+          );
 
           let newCurrentPage: IPowerPage | null = null;
 
@@ -687,8 +696,12 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     try {
       await deletePowerSection(sectionId);
 
-      setSections((prevSections) => prevSections.filter((section) => section.id !== sectionId));
-      setBlocks((prevBlocks) => prevBlocks.filter((block) => block.sectionId !== sectionId));
+      setSections((prevSections) =>
+        prevSections.filter((section) => section.id !== sectionId)
+      );
+      setBlocks((prevBlocks) =>
+        prevBlocks.filter((block) => block.sectionId !== sectionId)
+      );
     } catch (error) {
       console.error("Error deleting section:", error);
     }
@@ -715,7 +728,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     try {
       let orderIndex = 0;
       setBlocks((prevBlocks) => {
-        const sectionBlocks = prevBlocks.filter((b) => b.sectionId === sectionId);
+        const sectionBlocks = prevBlocks.filter(
+          (b) => b.sectionId === sectionId
+        );
         orderIndex = sectionBlocks.length;
         return prevBlocks;
       });
@@ -766,7 +781,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     try {
       await deletePowerBlock(blockId);
 
-      setBlocks((prevBlocks) => prevBlocks.filter((block) => block.id !== blockId));
+      setBlocks((prevBlocks) =>
+        prevBlocks.filter((block) => block.id !== blockId)
+      );
     } catch (error) {
       console.error("Error deleting block:", error);
     }

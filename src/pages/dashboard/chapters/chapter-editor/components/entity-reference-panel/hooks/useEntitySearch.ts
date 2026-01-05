@@ -27,9 +27,15 @@ export function useEntitySearch(bookId: string): UseEntitySearchReturn {
   const [selectedType, setSelectedType] = useState<EntityType | "all">("all");
 
   // Get entities directly from store cache (reactive)
-  const allCharacters = useCharactersStore((state) => state.cache[bookId]?.characters || []);
-  const allRegions = useRegionsStore((state) => state.cache[bookId]?.regions || []);
-  const allFactions = useFactionsStore((state) => state.cache[bookId]?.factions || []);
+  const allCharacters = useCharactersStore(
+    (state) => state.cache[bookId]?.characters || []
+  );
+  const allRegions = useRegionsStore(
+    (state) => state.cache[bookId]?.regions || []
+  );
+  const allFactions = useFactionsStore(
+    (state) => state.cache[bookId]?.factions || []
+  );
   const allItems = useItemsStore((state) => state.cache[bookId]?.items || []);
   const allRaces = useRacesStore((state) => state.cache[bookId]?.races || []);
 

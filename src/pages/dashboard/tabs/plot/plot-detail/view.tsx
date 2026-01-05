@@ -451,23 +451,21 @@ export function PlotArcDetailView({
             {/* Right side - Action buttons */}
             <div className="flex flex-col items-end gap-1 shrink-0 ml-auto">
               {isEditing ? (
-                <>
-                  <div className="flex gap-2">
-                    <Button variant="secondary" onClick={onCancel}>
-                      <X className="w-4 h-4 mr-2" />
-                      {t("plot:header.cancel")}
-                    </Button>
-                    <Button
-                      variant="magical"
-                      className="animate-glow"
-                      onClick={onSave}
-                      disabled={!hasChanges || hasRequiredFieldsEmpty}
-                    >
-                      <Save className="w-4 h-4 mr-2" />
-                      {t("plot:header.save")}
-                    </Button>
-                  </div>
-                </>
+                <div className="flex gap-2">
+                  <Button variant="secondary" onClick={onCancel}>
+                    <X className="w-4 h-4 mr-2" />
+                    {t("plot:header.cancel")}
+                  </Button>
+                  <Button
+                    variant="magical"
+                    className="animate-glow"
+                    onClick={onSave}
+                    disabled={!hasChanges || hasRequiredFieldsEmpty}
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    {t("plot:header.save")}
+                  </Button>
+                </div>
               ) : (
                 <div className="flex gap-2">
                   <Tooltip>
@@ -569,7 +567,11 @@ export function PlotArcDetailView({
                       required
                       showCharCount
                       error={validationErrors.name}
-                      labelClassName={validationErrors.name ? "text-destructive" : "text-primary"}
+                      labelClassName={
+                        validationErrors.name
+                          ? "text-destructive"
+                          : "text-primary"
+                      }
                     />
 
                     {/* Arc Summary */}
@@ -592,7 +594,11 @@ export function PlotArcDetailView({
                       required
                       showOptionalLabel={false}
                       error={validationErrors.description}
-                      labelClassName={validationErrors.description ? "text-destructive" : "text-primary"}
+                      labelClassName={
+                        validationErrors.description
+                          ? "text-destructive"
+                          : "text-primary"
+                      }
                       className="resize-none"
                     />
 
@@ -614,7 +620,11 @@ export function PlotArcDetailView({
                       required
                       showOptionalLabel={false}
                       error={validationErrors.focus}
-                      labelClassName={validationErrors.focus ? "text-destructive" : "text-primary"}
+                      labelClassName={
+                        validationErrors.focus
+                          ? "text-destructive"
+                          : "text-primary"
+                      }
                       className="resize-none"
                     />
 
@@ -1038,9 +1048,13 @@ export function PlotArcDetailView({
                 }
                 isEditMode={isEditing}
                 isVisible={fieldVisibility["chapterMetrics"] !== false}
-                onVisibilityToggle={() => onFieldVisibilityToggle("chapterMetrics")}
+                onVisibilityToggle={() =>
+                  onFieldVisibilityToggle("chapterMetrics")
+                }
                 emptyState={
-                  !isEditing && hasChapterMetrics === false ? "empty-view" : null
+                  !isEditing && hasChapterMetrics === false
+                    ? "empty-view"
+                    : null
                 }
                 emptyIcon={BookOpen}
                 emptyTitle={t("chapter-metrics:plot_section.empty_state_title")}

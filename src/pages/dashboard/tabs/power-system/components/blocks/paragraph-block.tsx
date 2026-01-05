@@ -15,6 +15,7 @@ import {
   type IPowerBlock,
   type ParagraphContent,
 } from "../../types/power-system-types";
+
 import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 
 interface ParagraphBlockProps {

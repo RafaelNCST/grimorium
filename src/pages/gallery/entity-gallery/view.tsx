@@ -6,15 +6,12 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import {
-  IGalleryItem,
-  IGalleryLink,
-  EntityType,
-} from "@/types/gallery-types";
+import { IGalleryItem, IGalleryLink, EntityType } from "@/types/gallery-types";
 
 import { GalleryGrid } from "../components/gallery-grid";
 import { ImageLightbox } from "../components/image-lightbox";
 import { UploadImageModal } from "../components/upload-image-modal";
+
 import { EntityGalleryEmptyState } from "./components/entity-gallery-empty-state";
 
 interface EntityGalleryViewProps {
@@ -107,9 +104,9 @@ export function EntityGalleryView({
     const container = scrollContainerRef.current;
     if (!container || isLoadingMore || !hasMore) return;
 
-    const scrollTop = container.scrollTop;
-    const scrollHeight = container.scrollHeight;
-    const clientHeight = container.clientHeight;
+    const { scrollTop } = container;
+    const { scrollHeight } = container;
+    const { clientHeight } = container;
 
     // Load more when 80% scrolled
     if (scrollTop + clientHeight >= scrollHeight * 0.8) {

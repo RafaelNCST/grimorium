@@ -34,6 +34,7 @@ import {
   type IPowerBlock,
   type IconGroupContent,
 } from "../../types/power-system-types";
+
 import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 
 interface IconGroupBlockProps {

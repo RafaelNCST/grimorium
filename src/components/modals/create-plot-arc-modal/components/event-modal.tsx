@@ -96,51 +96,51 @@ export function EventModal({
           )}
         >
           <div className="space-y-4">
-          <div className="space-y-2">
-            <Label
-              htmlFor="event-name"
-              className="text-sm font-medium text-primary"
-            >
-              {t("modal.event_name")}{" "}
-              <span className="text-destructive">*</span>
-            </Label>
-            <div className="px-1">
-              <Input
-                id="event-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={t("modal.event_name_placeholder")}
-                maxLength={100}
-              />
+            <div className="space-y-2">
+              <Label
+                htmlFor="event-name"
+                className="text-sm font-medium text-primary"
+              >
+                {t("modal.event_name")}{" "}
+                <span className="text-destructive">*</span>
+              </Label>
+              <div className="px-1">
+                <Input
+                  id="event-name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={t("modal.event_name_placeholder")}
+                  maxLength={100}
+                />
+              </div>
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{name.length}/100</span>
+              </div>
             </div>
-            <div className="flex justify-end text-xs text-muted-foreground">
-              <span>{name.length}/100</span>
-            </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label
-              htmlFor="event-description"
-              className="text-sm font-medium text-primary"
-            >
-              {t("modal.event_description")}{" "}
-              <span className="text-destructive">*</span>
-            </Label>
-            <div className="px-1">
-              <Textarea
-                id="event-description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder={t("modal.event_description_placeholder")}
-                rows={4}
-                maxLength={500}
-                className="resize-none"
-              />
+            <div className="space-y-2">
+              <Label
+                htmlFor="event-description"
+                className="text-sm font-medium text-primary"
+              >
+                {t("modal.event_description")}{" "}
+                <span className="text-destructive">*</span>
+              </Label>
+              <div className="px-1">
+                <Textarea
+                  id="event-description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder={t("modal.event_description_placeholder")}
+                  rows={4}
+                  maxLength={500}
+                  className="resize-none"
+                />
+              </div>
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{description.length}/500</span>
+              </div>
             </div>
-            <div className="flex justify-end text-xs text-muted-foreground">
-              <span>{description.length}/500</span>
-            </div>
-          </div>
           </div>
         </div>
 

@@ -11,9 +11,9 @@ import {
   TableOfContents,
 } from "docx";
 
+import type { ExportConfig } from "@/components/modals/export-preview-modal";
 import i18n from "@/lib/i18n";
 
-import type { ExportConfig } from "@/components/modals/export-preview-modal";
 import type { BatchExportConfig, ChapterContent } from "./export-pdf.service";
 
 // Page format dimensions in twips (1 inch = 1440 twips)
@@ -55,19 +55,19 @@ const getFontFamily = (fontValue: string): string => {
   return fontMap[fontValue] || "Times New Roman";
 };
 
-const getFontSize = (sizeValue: number): number => {
+const getFontSize = (sizeValue: number): number =>
   // Convert pt to half-points (Word uses half-points)
-  return sizeValue * 2;
-};
-
-const getLineSpacing = (lineSpacing: number): number => {
+  sizeValue * 2;
+const getLineSpacing = (lineSpacing: number): number =>
   // Word uses a value where 240 = single spacing (1.0)
   // So we multiply by 240 to get the correct value
-  return Math.round(lineSpacing * 240);
-};
-
+  Math.round(lineSpacing * 240);
 function formatChapterTitle(
-  format: "number-colon-title" | "number-dash-title" | "title-only" | "number-only",
+  format:
+    | "number-colon-title"
+    | "number-dash-title"
+    | "title-only"
+    | "number-only",
   chapterNumber: string,
   chapterTitle: string
 ): string {
@@ -120,7 +120,11 @@ export async function generateChapterWord(
   const titleParagraph = new Paragraph({
     children: [
       new TextRun({
-        text: formatChapterTitle(config.titleFormat, chapterNumber, chapterTitle),
+        text: formatChapterTitle(
+          config.titleFormat,
+          chapterNumber,
+          chapterTitle
+        ),
         font: titleFont,
         size: titleSize,
         bold: config.titleBold,
@@ -357,7 +361,8 @@ export async function generateBatchChaptersWord(
       lines.forEach((line, lineIndex) => {
         const isLastLine = lineIndex === lines.length - 1;
         // Adiciona espaçamento extra após o último parágrafo do capítulo (exceto no último capítulo)
-        const afterSpacing = isLastLine && !isLastChapter ? config.chapterSpacing * 20 : 0;
+        const afterSpacing =
+          isLastLine && !isLastChapter ? config.chapterSpacing * 20 : 0;
 
         allChildren.push(
           new Paragraph({

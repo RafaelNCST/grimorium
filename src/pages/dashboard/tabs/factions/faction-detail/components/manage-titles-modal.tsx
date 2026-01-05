@@ -219,61 +219,65 @@ export function ManageTitlesModal({
                 )}
               >
                 <div className="min-h-[300px]">
-                {customTitles.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-[300px] py-12 text-muted-foreground">
-                    <Crown className="w-12 h-12 mb-3 opacity-50" />
-                    <p className="text-sm font-medium">
-                      {t("hierarchy.no_titles_yet")}
-                    </p>
-                    <p className="text-xs mt-1 opacity-70">
-                      {t("hierarchy.no_titles_hint")}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {customTitles.map((title) => {
-                      const colorClasses = getColorClasses(title.color);
-                      return (
-                        <div
-                          key={title.id}
-                          className={`flex items-center gap-3 p-3 rounded-lg ${colorClasses.bg}`}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate text-foreground">
-                              {title.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {t("hierarchy.order")}: #{title.order}
-                            </p>
+                  {customTitles.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-[300px] py-12 text-muted-foreground">
+                      <Crown className="w-12 h-12 mb-3 opacity-50" />
+                      <p className="text-sm font-medium">
+                        {t("hierarchy.no_titles_yet")}
+                      </p>
+                      <p className="text-xs mt-1 opacity-70">
+                        {t("hierarchy.no_titles_hint")}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {customTitles.map((title) => {
+                        const colorClasses = getColorClasses(title.color);
+                        return (
+                          <div
+                            key={title.id}
+                            className={`flex items-center gap-3 p-3 rounded-lg ${colorClasses.bg}`}
+                          >
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium truncate text-foreground">
+                                {title.name}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {t("hierarchy.order")}: #{title.order}
+                              </p>
+                            </div>
+                            <div className="flex gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => handleStartEdit(title)}
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost-destructive"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => handleDeleteTitle(title.id)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </div>
-                          <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleStartEdit(title)}
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost-destructive"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleDeleteTitle(title.id)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
 
               <DialogFooter className="flex-shrink-0 pt-4 border-t">
-                <Button variant="secondary" className="w-full" onClick={onClose}>
+                <Button
+                  variant="secondary"
+                  className="w-full"
+                  onClick={onClose}
+                >
                   {t("hierarchy.close")}
                 </Button>
               </DialogFooter>
@@ -284,108 +288,112 @@ export function ManageTitlesModal({
                 <div className="space-y-4">
                   {/* Nome do Título */}
                   <div className="space-y-2">
-                <Label htmlFor="title-name" className="text-primary">
-                  {t("hierarchy.title_name")}
-                  <span className="text-red-500 ml-1">*</span>
-                </Label>
-                <div className="px-1">
-                  <Input
-                    id="title-name"
-                    value={formName}
-                    onChange={(e) => setFormName(e.target.value)}
-                    placeholder={t("hierarchy.title_name_placeholder")}
-                    maxLength={200}
-                  />
-                </div>
-                <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{formName.length}/200</span>
-                </div>
-              </div>
-
-              {/* Ordem (Contador 1-100) */}
-              <div className="space-y-2">
-                <Label className="text-primary">{t("hierarchy.title_order")}</Label>
-                <div className="px-1">
-                  <div className="flex items-center gap-1">
-                    <Input
-                      type="text"
-                      value={formOrder}
-                      onChange={handleOrderInputChange}
-                      className="w-16 h-10 text-center font-mono font-semibold text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      placeholder="1"
-                    />
-                  <div className="flex flex-col gap-0.5">
-                    <Tooltip delayDuration={300} disableHoverableContent>
-                      <TooltipTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleOrderChange(1)}
-                          disabled={formOrder >= 100}
-                          className="h-4 w-5 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
-                        >
-                          <ChevronUp className="h-3 w-3 text-muted-foreground" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{t("hierarchy.increment_order")}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <Tooltip delayDuration={300} disableHoverableContent>
-                      <TooltipTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleOrderChange(-1)}
-                          disabled={formOrder <= 1}
-                          className="h-4 w-5 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
-                        >
-                          <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{t("hierarchy.decrement_order")}</p>
-                      </TooltipContent>
-                    </Tooltip>
+                    <Label htmlFor="title-name" className="text-primary">
+                      {t("hierarchy.title_name")}
+                      <span className="text-red-500 ml-1">*</span>
+                    </Label>
+                    <div className="px-1">
+                      <Input
+                        id="title-name"
+                        value={formName}
+                        onChange={(e) => setFormName(e.target.value)}
+                        placeholder={t("hierarchy.title_name_placeholder")}
+                        maxLength={200}
+                      />
+                    </div>
+                    <div className="flex justify-end text-xs text-muted-foreground">
+                      <span>{formName.length}/200</span>
+                    </div>
                   </div>
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {t("hierarchy.order_hint")}
-                </p>
-              </div>
 
-              {/* Seletor de Cor */}
-              <div className="space-y-2">
-                <Label className="text-primary">{t("hierarchy.title_color")}</Label>
-                <div className="grid grid-cols-6 gap-2">
-                  {HIERARCHY_TITLE_COLORS.map((color) => (
-                    <Tooltip key={color.value} delayDuration={300}>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          onClick={() => setFormColor(color.value)}
-                          className={cn(
-                            "w-10 h-10 rounded-lg border flex items-center justify-center transition-all hover:opacity-60",
-                            color.pickerBg,
-                            formColor === color.value
-                              ? "opacity-60 border-foreground"
-                              : "border-border"
-                          )}
-                        >
-                          {formColor === color.value && (
-                            <Check className="w-5 h-5 text-white" />
-                          )}
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{t(`hierarchy.colors.${color.value}`)}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  ))}
-                </div>
+                  {/* Ordem (Contador 1-100) */}
+                  <div className="space-y-2">
+                    <Label className="text-primary">
+                      {t("hierarchy.title_order")}
+                    </Label>
+                    <div className="px-1">
+                      <div className="flex items-center gap-1">
+                        <Input
+                          type="text"
+                          value={formOrder}
+                          onChange={handleOrderInputChange}
+                          className="w-16 h-10 text-center font-mono font-semibold text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          placeholder="1"
+                        />
+                        <div className="flex flex-col gap-0.5">
+                          <Tooltip delayDuration={300} disableHoverableContent>
+                            <TooltipTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleOrderChange(1)}
+                                disabled={formOrder >= 100}
+                                className="h-4 w-5 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+                              >
+                                <ChevronUp className="h-3 w-3 text-muted-foreground" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{t("hierarchy.increment_order")}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <Tooltip delayDuration={300} disableHoverableContent>
+                            <TooltipTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleOrderChange(-1)}
+                                disabled={formOrder <= 1}
+                                className="h-4 w-5 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+                              >
+                                <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{t("hierarchy.decrement_order")}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {t("hierarchy.order_hint")}
+                    </p>
+                  </div>
+
+                  {/* Seletor de Cor */}
+                  <div className="space-y-2">
+                    <Label className="text-primary">
+                      {t("hierarchy.title_color")}
+                    </Label>
+                    <div className="grid grid-cols-6 gap-2">
+                      {HIERARCHY_TITLE_COLORS.map((color) => (
+                        <Tooltip key={color.value} delayDuration={300}>
+                          <TooltipTrigger asChild>
+                            <button
+                              type="button"
+                              onClick={() => setFormColor(color.value)}
+                              className={cn(
+                                "w-10 h-10 rounded-lg border flex items-center justify-center transition-all hover:opacity-60",
+                                color.pickerBg,
+                                formColor === color.value
+                                  ? "opacity-60 border-foreground"
+                                  : "border-border"
+                              )}
+                            >
+                              {formColor === color.value && (
+                                <Check className="w-5 h-5 text-white" />
+                              )}
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{t(`hierarchy.colors.${color.value}`)}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

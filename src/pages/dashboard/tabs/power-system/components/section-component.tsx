@@ -362,32 +362,30 @@ export function SectionComponent({
       {!isCollapsed && (
         <div className="p-4 space-y-3">
           {/* Blocks */}
-          {sortedBlocks.length > 0 ? (
-            sortedBlocks.map((block, index) => (
-              <BlockWrapper
-                key={block.id}
-                block={block}
-                pages={pages}
-                bookId={bookId}
-                isEditMode={isEditMode}
-                isReadOnlyView={isReadOnlyView}
-                isFirst={index === 0}
-                isLast={index === sortedBlocks.length - 1}
-                onUpdate={(content) => onUpdateBlock(block.id, content)}
-                onDelete={() => onDeleteBlock(block.id)}
-                onMoveUp={() => handleMoveBlockUp(block.id)}
-                onMoveDown={() => handleMoveBlockDown(block.id)}
-                onPageSelect={onPageSelect}
-                currentPageId={currentPageId}
-              />
-            ))
-          ) : (
-            !isEditMode && (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                {t("section.empty_blocks")}
-              </p>
-            )
-          )}
+          {sortedBlocks.length > 0
+            ? sortedBlocks.map((block, index) => (
+                <BlockWrapper
+                  key={block.id}
+                  block={block}
+                  pages={pages}
+                  bookId={bookId}
+                  isEditMode={isEditMode}
+                  isReadOnlyView={isReadOnlyView}
+                  isFirst={index === 0}
+                  isLast={index === sortedBlocks.length - 1}
+                  onUpdate={(content) => onUpdateBlock(block.id, content)}
+                  onDelete={() => onDeleteBlock(block.id)}
+                  onMoveUp={() => handleMoveBlockUp(block.id)}
+                  onMoveDown={() => handleMoveBlockDown(block.id)}
+                  onPageSelect={onPageSelect}
+                  currentPageId={currentPageId}
+                />
+              ))
+            : !isEditMode && (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  {t("section.empty_blocks")}
+                </p>
+              )}
 
           {/* Add Block Button */}
           {isEditMode && (

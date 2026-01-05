@@ -218,7 +218,6 @@ export function CreateCharacterModalView({
                 onValueChange={(value) => setValue("gender", value)}
               >
                 <SelectTrigger>
-
                   <SelectValue placeholder={t("modal.gender_placeholder")} />
                 </SelectTrigger>
                 <SelectContent side="bottom">

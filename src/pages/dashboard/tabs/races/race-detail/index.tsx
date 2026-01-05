@@ -3,18 +3,18 @@ import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
+import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   getRaceById,
   getRacesByBookId,
   getRaceRelationships,
   saveRaceRelationships,
 } from "@/lib/db/races.service";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useRacesStore } from "@/stores/races-store";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { RaceDetailView } from "./view";
-import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
 
 import type { IRace } from "../types/race-types";
 import type {
@@ -81,7 +81,8 @@ export function RaceDetail() {
   >([]);
 
   // Ref to keep sectionVisibility always up-to-date (fixes async setState issue)
-  const sectionVisibilityRef = useRef<Record<string, boolean>>(sectionVisibility);
+  const sectionVisibilityRef =
+    useRef<Record<string, boolean>>(sectionVisibility);
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -357,12 +358,7 @@ export function RaceDetail() {
     } catch (error) {
       console.error("Error deleting race:", error);
     }
-  }, [
-    raceId,
-    dashboardId,
-    deleteRaceFromCache,
-    navigate,
-  ]);
+  }, [raceId, dashboardId, deleteRaceFromCache, navigate]);
 
   const handleFieldVisibilityToggle = useCallback((fieldName: string) => {
     setFieldVisibility((prev) => ({

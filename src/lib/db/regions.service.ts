@@ -5,16 +5,14 @@ import {
   RegionSeason,
 } from "@/pages/dashboard/tabs/world/types/region-types";
 
-import { getDB } from "./index";
-import { safeDBOperation } from "./safe-db-operation";
 import {
   cleanCommonEntityReferences,
   removeFromJSONArray,
 } from "./cleanup-helpers";
-import {
-  safeParseUnknownObject,
-  safeParseEntityRefs,
-} from "./safe-json-parse";
+import { safeDBOperation } from "./safe-db-operation";
+import { safeParseUnknownObject, safeParseEntityRefs } from "./safe-json-parse";
+
+import { getDB } from "./index";
 
 /**
  * Database representation of a region (snake_case)
@@ -160,13 +158,13 @@ function dbRegionToRegion(dbRegion: DBRegion): IRegion {
  */
 export async function getRegionsByBookId(bookId: string): Promise<IRegion[]> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const result = await db.select<DBRegion[]>(
-    "SELECT * FROM regions WHERE book_id = $1 ORDER BY order_index DESC, created_at DESC",
-    [bookId]
-  );
-  return result.map(dbRegionToRegion);
-}, 'getRegionsByBookId');
+    const db = await getDB();
+    const result = await db.select<DBRegion[]>(
+      "SELECT * FROM regions WHERE book_id = $1 ORDER BY order_index DESC, created_at DESC",
+      [bookId]
+    );
+    return result.map(dbRegionToRegion);
+  }, "getRegionsByBookId");
 }
 
 /**
@@ -174,13 +172,13 @@ export async function getRegionsByBookId(bookId: string): Promise<IRegion[]> {
  */
 export async function getRegionById(id: string): Promise<IRegion | null> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const result = await db.select<DBRegion[]>(
-    "SELECT * FROM regions WHERE id = $1",
-    [id]
-  );
-  return result.length > 0 ? dbRegionToRegion(result[0]) : null;
-}, 'getRegionById');
+    const db = await getDB();
+    const result = await db.select<DBRegion[]>(
+      "SELECT * FROM regions WHERE id = $1",
+      [id]
+    );
+    return result.length > 0 ? dbRegionToRegion(result[0]) : null;
+  }, "getRegionById");
 }
 
 /**
@@ -190,33 +188,33 @@ export async function createRegion(
   region: Omit<IRegion, "id" | "createdAt" | "updatedAt" | "orderIndex">
 ): Promise<IRegion> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const now = Date.now();
-  const id = crypto.randomUUID();
+    const db = await getDB();
+    const now = Date.now();
+    const id = crypto.randomUUID();
 
-  // Calculate the next order_index for regions with the same parent
-  const siblings = await db.select<DBRegion[]>(
-    `SELECT MAX(order_index) as max_order FROM regions WHERE book_id = $1 AND ${
-      region.parentId ? "parent_id = $2" : "parent_id IS NULL"
-    }`,
-    region.parentId ? [region.bookId, region.parentId] : [region.bookId]
-  );
+    // Calculate the next order_index for regions with the same parent
+    const siblings = await db.select<DBRegion[]>(
+      `SELECT MAX(order_index) as max_order FROM regions WHERE book_id = $1 AND ${
+        region.parentId ? "parent_id = $2" : "parent_id IS NULL"
+      }`,
+      region.parentId ? [region.bookId, region.parentId] : [region.bookId]
+    );
 
-  const maxOrder = (siblings[0] as any)?.max_order ?? -1;
-  const orderIndex = maxOrder + 1;
+    const maxOrder = (siblings[0] as any)?.max_order ?? -1;
+    const orderIndex = maxOrder + 1;
 
-  const newRegion: IRegion = {
-    ...region,
-    id,
-    orderIndex,
-    createdAt: now,
-    updatedAt: now,
-  };
+    const newRegion: IRegion = {
+      ...region,
+      id,
+      orderIndex,
+      createdAt: now,
+      updatedAt: now,
+    };
 
-  const dbRegion = regionToDBRegion(newRegion);
+    const dbRegion = regionToDBRegion(newRegion);
 
-  await db.execute(
-    `INSERT INTO regions (
+    await db.execute(
+      `INSERT INTO regions (
       id, book_id, name, parent_id, scale, summary, image, order_index, created_at, updated_at,
       climate, current_season, custom_season_name, general_description, region_anomalies,
       resident_factions, dominant_factions, important_characters, races_found, items_found,
@@ -229,41 +227,41 @@ export async function createRegion(
       $21, $22, $23, $24, $25, $26, $27,
       $28, $29
     )`,
-    [
-      dbRegion.id,
-      dbRegion.book_id,
-      dbRegion.name,
-      dbRegion.parent_id,
-      dbRegion.scale,
-      dbRegion.summary,
-      dbRegion.image,
-      dbRegion.order_index,
-      dbRegion.created_at,
-      dbRegion.updated_at,
-      dbRegion.climate,
-      dbRegion.current_season,
-      dbRegion.custom_season_name,
-      dbRegion.general_description,
-      dbRegion.region_anomalies,
-      dbRegion.resident_factions,
-      dbRegion.dominant_factions,
-      dbRegion.important_characters,
-      dbRegion.races_found,
-      dbRegion.items_found,
-      dbRegion.narrative_purpose,
-      dbRegion.unique_characteristics,
-      dbRegion.political_importance,
-      dbRegion.religious_importance,
-      dbRegion.world_perception,
-      dbRegion.region_mysteries,
-      dbRegion.inspirations,
-      dbRegion.section_visibility,
-      dbRegion.timeline,
-    ]
-  );
+      [
+        dbRegion.id,
+        dbRegion.book_id,
+        dbRegion.name,
+        dbRegion.parent_id,
+        dbRegion.scale,
+        dbRegion.summary,
+        dbRegion.image,
+        dbRegion.order_index,
+        dbRegion.created_at,
+        dbRegion.updated_at,
+        dbRegion.climate,
+        dbRegion.current_season,
+        dbRegion.custom_season_name,
+        dbRegion.general_description,
+        dbRegion.region_anomalies,
+        dbRegion.resident_factions,
+        dbRegion.dominant_factions,
+        dbRegion.important_characters,
+        dbRegion.races_found,
+        dbRegion.items_found,
+        dbRegion.narrative_purpose,
+        dbRegion.unique_characteristics,
+        dbRegion.political_importance,
+        dbRegion.religious_importance,
+        dbRegion.world_perception,
+        dbRegion.region_mysteries,
+        dbRegion.inspirations,
+        dbRegion.section_visibility,
+        dbRegion.timeline,
+      ]
+    );
 
-  return newRegion;
-}, 'createRegion');
+    return newRegion;
+  }, "createRegion");
 }
 
 /**
@@ -274,26 +272,26 @@ export async function updateRegion(
   updates: Partial<Omit<IRegion, "id" | "bookId" | "createdAt">>
 ): Promise<void> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const now = Date.now();
+    const db = await getDB();
+    const now = Date.now();
 
-  // Get current region
-  const current = await getRegionById(id);
-  if (!current) {
-    throw new Error("Region not found");
-  }
+    // Get current region
+    const current = await getRegionById(id);
+    if (!current) {
+      throw new Error("Region not found");
+    }
 
-  // Merge updates
-  const updatedRegion: IRegion = {
-    ...current,
-    ...updates,
-    updatedAt: now,
-  };
+    // Merge updates
+    const updatedRegion: IRegion = {
+      ...current,
+      ...updates,
+      updatedAt: now,
+    };
 
-  const dbRegion = regionToDBRegion(updatedRegion);
+    const dbRegion = regionToDBRegion(updatedRegion);
 
-  await db.execute(
-    `UPDATE regions SET
+    await db.execute(
+      `UPDATE regions SET
       name = $1,
       parent_id = $2,
       scale = $3,
@@ -321,37 +319,37 @@ export async function updateRegion(
       section_visibility = $25,
       timeline = $26
     WHERE id = $27`,
-    [
-      dbRegion.name,
-      dbRegion.parent_id,
-      dbRegion.scale,
-      dbRegion.summary,
-      dbRegion.image,
-      dbRegion.order_index,
-      dbRegion.updated_at,
-      dbRegion.climate,
-      dbRegion.current_season,
-      dbRegion.custom_season_name,
-      dbRegion.general_description,
-      dbRegion.region_anomalies,
-      dbRegion.resident_factions,
-      dbRegion.dominant_factions,
-      dbRegion.important_characters,
-      dbRegion.races_found,
-      dbRegion.items_found,
-      dbRegion.narrative_purpose,
-      dbRegion.unique_characteristics,
-      dbRegion.political_importance,
-      dbRegion.religious_importance,
-      dbRegion.world_perception,
-      dbRegion.region_mysteries,
-      dbRegion.inspirations,
-      dbRegion.section_visibility,
-      dbRegion.timeline,
-      id,
-    ]
-  );
-}, 'updateRegion');
+      [
+        dbRegion.name,
+        dbRegion.parent_id,
+        dbRegion.scale,
+        dbRegion.summary,
+        dbRegion.image,
+        dbRegion.order_index,
+        dbRegion.updated_at,
+        dbRegion.climate,
+        dbRegion.current_season,
+        dbRegion.custom_season_name,
+        dbRegion.general_description,
+        dbRegion.region_anomalies,
+        dbRegion.resident_factions,
+        dbRegion.dominant_factions,
+        dbRegion.important_characters,
+        dbRegion.races_found,
+        dbRegion.items_found,
+        dbRegion.narrative_purpose,
+        dbRegion.unique_characteristics,
+        dbRegion.political_importance,
+        dbRegion.religious_importance,
+        dbRegion.world_perception,
+        dbRegion.region_mysteries,
+        dbRegion.inspirations,
+        dbRegion.section_visibility,
+        dbRegion.timeline,
+        id,
+      ]
+    );
+  }, "updateRegion");
 }
 
 /**
@@ -386,7 +384,7 @@ export async function deleteRegion(id: string): Promise<void> {
     // 8. Finally, delete the region (CASCADE will handle versions and markers)
     // Child regions will have parent_id SET NULL automatically
     await db.execute("DELETE FROM regions WHERE id = $1", [id]);
-  }, 'deleteRegion');
+  }, "deleteRegion");
 }
 
 /**
@@ -397,22 +395,22 @@ export async function updateParentRegion(
   newParentId: string | null
 ): Promise<void> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const now = Date.now();
+    const db = await getDB();
+    const now = Date.now();
 
-  // Prevent circular hierarchy
-  if (newParentId) {
-    const isCircular = await checkCircularHierarchy(regionId, newParentId);
-    if (isCircular) {
-      throw new Error("Cannot set parent: circular hierarchy detected");
+    // Prevent circular hierarchy
+    if (newParentId) {
+      const isCircular = await checkCircularHierarchy(regionId, newParentId);
+      if (isCircular) {
+        throw new Error("Cannot set parent: circular hierarchy detected");
+      }
     }
-  }
 
-  await db.execute(
-    "UPDATE regions SET parent_id = $1, updated_at = $2 WHERE id = $3",
-    [newParentId, now, regionId]
-  );
-}, 'updateParentRegion');
+    await db.execute(
+      "UPDATE regions SET parent_id = $1, updated_at = $2 WHERE id = $3",
+      [newParentId, now, regionId]
+    );
+  }, "updateParentRegion");
 }
 
 /**
@@ -457,49 +455,49 @@ export async function getRegionHierarchy(
   bookId: string
 ): Promise<IRegionWithChildren[]> {
   return safeDBOperation(async () => {
-  const regions = await getRegionsByBookId(bookId);
+    const regions = await getRegionsByBookId(bookId);
 
-  // Build a map for quick lookup
-  const regionMap = new Map<string, IRegionWithChildren>();
-  regions.forEach((region) => {
-    regionMap.set(region.id, { ...region, children: [] });
-  });
-
-  // Build the tree
-  const rootRegions: IRegionWithChildren[] = [];
-
-  regions.forEach((region) => {
-    const regionWithChildren = regionMap.get(region.id)!;
-
-    if (region.parentId === null) {
-      // Top-level region
-      rootRegions.push(regionWithChildren);
-    } else {
-      // Child region - add to parent
-      const parent = regionMap.get(region.parentId);
-      if (parent) {
-        parent.children.push(regionWithChildren);
-      } else {
-        // Parent not found - treat as root
-        rootRegions.push(regionWithChildren);
-      }
-    }
-  });
-
-  // Sort children by orderIndex
-  const sortByOrderIndex = (regions: IRegionWithChildren[]) => {
-    regions.sort((a, b) => b.orderIndex - a.orderIndex);
+    // Build a map for quick lookup
+    const regionMap = new Map<string, IRegionWithChildren>();
     regions.forEach((region) => {
-      if (region.children.length > 0) {
-        sortByOrderIndex(region.children);
+      regionMap.set(region.id, { ...region, children: [] });
+    });
+
+    // Build the tree
+    const rootRegions: IRegionWithChildren[] = [];
+
+    regions.forEach((region) => {
+      const regionWithChildren = regionMap.get(region.id)!;
+
+      if (region.parentId === null) {
+        // Top-level region
+        rootRegions.push(regionWithChildren);
+      } else {
+        // Child region - add to parent
+        const parent = regionMap.get(region.parentId);
+        if (parent) {
+          parent.children.push(regionWithChildren);
+        } else {
+          // Parent not found - treat as root
+          rootRegions.push(regionWithChildren);
+        }
       }
     });
-  };
 
-  sortByOrderIndex(rootRegions);
+    // Sort children by orderIndex
+    const sortByOrderIndex = (regions: IRegionWithChildren[]) => {
+      regions.sort((a, b) => b.orderIndex - a.orderIndex);
+      regions.forEach((region) => {
+        if (region.children.length > 0) {
+          sortByOrderIndex(region.children);
+        }
+      });
+    };
 
-  return rootRegions;
-}, 'getRegionHierarchy');
+    sortByOrderIndex(rootRegions);
+
+    return rootRegions;
+  }, "getRegionHierarchy");
 }
 
 /**
@@ -524,7 +522,6 @@ interface DBRegionVersion {
   region_data: string;
 }
 
-
 /**
  * Reorder regions within the same parent
  * Similar to power system's reorderPages function
@@ -534,17 +531,17 @@ export async function reorderRegions(
   _parentId: string | null
 ): Promise<void> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const now = Date.now();
+    const db = await getDB();
+    const now = Date.now();
 
-  // Update each region with its new order index
-  for (let i = 0; i < regionIds.length; i++) {
-    await db.execute(
-      "UPDATE regions SET order_index = $1, updated_at = $2 WHERE id = $3",
-      [i, now, regionIds[i]]
-    );
-  }
-}, 'reorderRegions');
+    // Update each region with its new order index
+    for (let i = 0; i < regionIds.length; i++) {
+      await db.execute(
+        "UPDATE regions SET order_index = $1, updated_at = $2 WHERE id = $3",
+        [i, now, regionIds[i]]
+      );
+    }
+  }, "reorderRegions");
 }
 
 /**
@@ -557,40 +554,39 @@ export async function moveRegion(
   newOrderIndex?: number
 ): Promise<void> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const now = Date.now();
+    const db = await getDB();
+    const now = Date.now();
 
-  // Prevent circular hierarchy
-  if (newParentId) {
-    const isCircular = await checkCircularHierarchy(regionId, newParentId);
-    if (isCircular) {
-      throw new Error("Cannot move region: circular hierarchy detected");
-    }
-  }
-
-  // If no order index provided, calculate the next one
-  let orderIndex = newOrderIndex;
-  if (orderIndex === undefined) {
-    const region = await getRegionById(regionId);
-    if (!region) {
-      throw new Error("Region not found");
+    // Prevent circular hierarchy
+    if (newParentId) {
+      const isCircular = await checkCircularHierarchy(regionId, newParentId);
+      if (isCircular) {
+        throw new Error("Cannot move region: circular hierarchy detected");
+      }
     }
 
-    const siblings = await db.select<DBRegion[]>(
-      `SELECT MAX(order_index) as max_order FROM regions WHERE book_id = $1 AND ${
-        newParentId ? "parent_id = $2" : "parent_id IS NULL"
-      }`,
-      newParentId ? [region.bookId, newParentId] : [region.bookId]
+    // If no order index provided, calculate the next one
+    let orderIndex = newOrderIndex;
+    if (orderIndex === undefined) {
+      const region = await getRegionById(regionId);
+      if (!region) {
+        throw new Error("Region not found");
+      }
+
+      const siblings = await db.select<DBRegion[]>(
+        `SELECT MAX(order_index) as max_order FROM regions WHERE book_id = $1 AND ${
+          newParentId ? "parent_id = $2" : "parent_id IS NULL"
+        }`,
+        newParentId ? [region.bookId, newParentId] : [region.bookId]
+      );
+
+      const maxOrder = (siblings[0] as any)?.max_order ?? -1;
+      orderIndex = maxOrder + 1;
+    }
+
+    await db.execute(
+      "UPDATE regions SET parent_id = $1, order_index = $2, updated_at = $3 WHERE id = $4",
+      [newParentId, orderIndex, now, regionId]
     );
-
-    const maxOrder = (siblings[0] as any)?.max_order ?? -1;
-    orderIndex = maxOrder + 1;
-  }
-
-  await db.execute(
-    "UPDATE regions SET parent_id = $1, order_index = $2, updated_at = $3 WHERE id = $4",
-    [newParentId, orderIndex, now, regionId]
-  );
-}, 'moveRegion');
+  }, "moveRegion");
 }
-

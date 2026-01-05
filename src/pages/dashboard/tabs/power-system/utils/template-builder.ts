@@ -42,7 +42,11 @@ async function createPageWithContent(
   // Create the page
   const pageId = await createPowerPage(systemId, pageName, groupId, orderIndex);
 
-  const navigatorBlocks: Array<{ blockId: string; targetPageName: string; content: any }> = [];
+  const navigatorBlocks: Array<{
+    blockId: string;
+    targetPageName: string;
+    content: any;
+  }> = [];
 
   // Create sections and blocks
   for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex++) {
@@ -56,7 +60,12 @@ async function createPageWithContent(
     // Create blocks within the section
     for (let blockIndex = 0; blockIndex < section.blocks.length; blockIndex++) {
       const block = section.blocks[blockIndex];
-      const blockId = await createPowerBlock(sectionId, block.type, block.content, blockIndex);
+      const blockId = await createPowerBlock(
+        sectionId,
+        block.type,
+        block.content,
+        blockIndex
+      );
 
       // Track navigator blocks for later linking
       if (block.type === "navigator" && block.content.title) {
@@ -75,7 +84,11 @@ async function createPageWithContent(
         }
 
         if (targetPageName) {
-          navigatorBlocks.push({ blockId, targetPageName, content: block.content });
+          navigatorBlocks.push({
+            blockId,
+            targetPageName,
+            content: block.content,
+          });
         }
       }
     }
@@ -100,7 +113,8 @@ export async function buildMagicTemplate(
 
   let firstPageId: string | null = null;
   const pageMap = new Map<string, string>(); // pageName -> pageId
-  const allNavigatorBlocks: Array<{ blockId: string; targetPageName: string }> = [];
+  const allNavigatorBlocks: Array<{ blockId: string; targetPageName: string }> =
+    [];
 
   // Create the overview page (without group)
   const overviewResult = await createPageWithContent(
@@ -163,7 +177,11 @@ export async function buildMartialTemplate(
 
   let firstPageId: string | null = null;
   const pageMap = new Map<string, string>(); // pageName -> pageId
-  const allNavigatorBlocks: Array<{ blockId: string; targetPageName: string; content: any }> = [];
+  const allNavigatorBlocks: Array<{
+    blockId: string;
+    targetPageName: string;
+    content: any;
+  }> = [];
 
   // Create the overview page (without group)
   const overviewResult = await createPageWithContent(

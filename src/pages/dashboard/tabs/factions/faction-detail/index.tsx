@@ -65,7 +65,9 @@ export function FactionDetail() {
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [imagePreview, setImagePreview] = useState<string>("");
-  const [hasChapterMetrics, setHasChapterMetrics] = useState<boolean | null>(null);
+  const [hasChapterMetrics, setHasChapterMetrics] = useState<boolean | null>(
+    null
+  );
   const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
   const [uiState, setUiState] = useState<IFactionUIState>(() => {
     const stored = localStorage.getItem("factionDetailAdvancedSectionOpen");
@@ -169,13 +171,22 @@ export function FactionDetail() {
     const { uiState: _editDataUiState, ...editDataData } = editData;
 
     // Check if data has changed (excluding uiState)
-    const dataChanged = JSON.stringify(factionData) !== JSON.stringify(editDataData);
+    const dataChanged =
+      JSON.stringify(factionData) !== JSON.stringify(editDataData);
 
     // Check if UI state has changed (section visibility)
-    const uiStateChanged = JSON.stringify(uiState.sectionVisibility) !== JSON.stringify(originalUiState.sectionVisibility);
+    const uiStateChanged =
+      JSON.stringify(uiState.sectionVisibility) !==
+      JSON.stringify(originalUiState.sectionVisibility);
 
     return dataChanged || uiStateChanged;
-  }, [isEditing, faction, editData, uiState.sectionVisibility, originalUiState.sectionVisibility]);
+  }, [
+    isEditing,
+    faction,
+    editData,
+    uiState.sectionVisibility,
+    originalUiState.sectionVisibility,
+  ]);
 
   // Load all entity caches
   useEffect(() => {
@@ -189,7 +200,14 @@ export function FactionDetail() {
       fetchItems(dashboardId),
       fetchRegions(dashboardId),
     ]);
-  }, [dashboardId, fetchFactions, fetchCharacters, fetchRaces, fetchItems, fetchRegions]);
+  }, [
+    dashboardId,
+    fetchFactions,
+    fetchCharacters,
+    fetchRaces,
+    fetchItems,
+    fetchRegions,
+  ]);
 
   // Load faction from database
   useEffect(() => {
@@ -203,7 +221,9 @@ export function FactionDetail() {
 
           // Load section visibility from database (olhinho - per faction)
           // But keep advancedSectionOpen from localStorage (setinha - global preference)
-          const stored = localStorage.getItem("factionDetailAdvancedSectionOpen");
+          const stored = localStorage.getItem(
+            "factionDetailAdvancedSectionOpen"
+          );
           const loadedUiState = {
             advancedSectionOpen: stored ? JSON.parse(stored) : false,
             sectionVisibility: factionFromDB.uiState?.sectionVisibility ?? {
@@ -214,8 +234,11 @@ export function FactionDetail() {
           setUiState(loadedUiState);
           setOriginalUiState(loadedUiState);
 
-          console.log('[Faction Load] factionFromDB.uiState:', factionFromDB.uiState);
-          console.log('[Faction Load] loadedUiState:', loadedUiState);
+          console.log(
+            "[Faction Load] factionFromDB.uiState:",
+            factionFromDB.uiState
+          );
+          console.log("[Faction Load] loadedUiState:", loadedUiState);
         }
       } catch (error) {
         console.error("Error loading faction:", error);
@@ -338,8 +361,11 @@ export function FactionDetail() {
       setFaction(updatedFaction);
       setImagePreview(updatedFaction.image || "");
 
-      console.log('[Faction Save] currentUiState from ref:', currentUiState);
-      console.log('[Faction Save] updatedFaction.uiState:', updatedFaction.uiState);
+      console.log("[Faction Save] currentUiState from ref:", currentUiState);
+      console.log(
+        "[Faction Save] updatedFaction.uiState:",
+        updatedFaction.uiState
+      );
 
       await updateFactionInStore(factionId, updatedFaction);
 
@@ -495,11 +521,15 @@ export function FactionDetail() {
     setUiState(newUiState);
   }, [uiState]);
 
-
   const handleSectionVisibilityChange = useCallback(
     (sectionName: string, isVisible: boolean) => {
-      console.log('[handleSectionVisibilityChange] sectionName:', sectionName, 'isVisible:', isVisible);
-      console.log('[handleSectionVisibilityChange] current uiState:', uiState);
+      console.log(
+        "[handleSectionVisibilityChange] sectionName:",
+        sectionName,
+        "isVisible:",
+        isVisible
+      );
+      console.log("[handleSectionVisibilityChange] current uiState:", uiState);
 
       const newUiState = {
         ...uiState,
@@ -509,12 +539,11 @@ export function FactionDetail() {
         },
       };
 
-      console.log('[handleSectionVisibilityChange] newUiState:', newUiState);
+      console.log("[handleSectionVisibilityChange] newUiState:", newUiState);
       setUiState(newUiState);
     },
     [uiState]
   );
-
 
   const handleFactionSelect = useCallback(
     (newFactionId: string) => {

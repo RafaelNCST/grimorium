@@ -217,60 +217,55 @@ export function HierarchySection({
       ) : (
         <div className="space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar pr-2 pb-4">
           {sortedMembers.map(({ characterId, character, title }) => {
-              const colorClasses = getColorClasses(title.color);
+            const colorClasses = getColorClasses(title.color);
 
-              return (
-                <div
-                  key={`${title.id}-${characterId}`}
-                  className={`flex items-center gap-3 p-3 rounded-lg ${colorClasses.bg} transition-all`}
-                >
-                  <Avatar className="w-10 h-10 border-2 border-border">
-                    <AvatarImage
-                      src={character.image}
-                      className="object-cover"
-                    />
-                    <AvatarFallback className="text-sm bg-muted text-muted-foreground">
-                      {character.name.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
+            return (
+              <div
+                key={`${title.id}-${characterId}`}
+                className={`flex items-center gap-3 p-3 rounded-lg ${colorClasses.bg} transition-all`}
+              >
+                <Avatar className="w-10 h-10 border-2 border-border">
+                  <AvatarImage src={character.image} className="object-cover" />
+                  <AvatarFallback className="text-sm bg-muted text-muted-foreground">
+                    {character.name.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
 
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate text-foreground">
-                      {character.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {title.name}
-                      {!title.isMembersTitle && title.order !== undefined && (
-                        <span className="ml-1">#{title.order}</span>
-                      )}
-                    </p>
-                  </div>
-
-                  {isEditing && (
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => handleEditMember(title.id, characterId)}
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost-destructive"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() =>
-                          handleRemoveMember(title.id, characterId)
-                        }
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  )}
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate text-foreground">
+                    {character.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {title.name}
+                    {!title.isMembersTitle && title.order !== undefined && (
+                      <span className="ml-1">#{title.order}</span>
+                    )}
+                  </p>
                 </div>
-              );
-            })}
+
+                {isEditing && (
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => handleEditMember(title.id, characterId)}
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost-destructive"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => handleRemoveMember(title.id, characterId)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

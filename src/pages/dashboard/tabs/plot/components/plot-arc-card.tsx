@@ -52,7 +52,9 @@ function getVisibleEvents(events: IPlotEvent[]): IPlotEvent[] {
 
   // Find next 2 incomplete events after the last completed
   const eventsAfterLastCompleted = events.slice(lastCompletedIndex + 1);
-  const nextTwoIncomplete = eventsAfterLastCompleted.filter(e => !e.completed).slice(0, 2);
+  const nextTwoIncomplete = eventsAfterLastCompleted
+    .filter((e) => !e.completed)
+    .slice(0, 2);
 
   // If we have 2 incomplete events after last completed, show [last completed, next 2 incomplete]
   if (nextTwoIncomplete.length === 2) {
@@ -61,8 +63,9 @@ function getVisibleEvents(events: IPlotEvent[]): IPlotEvent[] {
 
   // If we have only 1 incomplete after, check if remaining are all completed
   // In this case, or if all are completed, show last 3
-  const allCompleted = events.every(e => e.completed);
-  const onlyOneIncompleteLeft = eventsAfterLastCompleted.filter(e => !e.completed).length === 1;
+  const allCompleted = events.every((e) => e.completed);
+  const onlyOneIncompleteLeft =
+    eventsAfterLastCompleted.filter((e) => !e.completed).length === 1;
 
   if (allCompleted || onlyOneIncompleteLeft) {
     return events.slice(-3);
@@ -76,8 +79,8 @@ function getVisibleEvents(events: IPlotEvent[]): IPlotEvent[] {
     const needed = 3 - result.length;
     const additional = events.slice(Math.max(0, events.length - needed));
     // Merge without duplicates
-    const resultIds = new Set(result.map(e => e.id));
-    const filtered = additional.filter(e => !resultIds.has(e.id));
+    const resultIds = new Set(result.map((e) => e.id));
+    const filtered = additional.filter((e) => !resultIds.has(e.id));
     return [...result, ...filtered].slice(0, 3);
   }
 

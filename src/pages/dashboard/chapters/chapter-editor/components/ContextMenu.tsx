@@ -161,12 +161,12 @@ export function ContextMenu({
 
           {/* Editor actions */}
           <button
-            onClick={() => annotationHighlightsEnabled && handleAction(onAnnotate)}
+            onClick={() =>
+              annotationHighlightsEnabled && handleAction(onAnnotate)
+            }
             disabled={!annotationHighlightsEnabled}
             className={`w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors ${
-              annotationHighlightsEnabled
-                ? "hover:bg-muted"
-                : "opacity-50"
+              annotationHighlightsEnabled ? "hover:bg-muted" : "opacity-50"
             }`}
           >
             <MessageSquare className="h-4 w-4" />

@@ -1,5 +1,6 @@
-import { create } from 'zustand';
-import { SQLiteErrorType } from '@/lib/db/error-handler';
+import { create } from "zustand";
+
+import { SQLiteErrorType } from "@/lib/db/error-handler";
 
 interface ErrorModalStore {
   isOpen: boolean;

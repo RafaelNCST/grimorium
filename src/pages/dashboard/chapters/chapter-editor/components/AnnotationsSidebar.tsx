@@ -1,6 +1,17 @@
 import { useState } from "react";
 
-import { X, Star, Trash2, Edit, Save, Plus, MapPin, Palette, Eye, EyeOff } from "lucide-react";
+import {
+  X,
+  Star,
+  Trash2,
+  Edit,
+  Save,
+  Plus,
+  MapPin,
+  Palette,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -14,8 +25,9 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
-import type { Annotation, AnnotationNote, AnnotationColor } from "../types";
 import { ANNOTATION_COLORS } from "../types";
+
+import type { Annotation, AnnotationNote, AnnotationColor } from "../types";
 
 interface AnnotationsSidebarProps {
   annotation: Annotation | null;
@@ -146,85 +158,87 @@ export function AnnotationsSidebar({
         {/* Color Picker */}
         {!isSimplifiedMode && (
           <div className="p-4 border-b border-border">
-          {/* Color selection in one line */}
-          <div className="flex items-center gap-2">
-            <p className="text-sm text-muted-foreground whitespace-nowrap">
-              {t("annotations.color_label")}
-            </p>
-            <span className="text-sm font-medium">
-              {t(`annotation_colors.${currentColor}`)}
-            </span>
-            <div
-              className="w-5 h-5 rounded border border-border shrink-0"
-              style={{ backgroundColor: ANNOTATION_COLORS[currentColor].weak }}
-            />
-            <div className="flex-1" />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowColorPicker(!showColorPicker)}
-              className="h-7 px-2 shrink-0"
-            >
-              <Palette className="w-4 h-4 mr-1" />
-              {showColorPicker
-                ? t("annotations.close_picker")
-                : t("annotations.choose_color")}
-            </Button>
-          </div>
-
-          {/* Color Options */}
-          {showColorPicker && (
-            <div className="grid grid-cols-3 gap-2 mt-3">
-              {(Object.keys(ANNOTATION_COLORS) as AnnotationColor[]).map(
-                (colorKey) => {
-                  const colorData = ANNOTATION_COLORS[colorKey];
-                  const isSelected = colorKey === currentColor;
-
-                  return (
-                    <Tooltip key={colorKey}>
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={() => {
-                            onColorChange?.(annotation.id, colorKey);
-                            setShowColorPicker(false);
-                          }}
-                          className={cn(
-                            "flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all hover:scale-105",
-                            isSelected
-                              ? "border-primary bg-primary/5"
-                              : "border-border hover:border-primary/50"
-                          )}
-                        >
-                          <div className="flex gap-1">
-                            {/* Weak tone */}
-                            <div
-                              className="w-5 h-5 rounded border border-border"
-                              style={{ backgroundColor: colorData.weak }}
-                            />
-                            {/* Strong tone */}
-                            <div
-                              className="w-5 h-5 rounded border border-border"
-                              style={{ backgroundColor: colorData.strong }}
-                            />
-                          </div>
-                          <span className="text-xs font-medium">
-                            {t(`annotation_colors.${colorKey}`)}
-                          </span>
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>
-                          {t("annotations.color_tone_tooltip", {
-                            color: t(`annotation_colors.${colorKey}`),
-                          })}
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  );
-                }
-              )}
+            {/* Color selection in one line */}
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-muted-foreground whitespace-nowrap">
+                {t("annotations.color_label")}
+              </p>
+              <span className="text-sm font-medium">
+                {t(`annotation_colors.${currentColor}`)}
+              </span>
+              <div
+                className="w-5 h-5 rounded border border-border shrink-0"
+                style={{
+                  backgroundColor: ANNOTATION_COLORS[currentColor].weak,
+                }}
+              />
+              <div className="flex-1" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowColorPicker(!showColorPicker)}
+                className="h-7 px-2 shrink-0"
+              >
+                <Palette className="w-4 h-4 mr-1" />
+                {showColorPicker
+                  ? t("annotations.close_picker")
+                  : t("annotations.choose_color")}
+              </Button>
             </div>
-          )}
+
+            {/* Color Options */}
+            {showColorPicker && (
+              <div className="grid grid-cols-3 gap-2 mt-3">
+                {(Object.keys(ANNOTATION_COLORS) as AnnotationColor[]).map(
+                  (colorKey) => {
+                    const colorData = ANNOTATION_COLORS[colorKey];
+                    const isSelected = colorKey === currentColor;
+
+                    return (
+                      <Tooltip key={colorKey}>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => {
+                              onColorChange?.(annotation.id, colorKey);
+                              setShowColorPicker(false);
+                            }}
+                            className={cn(
+                              "flex flex-col items-center gap-1 p-2 rounded-lg border-2 transition-all hover:scale-105",
+                              isSelected
+                                ? "border-primary bg-primary/5"
+                                : "border-border hover:border-primary/50"
+                            )}
+                          >
+                            <div className="flex gap-1">
+                              {/* Weak tone */}
+                              <div
+                                className="w-5 h-5 rounded border border-border"
+                                style={{ backgroundColor: colorData.weak }}
+                              />
+                              {/* Strong tone */}
+                              <div
+                                className="w-5 h-5 rounded border border-border"
+                                style={{ backgroundColor: colorData.strong }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium">
+                              {t(`annotation_colors.${colorKey}`)}
+                            </span>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            {t("annotations.color_tone_tooltip", {
+                              color: t(`annotation_colors.${colorKey}`),
+                            })}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  }
+                )}
+              </div>
+            )}
           </div>
         )}
 

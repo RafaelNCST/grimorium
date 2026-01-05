@@ -5,6 +5,7 @@
  */
 
 import { BaseDirectory, exists, readDir, remove } from "@tauri-apps/plugin-fs";
+
 import { getDB } from "./index";
 
 export interface OrphanedFilesReport {
@@ -80,8 +81,14 @@ export async function scanOrphanedFiles(): Promise<OrphanedFilesReport> {
         report.debug!.galleryPathsInDB = Array.from(validPaths);
         report.debug!.galleryFilesFound = allGalleryFiles;
 
-        console.log("[cleanup] Gallery images in database:", report.debug!.galleryPathsInDB);
-        console.log("[cleanup] ALL files in gallery directory:", report.debug!.galleryFilesFound);
+        console.log(
+          "[cleanup] Gallery images in database:",
+          report.debug!.galleryPathsInDB
+        );
+        console.log(
+          "[cleanup] ALL files in gallery directory:",
+          report.debug!.galleryFilesFound
+        );
         console.log("[cleanup] Total files found:", allGalleryFiles.length);
 
         // Check each file
@@ -89,11 +96,15 @@ export async function scanOrphanedFiles(): Promise<OrphanedFilesReport> {
           if (file.isFile && !file.name.includes("thumbnails")) {
             const filePath = `gallery/${file.name}`;
             const existsInDB = validPaths.has(filePath);
-            console.log(`[cleanup] Checking file: ${filePath}, exists in DB: ${existsInDB}`);
+            console.log(
+              `[cleanup] Checking file: ${filePath}, exists in DB: ${existsInDB}`
+            );
 
             if (!existsInDB) {
               report.galleryOrphans.push(filePath);
-              console.log(`[cleanup] ⚠️  File ${filePath} is ORPHAN - will be deleted`);
+              console.log(
+                `[cleanup] ⚠️  File ${filePath} is ORPHAN - will be deleted`
+              );
             } else {
               console.log(`[cleanup] ✓ File ${filePath} is valid`);
             }
@@ -118,9 +129,9 @@ export async function scanOrphanedFiles(): Promise<OrphanedFilesReport> {
         });
 
         // Get all gallery items from database
-        const galleryItems = await db.select<{ thumbnail_path: string | null }[]>(
-          "SELECT thumbnail_path FROM gallery_items"
-        );
+        const galleryItems = await db.select<
+          { thumbnail_path: string | null }[]
+        >("SELECT thumbnail_path FROM gallery_items");
         const validPaths = new Set(
           galleryItems
             ?.filter((item) => item.thumbnail_path)
@@ -153,9 +164,9 @@ export async function scanOrphanedFiles(): Promise<OrphanedFilesReport> {
         });
 
         // Get all map paths from database
-        const maps = await db.select<{ region_id: string; image_path: string }[]>(
-          "SELECT region_id, image_path FROM region_maps"
-        );
+        const maps = await db.select<
+          { region_id: string; image_path: string }[]
+        >("SELECT region_id, image_path FROM region_maps");
         const validPaths = new Set(maps?.map((map) => map.image_path) || []);
 
         // Note: Duplicate maps are now automatically fixed before scanning
@@ -170,7 +181,10 @@ export async function scanOrphanedFiles(): Promise<OrphanedFilesReport> {
         report.debug!.mapFilesFound = allMapFiles;
 
         console.log("[cleanup] Maps in database:", report.debug!.mapPathsInDB);
-        console.log("[cleanup] ALL files in maps directory:", report.debug!.mapFilesFound);
+        console.log(
+          "[cleanup] ALL files in maps directory:",
+          report.debug!.mapFilesFound
+        );
         console.log("[cleanup] Total files found:", allMapFiles.length);
 
         // Check each file (ALL files, not just those starting with "map_")
@@ -178,11 +192,15 @@ export async function scanOrphanedFiles(): Promise<OrphanedFilesReport> {
           if (file.isFile) {
             const filePath = `maps/${file.name}`;
             const existsInDB = validPaths.has(filePath);
-            console.log(`[cleanup] Checking file: ${filePath}, exists in DB: ${existsInDB}`);
+            console.log(
+              `[cleanup] Checking file: ${filePath}, exists in DB: ${existsInDB}`
+            );
 
             if (!existsInDB) {
               report.mapOrphans.push(filePath);
-              console.log(`[cleanup] ⚠️  File ${filePath} is ORPHAN - will be deleted`);
+              console.log(
+                `[cleanup] ⚠️  File ${filePath} is ORPHAN - will be deleted`
+              );
             } else {
               console.log(`[cleanup] ✓ File ${filePath} is valid`);
             }
@@ -223,7 +241,9 @@ export async function cleanupOrphanedFiles(): Promise<OrphanedFilesReport> {
     duplicateMapsRemoved = fixReport.mapsRemoved;
 
     if (fixReport.duplicatesFound > 0) {
-      console.log(`[cleanup] Fixed ${fixReport.duplicatesFound} region(s) with duplicate maps`);
+      console.log(
+        `[cleanup] Fixed ${fixReport.duplicatesFound} region(s) with duplicate maps`
+      );
       console.log(`[cleanup] Removed ${fixReport.mapsRemoved} old map(s)`);
     }
 

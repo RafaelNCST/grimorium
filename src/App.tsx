@@ -9,8 +9,8 @@ import { DatabaseErrorModal } from "@/components/modals/database-error-modal";
 import { SplashScreen } from "@/components/splash-screen";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAutomaticCleanup } from "@/hooks/useAutomaticCleanup";
-import { useErrorModalStore } from "@/stores/error-modal-store";
 import { ChapterArcWarningProvider } from "@/lib/helpers/chapter-arc-warning";
+import { useErrorModalStore } from "@/stores/error-modal-store";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";

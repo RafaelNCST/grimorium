@@ -260,7 +260,10 @@ export function RaceSuperView({
           isEditing={isEditing}
           onFieldVisibilityToggle={onFieldVisibilityToggle}
         >
-          <DisplaySelectGrid value={race.habits} options={getHabitsOptions(t)} />
+          <DisplaySelectGrid
+            value={race.habits}
+            options={getHabitsOptions(t)}
+          />
         </FieldWithVisibilityToggle>
 
         {/* Reproductive Cycle */}

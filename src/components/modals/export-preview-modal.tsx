@@ -74,7 +74,11 @@ const LINE_SPACING_RANGE = { min: 1.0, max: 2.5, default: 2.0 };
 export interface ExportConfig {
   pageFormat: "a4" | "letter";
   margins: keyof typeof MARGIN_PRESETS;
-  titleFormat: "number-colon-title" | "number-dash-title" | "title-only" | "number-only";
+  titleFormat:
+    | "number-colon-title"
+    | "number-dash-title"
+    | "title-only"
+    | "number-only";
   titleFont: string;
   titleSize: number;
   titleAlignment: "left" | "center";
@@ -137,7 +141,9 @@ export function ExportPreviewModal({
   const [numPages, setNumPages] = useState<number>(0);
   const [hasError, setHasError] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [feedbackType, setFeedbackType] = useState<"success" | "error">("success");
+  const [feedbackType, setFeedbackType] = useState<"success" | "error">(
+    "success"
+  );
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const scale = 1.0; // Fixed zoom at 100%
   const [config, setConfig] = useState<ExportConfig>({
@@ -203,7 +209,8 @@ export function ExportPreviewModal({
       // Configurações do corpo - usar do editor ou padrões editoriais
       contentFont: initialContentFont || "Times New Roman",
       contentSize: initialContentSize || CONTENT_SIZE_RANGE.default,
-      contentLineSpacing: initialContentLineSpacing || LINE_SPACING_RANGE.default,
+      contentLineSpacing:
+        initialContentLineSpacing || LINE_SPACING_RANGE.default,
       contentAlignment: "left",
     });
   }, [open, initialContentFont, initialContentSize, initialContentLineSpacing]);
@@ -367,425 +374,478 @@ export function ExportPreviewModal({
       </AlertDialog>
 
       {/* Export Preview Modal */}
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[90vw] w-[1400px] max-h-[85vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <FileText className="w-5 h-5" />
-            {t("modal.title")}
-          </DialogTitle>
-        </DialogHeader>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-[90vw] w-[1400px] max-h-[85vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              {t("modal.title")}
+            </DialogTitle>
+          </DialogHeader>
 
-        {/* Main content: Settings on left, Preview on right */}
-        <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
-          {/* Settings Panel - Left Side */}
-          <div className={`w-80 flex-shrink-0 overflow-y-auto space-y-6 px-4 border-r relative z-10 ${hasError ? 'opacity-50 pointer-events-none' : ''}`}>
-            <div className="space-y-6 py-2">
-              {/* Page Format */}
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">
-                  {t("settings.page_format")}
-                </Label>
-                <RadioGroup
-                  value={config.pageFormat}
-                  onValueChange={(value) =>
-                    handleConfigChange("pageFormat", value as "a4" | "letter")
-                  }
-                  disabled={hasError}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="a4" id="a4" disabled={hasError} />
-                    <Label htmlFor="a4" className="cursor-pointer">
-                      {PAGE_FORMATS.a4.label}
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="letter" id="letter" disabled={hasError} />
-                    <Label htmlFor="letter" className="cursor-pointer">
-                      {PAGE_FORMATS.letter.label}
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
+          {/* Main content: Settings on left, Preview on right */}
+          <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
+            {/* Settings Panel - Left Side */}
+            <div
+              className={`w-80 flex-shrink-0 overflow-y-auto space-y-6 px-4 border-r relative z-10 ${hasError ? "opacity-50 pointer-events-none" : ""}`}
+            >
+              <div className="space-y-6 py-2">
+                {/* Page Format */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">
+                    {t("settings.page_format")}
+                  </Label>
+                  <RadioGroup
+                    value={config.pageFormat}
+                    onValueChange={(value) =>
+                      handleConfigChange("pageFormat", value as "a4" | "letter")
+                    }
+                    disabled={hasError}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="a4" id="a4" disabled={hasError} />
+                      <Label htmlFor="a4" className="cursor-pointer">
+                        {PAGE_FORMATS.a4.label}
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem
+                        value="letter"
+                        id="letter"
+                        disabled={hasError}
+                      />
+                      <Label htmlFor="letter" className="cursor-pointer">
+                        {PAGE_FORMATS.letter.label}
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
 
-              <Separator />
+                <Separator />
 
-              {/* Margins */}
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">
-                  {t("settings.margins")}
-                </Label>
-                <Select
-                  value={config.margins}
-                  onValueChange={(value) =>
-                    handleConfigChange(
-                      "margins",
-                      value as keyof typeof MARGIN_PRESETS
-                    )
-                  }
-                  disabled={hasError}
-                >
-                  <SelectTrigger disabled={hasError}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.keys(MARGIN_PRESETS).map((key) => (
-                      <SelectItem key={key} value={key}>
-                        {t(`margins.${key}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                {/* Margins */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">
+                    {t("settings.margins")}
+                  </Label>
+                  <Select
+                    value={config.margins}
+                    onValueChange={(value) =>
+                      handleConfigChange(
+                        "margins",
+                        value as keyof typeof MARGIN_PRESETS
+                      )
+                    }
+                    disabled={hasError}
+                  >
+                    <SelectTrigger disabled={hasError}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.keys(MARGIN_PRESETS).map((key) => (
+                        <SelectItem key={key} value={key}>
+                          {t(`margins.${key}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <Separator />
+                <Separator />
 
-              {/* Title Settings */}
-              <div className="space-y-4">
-                <Label className="text-base font-semibold">
-                  {t("settings.title_settings")}
-                </Label>
-
+                {/* Title Settings */}
                 <div className="space-y-4">
-                  {/* Title Format */}
-                  <div className="space-y-2">
-                    <Label>{t("singleExport.titleFormat")}</Label>
-                    <Select
-                      value={config.titleFormat}
-                      onValueChange={(value) =>
-                        handleConfigChange(
-                          "titleFormat",
-                          value as "number-colon-title" | "number-dash-title" | "title-only" | "number-only"
-                        )
-                      }
-                      disabled={hasError}
-                    >
-                      <SelectTrigger disabled={hasError}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="number-colon-title">
-                          {t("singleExport.titleFormatNumberColon")}
-                        </SelectItem>
-                        <SelectItem value="number-dash-title">
-                          {t("singleExport.titleFormatNumberDash")}
-                        </SelectItem>
-                        <SelectItem value="title-only">
-                          {t("singleExport.titleFormatTitleOnly")}
-                        </SelectItem>
-                        <SelectItem value="number-only">
-                          {t("singleExport.titleFormatNumberOnly")}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <Label className="text-base font-semibold">
+                    {t("settings.title_settings")}
+                  </Label>
 
-                  <div className="space-y-2">
-                    <Label>{t("settings.font")}</Label>
-                    <Select
-                      value={config.titleFont}
-                      onValueChange={(value) =>
-                        handleConfigChange("titleFont", value)
-                      }
-                      disabled={hasError}
-                    >
-                      <SelectTrigger disabled={hasError}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {FONT_FAMILIES.map((font) => (
-                          <SelectItem key={font.value} value={font.value}>
-                            {font.label}
+                  <div className="space-y-4">
+                    {/* Title Format */}
+                    <div className="space-y-2">
+                      <Label>{t("singleExport.titleFormat")}</Label>
+                      <Select
+                        value={config.titleFormat}
+                        onValueChange={(value) =>
+                          handleConfigChange(
+                            "titleFormat",
+                            value as
+                              | "number-colon-title"
+                              | "number-dash-title"
+                              | "title-only"
+                              | "number-only"
+                          )
+                        }
+                        disabled={hasError}
+                      >
+                        <SelectTrigger disabled={hasError}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="number-colon-title">
+                            {t("singleExport.titleFormatNumberColon")}
                           </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <Label>{t("settings.size")}</Label>
-                      <span className="text-sm font-medium text-primary">
-                        {config.titleSize}pt
-                      </span>
+                          <SelectItem value="number-dash-title">
+                            {t("singleExport.titleFormatNumberDash")}
+                          </SelectItem>
+                          <SelectItem value="title-only">
+                            {t("singleExport.titleFormatTitleOnly")}
+                          </SelectItem>
+                          <SelectItem value="number-only">
+                            {t("singleExport.titleFormatNumberOnly")}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <Slider
-                      value={[config.titleSize]}
-                      onValueChange={([value]) =>
-                        handleConfigChange("titleSize", value)
-                      }
-                      min={TITLE_SIZE_RANGE.min}
-                      max={TITLE_SIZE_RANGE.max}
-                      step={2}
-                      disabled={hasError}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>{TITLE_SIZE_RANGE.min}pt</span>
-                      <span>{TITLE_SIZE_RANGE.default}pt (padrão)</span>
-                      <span>{TITLE_SIZE_RANGE.max}pt</span>
-                    </div>
-                  </div>
 
-                  <div className="space-y-2">
-                    <Label>{t("settings.alignment")}</Label>
-                    <RadioGroup
-                      value={config.titleAlignment}
-                      onValueChange={(value) =>
-                        handleConfigChange(
-                          "titleAlignment",
-                          value as "left" | "center"
-                        )
-                      }
-                      className="flex gap-4"
-                      disabled={hasError}
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="left" id="title-left" disabled={hasError} />
-                        <Label htmlFor="title-left" className="cursor-pointer">
-                          {t("settings.alignment_left")}
-                        </Label>
+                    <div className="space-y-2">
+                      <Label>{t("settings.font")}</Label>
+                      <Select
+                        value={config.titleFont}
+                        onValueChange={(value) =>
+                          handleConfigChange("titleFont", value)
+                        }
+                        disabled={hasError}
+                      >
+                        <SelectTrigger disabled={hasError}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FONT_FAMILIES.map((font) => (
+                            <SelectItem key={font.value} value={font.value}>
+                              {font.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label>{t("settings.size")}</Label>
+                        <span className="text-sm font-medium text-primary">
+                          {config.titleSize}pt
+                        </span>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="center" id="title-center" disabled={hasError} />
-                        <Label
-                          htmlFor="title-center"
-                          className="cursor-pointer"
-                        >
-                          {t("settings.alignment_center")}
-                        </Label>
+                      <Slider
+                        value={[config.titleSize]}
+                        onValueChange={([value]) =>
+                          handleConfigChange("titleSize", value)
+                        }
+                        min={TITLE_SIZE_RANGE.min}
+                        max={TITLE_SIZE_RANGE.max}
+                        step={2}
+                        disabled={hasError}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>{TITLE_SIZE_RANGE.min}pt</span>
+                        <span>{TITLE_SIZE_RANGE.default}pt (padrão)</span>
+                        <span>{TITLE_SIZE_RANGE.max}pt</span>
                       </div>
-                    </RadioGroup>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="titleBold"
-                      checked={config.titleBold}
-                      onCheckedChange={(checked) =>
-                        handleConfigChange("titleBold", checked as boolean)
-                      }
-                      disabled={hasError}
-                    />
-                    <Label htmlFor="titleBold" className="cursor-pointer">
-                      {t("singleExport.bold")}
-                    </Label>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <Label>{t("singleExport.titleSpacing")}</Label>
-                      <span className="text-sm font-medium text-primary">
-                        {config.titleSpacing}pt
-                      </span>
                     </div>
-                    <Slider
-                      value={[config.titleSpacing]}
-                      onValueChange={([value]) =>
-                        handleConfigChange("titleSpacing", value)
-                      }
-                      min={20}
-                      max={80}
-                      step={5}
-                      disabled={hasError}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>20pt</span>
-                      <span>40pt (padrão)</span>
-                      <span>80pt</span>
+
+                    <div className="space-y-2">
+                      <Label>{t("settings.alignment")}</Label>
+                      <RadioGroup
+                        value={config.titleAlignment}
+                        onValueChange={(value) =>
+                          handleConfigChange(
+                            "titleAlignment",
+                            value as "left" | "center"
+                          )
+                        }
+                        className="flex gap-4"
+                        disabled={hasError}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="left"
+                            id="title-left"
+                            disabled={hasError}
+                          />
+                          <Label
+                            htmlFor="title-left"
+                            className="cursor-pointer"
+                          >
+                            {t("settings.alignment_left")}
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="center"
+                            id="title-center"
+                            disabled={hasError}
+                          />
+                          <Label
+                            htmlFor="title-center"
+                            className="cursor-pointer"
+                          >
+                            {t("settings.alignment_center")}
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="titleBold"
+                        checked={config.titleBold}
+                        onCheckedChange={(checked) =>
+                          handleConfigChange("titleBold", checked as boolean)
+                        }
+                        disabled={hasError}
+                      />
+                      <Label htmlFor="titleBold" className="cursor-pointer">
+                        {t("singleExport.bold")}
+                      </Label>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label>{t("singleExport.titleSpacing")}</Label>
+                        <span className="text-sm font-medium text-primary">
+                          {config.titleSpacing}pt
+                        </span>
+                      </div>
+                      <Slider
+                        value={[config.titleSpacing]}
+                        onValueChange={([value]) =>
+                          handleConfigChange("titleSpacing", value)
+                        }
+                        min={20}
+                        max={80}
+                        step={5}
+                        disabled={hasError}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>20pt</span>
+                        <span>40pt (padrão)</span>
+                        <span>80pt</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <Separator />
+                <Separator />
 
-              {/* Content Text Settings */}
-              <div className="space-y-4">
-                <Label className="text-base font-semibold">
-                  {t("singleExport.contentSettings")}
-                </Label>
-
+                {/* Content Text Settings */}
                 <div className="space-y-4">
-                  {/* Content Font */}
-                  <div className="space-y-2">
-                    <Label>{t("singleExport.font")}</Label>
-                    <Select
-                      value={config.contentFont}
-                      onValueChange={(value) =>
-                        handleConfigChange("contentFont", value)
-                      }
-                      disabled={hasError}
-                    >
-                      <SelectTrigger disabled={hasError}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {FONT_FAMILIES.map((font) => (
-                          <SelectItem key={font.value} value={font.value}>
-                            {font.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <Label className="text-base font-semibold">
+                    {t("singleExport.contentSettings")}
+                  </Label>
 
-                  {/* Content Size with Slider */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <Label>{t("singleExport.size")}</Label>
-                      <span className="text-sm font-medium text-primary">
-                        {config.contentSize}pt
-                      </span>
+                  <div className="space-y-4">
+                    {/* Content Font */}
+                    <div className="space-y-2">
+                      <Label>{t("singleExport.font")}</Label>
+                      <Select
+                        value={config.contentFont}
+                        onValueChange={(value) =>
+                          handleConfigChange("contentFont", value)
+                        }
+                        disabled={hasError}
+                      >
+                        <SelectTrigger disabled={hasError}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FONT_FAMILIES.map((font) => (
+                            <SelectItem key={font.value} value={font.value}>
+                              {font.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <Slider
-                      value={[config.contentSize]}
-                      onValueChange={([value]) =>
-                        handleConfigChange("contentSize", value)
-                      }
-                      min={CONTENT_SIZE_RANGE.min}
-                      max={CONTENT_SIZE_RANGE.max}
-                      step={1}
-                      disabled={hasError}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>{CONTENT_SIZE_RANGE.min}pt</span>
-                      <span>{CONTENT_SIZE_RANGE.default}pt (padrão)</span>
-                      <span>{CONTENT_SIZE_RANGE.max}pt</span>
-                    </div>
-                  </div>
 
-                  {/* Line Spacing with Slider */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <Label>{t("singleExport.lineSpacing")}</Label>
-                      <span className="text-sm font-medium text-primary">
-                        {config.contentLineSpacing.toFixed(1)}
-                      </span>
+                    {/* Content Size with Slider */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label>{t("singleExport.size")}</Label>
+                        <span className="text-sm font-medium text-primary">
+                          {config.contentSize}pt
+                        </span>
+                      </div>
+                      <Slider
+                        value={[config.contentSize]}
+                        onValueChange={([value]) =>
+                          handleConfigChange("contentSize", value)
+                        }
+                        min={CONTENT_SIZE_RANGE.min}
+                        max={CONTENT_SIZE_RANGE.max}
+                        step={1}
+                        disabled={hasError}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>{CONTENT_SIZE_RANGE.min}pt</span>
+                        <span>{CONTENT_SIZE_RANGE.default}pt (padrão)</span>
+                        <span>{CONTENT_SIZE_RANGE.max}pt</span>
+                      </div>
                     </div>
-                    <Slider
-                      value={[config.contentLineSpacing]}
-                      onValueChange={([value]) =>
-                        handleConfigChange("contentLineSpacing", value)
-                      }
-                      min={LINE_SPACING_RANGE.min}
-                      max={LINE_SPACING_RANGE.max}
-                      step={0.1}
-                      disabled={hasError}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>1.0 (simples)</span>
-                      <span>1.5</span>
-                      <span>2.0 (duplo)</span>
-                      <span>2.5</span>
-                    </div>
-                  </div>
 
-                  {/* Content Alignment */}
-                  <div className="space-y-2">
-                    <Label>{t("singleExport.alignment")}</Label>
-                    <RadioGroup
-                      value={config.contentAlignment}
-                      onValueChange={(value) =>
-                        handleConfigChange(
-                          "contentAlignment",
-                          value as "left" | "center" | "right" | "justify"
-                        )
-                      }
-                      className="grid grid-cols-2 gap-3"
-                      disabled={hasError}
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="left" id="content-left" disabled={hasError} />
-                        <Label htmlFor="content-left" className="cursor-pointer">
-                          {t("singleExport.alignmentLeft")}
-                        </Label>
+                    {/* Line Spacing with Slider */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label>{t("singleExport.lineSpacing")}</Label>
+                        <span className="text-sm font-medium text-primary">
+                          {config.contentLineSpacing.toFixed(1)}
+                        </span>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="center" id="content-center" disabled={hasError} />
-                        <Label htmlFor="content-center" className="cursor-pointer">
-                          {t("singleExport.alignmentCenter")}
-                        </Label>
+                      <Slider
+                        value={[config.contentLineSpacing]}
+                        onValueChange={([value]) =>
+                          handleConfigChange("contentLineSpacing", value)
+                        }
+                        min={LINE_SPACING_RANGE.min}
+                        max={LINE_SPACING_RANGE.max}
+                        step={0.1}
+                        disabled={hasError}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>1.0 (simples)</span>
+                        <span>1.5</span>
+                        <span>2.0 (duplo)</span>
+                        <span>2.5</span>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="right" id="content-right" disabled={hasError} />
-                        <Label htmlFor="content-right" className="cursor-pointer">
-                          {t("singleExport.alignmentRight")}
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="justify" id="content-justify" disabled={hasError} />
-                        <Label htmlFor="content-justify" className="cursor-pointer">
-                          {t("singleExport.alignmentJustify")}
-                        </Label>
-                      </div>
-                    </RadioGroup>
+                    </div>
+
+                    {/* Content Alignment */}
+                    <div className="space-y-2">
+                      <Label>{t("singleExport.alignment")}</Label>
+                      <RadioGroup
+                        value={config.contentAlignment}
+                        onValueChange={(value) =>
+                          handleConfigChange(
+                            "contentAlignment",
+                            value as "left" | "center" | "right" | "justify"
+                          )
+                        }
+                        className="grid grid-cols-2 gap-3"
+                        disabled={hasError}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="left"
+                            id="content-left"
+                            disabled={hasError}
+                          />
+                          <Label
+                            htmlFor="content-left"
+                            className="cursor-pointer"
+                          >
+                            {t("singleExport.alignmentLeft")}
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="center"
+                            id="content-center"
+                            disabled={hasError}
+                          />
+                          <Label
+                            htmlFor="content-center"
+                            className="cursor-pointer"
+                          >
+                            {t("singleExport.alignmentCenter")}
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="right"
+                            id="content-right"
+                            disabled={hasError}
+                          />
+                          <Label
+                            htmlFor="content-right"
+                            className="cursor-pointer"
+                          >
+                            {t("singleExport.alignmentRight")}
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="justify"
+                            id="content-justify"
+                            disabled={hasError}
+                          />
+                          <Label
+                            htmlFor="content-justify"
+                            className="cursor-pointer"
+                          >
+                            {t("singleExport.alignmentJustify")}
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Preview Panel - Right Side */}
-          <div className="flex-1 flex flex-col bg-muted/30 rounded-lg overflow-hidden">
-            {/* PDF Controls */}
-            {pdfPreviewUrl && !isLoading && (
-              <div className="flex-shrink-0 flex items-center justify-center px-4 py-3 border-b border-border bg-card/50">
-                <span className="text-sm text-muted-foreground">
-                  {numPages}{" "}
-                  {numPages === 1
-                    ? t("preview.page_singular")
-                    : t("preview.page_plural")}
-                </span>
-              </div>
-            )}
+            {/* Preview Panel - Right Side */}
+            <div className="flex-1 flex flex-col bg-muted/30 rounded-lg overflow-hidden">
+              {/* PDF Controls */}
+              {pdfPreviewUrl && !isLoading && (
+                <div className="flex-shrink-0 flex items-center justify-center px-4 py-3 border-b border-border bg-card/50">
+                  <span className="text-sm text-muted-foreground">
+                    {numPages}{" "}
+                    {numPages === 1
+                      ? t("preview.page_singular")
+                      : t("preview.page_plural")}
+                  </span>
+                </div>
+              )}
 
-            {/* PDF Preview - with FIXED container to prevent any resizing */}
-            <div
-              className={`bg-muted/20 p-4 flex justify-center ${hasError || isLoading || isGeneratingPreview ? 'items-center h-full' : 'flex-1 items-start overflow-y-auto'}`}
-              style={hasError || isLoading || isGeneratingPreview ? { height: `${containerDimensions.estimatedHeight}px` } : undefined}
-            >
-              {isLoading || (isGeneratingPreview && !pdfPreviewUrl) ? (
-                <div className="flex flex-col items-center gap-4">
-                  <Loader2 className="w-8 h-8 animate-spin" />
-                  <p className="text-sm text-muted-foreground">
-                    {t("preview.loading_content")}
-                  </p>
-                </div>
-              ) : hasError ? (
-                <div className="rounded-lg bg-muted/50 border-2 border-dashed border-border p-8 text-center max-w-md">
-                  <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-                  <p className="text-base font-medium text-foreground mb-2">
-                    {t("preview.empty_chapter_title")}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {t("preview.empty_chapter_description")}
-                  </p>
-                </div>
-              ) : pdfPreviewUrl ? (
-                <div
-                  className="relative flex-shrink-0"
-                  style={{
-                    width: `${containerDimensions.width}px`,
-                  }}
-                >
-                  {/* Loading overlay during regeneration - covers the fixed container */}
-                  {isGeneratingPreview && (
-                    <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
-                      <div className="flex flex-col items-center gap-4">
-                        <Loader2 className="w-8 h-8 animate-spin" />
-                        <p className="text-sm text-muted-foreground">
-                          {t("preview.updating_preview")}
-                        </p>
+              {/* PDF Preview - with FIXED container to prevent any resizing */}
+              <div
+                className={`bg-muted/20 p-4 flex justify-center ${hasError || isLoading || isGeneratingPreview ? "items-center h-full" : "flex-1 items-start overflow-y-auto"}`}
+                style={
+                  hasError || isLoading || isGeneratingPreview
+                    ? { height: `${containerDimensions.estimatedHeight}px` }
+                    : undefined
+                }
+              >
+                {isLoading || (isGeneratingPreview && !pdfPreviewUrl) ? (
+                  <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                    <p className="text-sm text-muted-foreground">
+                      {t("preview.loading_content")}
+                    </p>
+                  </div>
+                ) : hasError ? (
+                  <div className="rounded-lg bg-muted/50 border-2 border-dashed border-border p-8 text-center max-w-md">
+                    <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                    <p className="text-base font-medium text-foreground mb-2">
+                      {t("preview.empty_chapter_title")}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {t("preview.empty_chapter_description")}
+                    </p>
+                  </div>
+                ) : pdfPreviewUrl ? (
+                  <div
+                    className="relative flex-shrink-0"
+                    style={{
+                      width: `${containerDimensions.width}px`,
+                    }}
+                  >
+                    {/* Loading overlay during regeneration - covers the fixed container */}
+                    {isGeneratingPreview && (
+                      <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
+                        <div className="flex flex-col items-center gap-4">
+                          <Loader2 className="w-8 h-8 animate-spin" />
+                          <p className="text-sm text-muted-foreground">
+                            {t("preview.updating_preview")}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {/* PDF Document */}
-                  <div className="flex flex-col gap-6">
+                    {/* PDF Document */}
+                    <div className="flex flex-col gap-6">
                       <Document
                         key="pdf-document"
                         file={pdfPreviewUrl}
@@ -837,52 +897,56 @@ export function ExportPreviewModal({
                           </div>
                         ))}
                       </Document>
+                    </div>
                   </div>
-                </div>
-              ) : null}
+                ) : null}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Footer Actions */}
-        <div className="flex justify-between items-center pt-4 border-t">
-          <Button
-            variant="secondary"
-            onClick={() => onOpenChange(false)}
-            disabled={isExporting}
-          >
-            {t("actions.cancel")}
-          </Button>
+          {/* Footer Actions */}
+          <div className="flex justify-between items-center pt-4 border-t">
+            <Button
+              variant="secondary"
+              onClick={() => onOpenChange(false)}
+              disabled={isExporting}
+            >
+              {t("actions.cancel")}
+            </Button>
 
-          <div className="flex gap-2">
-            <Button
-              variant="magical"
-              onClick={() => handleExport("word")}
-              disabled={hasError || isExporting}
-            >
-              {isExporting ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <FileText className="w-4 h-4 mr-2" />
-              )}
-              {isExporting ? t("singleExport.exporting") : t("actions.export_word")}
-            </Button>
-            <Button
-              variant="magical"
-              onClick={() => handleExport("pdf")}
-              disabled={hasError || isExporting}
-            >
-              {isExporting ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <FileText className="w-4 h-4 mr-2" />
-              )}
-              {isExporting ? t("singleExport.exporting") : t("actions.export_pdf")}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="magical"
+                onClick={() => handleExport("word")}
+                disabled={hasError || isExporting}
+              >
+                {isExporting ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <FileText className="w-4 h-4 mr-2" />
+                )}
+                {isExporting
+                  ? t("singleExport.exporting")
+                  : t("actions.export_word")}
+              </Button>
+              <Button
+                variant="magical"
+                onClick={() => handleExport("pdf")}
+                disabled={hasError || isExporting}
+              >
+                {isExporting ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <FileText className="w-4 h-4 mr-2" />
+                )}
+                {isExporting
+                  ? t("singleExport.exporting")
+                  : t("actions.export_pdf")}
+              </Button>
+            </div>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

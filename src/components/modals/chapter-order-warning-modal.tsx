@@ -46,7 +46,9 @@ export function ChapterOrderWarningModal() {
 
         {/* Informações sobre as regras */}
         <div className="rounded-md bg-muted p-4 space-y-2">
-          <p className="text-sm font-medium">A ordem correta segue estas regras:</p>
+          <p className="text-sm font-medium">
+            A ordem correta segue estas regras:
+          </p>
           <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
             <li>Numeração sequencial e sem lacunas (1, 2, 3, 4...)</li>
             <li>Capítulos com mesmo número ficam ordenados por status</li>

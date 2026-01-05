@@ -137,7 +137,9 @@ export function RaceViewsDisplay({
             })}
           </div>
         ) : (
-          <span className="italic text-muted-foreground/60">{t("common:no_data")}</span>
+          <span className="italic text-muted-foreground/60">
+            {t("common:no_data")}
+          </span>
         )}
       </CollapsibleContent>
     </Collapsible>

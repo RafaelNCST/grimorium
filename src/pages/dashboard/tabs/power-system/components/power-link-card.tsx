@@ -39,7 +39,8 @@ export function PowerLinkCard({
     <div
       className={cn(
         "relative group border border-purple-500/30 bg-purple-950/40 rounded-lg p-6 transition-all duration-200",
-        !isEditing && "hover:border-purple-400/50 hover:bg-purple-900/50 cursor-pointer"
+        !isEditing &&
+          "hover:border-purple-400/50 hover:bg-purple-900/50 cursor-pointer"
       )}
       onClick={!isEditing ? onClick : undefined}
     >

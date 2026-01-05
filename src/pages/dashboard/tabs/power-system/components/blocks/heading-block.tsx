@@ -20,6 +20,7 @@ import {
   type HeadingContent,
   type IPowerBlock,
 } from "../../types/power-system-types";
+
 import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 
 interface HeadingBlockProps {
@@ -195,7 +196,9 @@ export function HeadingBlock({
   }
 
   return content.text ? (
-    <HeadingTag className={`${getHeadingClass(content.level, content.alignment)} mb-6`}>
+    <HeadingTag
+      className={`${getHeadingClass(content.level, content.alignment)} mb-6`}
+    >
       {content.text}
     </HeadingTag>
   ) : null;

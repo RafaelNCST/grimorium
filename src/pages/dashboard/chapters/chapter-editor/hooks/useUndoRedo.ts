@@ -21,14 +21,22 @@ export function useUndoRedo(
   const { maxHistorySize = 50, debounceMs = 200 } = options;
 
   const [history, setHistory] = useState<HistoryState[]>([
-    { content: initialContent, cursorPosition: initialContent.length, annotations: initialAnnotations }
+    {
+      content: initialContent,
+      cursorPosition: initialContent.length,
+      annotations: initialAnnotations,
+    },
   ]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const historyRef = useRef(history);
   const currentIndexRef = useRef(currentIndex);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const pendingStateRef = useRef<{ content: string; cursorPosition: number; annotations: Annotation[] } | null>(null);
+  const pendingStateRef = useRef<{
+    content: string;
+    cursorPosition: number;
+    annotations: Annotation[];
+  } | null>(null);
 
   useEffect(() => {
     historyRef.current = history;
@@ -55,14 +63,19 @@ export function useUndoRedo(
             const currentState = prev[currentIdx];
             if (
               currentState?.content === content &&
-              JSON.stringify(currentState?.annotations) === JSON.stringify(annotations)
+              JSON.stringify(currentState?.annotations) ===
+                JSON.stringify(annotations)
             ) {
               return prev;
             }
           }
 
           const newHistory = prev.slice(0, currentIdx + 1);
-          newHistory.push({ content, cursorPosition, annotations: JSON.parse(JSON.stringify(annotations)) });
+          newHistory.push({
+            content,
+            cursorPosition,
+            annotations: JSON.parse(JSON.stringify(annotations)),
+          });
           newLength = newHistory.length;
 
           if (newHistory.length > maxHistorySize) {
@@ -116,14 +129,19 @@ export function useUndoRedo(
           const currentState = prev[currentIdx];
           if (
             currentState?.content === content &&
-            JSON.stringify(currentState?.annotations) === JSON.stringify(annotations)
+            JSON.stringify(currentState?.annotations) ===
+              JSON.stringify(annotations)
           ) {
             return prev;
           }
         }
 
         const newHistory = prev.slice(0, currentIdx + 1);
-        newHistory.push({ content, cursorPosition, annotations: JSON.parse(JSON.stringify(annotations)) });
+        newHistory.push({
+          content,
+          cursorPosition,
+          annotations: JSON.parse(JSON.stringify(annotations)),
+        });
         newLength = newHistory.length;
 
         if (newHistory.length > maxHistorySize) {
@@ -168,7 +186,11 @@ export function useUndoRedo(
   const currentState = history[currentIndex];
 
   const resetHistory = useCallback(
-    (content: string, annotations: Annotation[] = [], cursorPosition: number = 0) => {
+    (
+      content: string,
+      annotations: Annotation[] = [],
+      cursorPosition: number = 0
+    ) => {
       setHistory([{ content, cursorPosition, annotations }]);
       setCurrentIndex(0);
     },

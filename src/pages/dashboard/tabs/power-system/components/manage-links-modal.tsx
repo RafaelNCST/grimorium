@@ -170,7 +170,9 @@ export function ManageLinksModal({
             {pageId ? t("links.manage_page") : t("links.manage_section")}
           </DialogTitle>
           <DialogDescription className="whitespace-normal">
-            {pageId ? t("links.page_description") : t("links.section_description")}
+            {pageId
+              ? t("links.page_description")
+              : t("links.section_description")}
           </DialogDescription>
         </DialogHeader>
 

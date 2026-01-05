@@ -58,24 +58,29 @@ export function SplashScreen({ onLoadingComplete }: SplashScreenProps) {
         setBooks(booksFromDB);
 
         // Run chapter UNIQUE constraint removal migration if needed
-        const needsChapterMigration = await needsChapterUniqueConstraintRemoval();
+        const needsChapterMigration =
+          await needsChapterUniqueConstraintRemoval();
 
         if (needsChapterMigration) {
-          console.log('[SplashScreen] Starting chapter UNIQUE constraint removal...');
+          console.log(
+            "[SplashScreen] Starting chapter UNIQUE constraint removal..."
+          );
           await removeChapterUniqueConstraint();
-          console.log('[SplashScreen] Chapter constraint migration complete!');
+          console.log("[SplashScreen] Chapter constraint migration complete!");
         }
 
         // Run gallery thumbnail migration if needed
         const needsMigration = await needsGalleryThumbnailMigration();
 
         if (needsMigration) {
-          console.log('[SplashScreen] Starting gallery thumbnail migration...');
+          console.log("[SplashScreen] Starting gallery thumbnail migration...");
           const result = await migrateGalleryThumbnails((current, total) => {
             // Progresso da migração (opcional: pode atualizar uma mensagem no futuro)
-            console.log(`[SplashScreen] Migration progress: ${current}/${total}`);
+            console.log(
+              `[SplashScreen] Migration progress: ${current}/${total}`
+            );
           });
-          console.log('[SplashScreen] Migration complete:', result);
+          console.log("[SplashScreen] Migration complete:", result);
         }
 
         setIsDataLoaded(true);

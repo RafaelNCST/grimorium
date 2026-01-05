@@ -261,7 +261,9 @@ export function CollapsibleSection({
             {t(`empty-states:entities.not_enough_${blockedEntityName}`)}
           </p>
           <p className="text-xs mt-1">
-            {t(`empty-states:entities.need_to_register_more_${blockedEntityName}`)}
+            {t(
+              `empty-states:entities.need_to_register_more_${blockedEntityName}`
+            )}
           </p>
         </InfoAlert>
       );
@@ -276,7 +278,9 @@ export function CollapsibleSection({
               {t(`empty-states:entities.all_added_${blockedEntityName}`)}
             </p>
             <p className="text-xs mt-1">
-              {t(`empty-states:entities.to_add_more_register_new_${blockedEntityName}`)}
+              {t(
+                `empty-states:entities.to_add_more_register_new_${blockedEntityName}`
+              )}
             </p>
           </InfoAlert>
           {children && <div>{children}</div>}
@@ -350,10 +354,14 @@ export function CollapsibleSection({
         {/* Content with padding */}
         {isCollapsible ? (
           <CollapsibleContent>
-            <CardContent className="pt-6 w-full max-w-full overflow-x-hidden">{renderEmptyState()}</CardContent>
+            <CardContent className="pt-6 w-full max-w-full overflow-x-hidden">
+              {renderEmptyState()}
+            </CardContent>
           </CollapsibleContent>
         ) : (
-          <CardContent className="w-full max-w-full overflow-x-hidden">{renderEmptyState()}</CardContent>
+          <CardContent className="w-full max-w-full overflow-x-hidden">
+            {renderEmptyState()}
+          </CardContent>
         )}
       </Card>
     </Collapsible>

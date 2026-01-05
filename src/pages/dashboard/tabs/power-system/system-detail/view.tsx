@@ -1,10 +1,4 @@
-import {
-  ArrowLeft,
-  Pencil,
-  PanelLeft,
-  Trash2,
-  Zap,
-} from "lucide-react";
+import { ArrowLeft, Pencil, PanelLeft, Trash2, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -233,9 +227,9 @@ export function PowerSystemDetailView({
   if (!currentPage && !isLoadingPages) {
     return (
       <TooltipProvider>
-      <div className="flex flex-col h-full overflow-hidden">
-        {/* Header */}
-        <div className="border-b bg-card px-6 py-3 flex items-center justify-between gap-4 shrink-0">
+        <div className="flex flex-col h-full overflow-hidden">
+          {/* Header */}
+          <div className="border-b bg-card px-6 py-3 flex items-center justify-between gap-4 shrink-0">
             <div className="flex items-center gap-2">
               {/* Back Button */}
               <Button
@@ -325,156 +319,162 @@ export function PowerSystemDetailView({
             </div>
           </div>
 
-        {/* Content Area with Sidebar */}
-        <div className="flex flex-1 overflow-hidden">
-          {/* Navigation Sidebar */}
-          <div
-            className={cn(
-              "transition-all duration-300 ease-in-out overflow-hidden",
-              isLeftSidebarOpen ? "w-80" : "w-0"
-            )}
-          >
-            <NavigationSidebar
-              systemId={system.id}
-              isOpen={isLeftSidebarOpen}
-              onToggle={onToggleLeftSidebar}
-              groups={groups}
-              pages={pages}
-              currentPageId={currentPage?.id}
-              isEditMode={isEditMode}
-              onPageSelect={onPageSelect}
-              onCreateGroup={onOpenCreateGroupModal}
-              onCreatePage={onOpenCreatePageModal}
-              onEditGroup={(groupId, newName) => onUpdateGroup(groupId, newName)}
-              onDeleteGroup={onDeleteGroup}
-              onEditPage={(pageId, newName) => onUpdatePage(pageId, newName)}
-              onDeletePage={onDeletePage}
-              onDuplicatePage={onDuplicatePage}
-              onMovePage={onMovePage}
-              onReorderPages={(pageIds) => {
-                const reorderedPages = pageIds
-                  .map((id, index) => {
-                    const page = pages.find((p) => p.id === id);
-                    return page ? { ...page, orderIndex: index } : null;
-                  })
-                  .filter(Boolean) as IPowerPage[];
-                onReorderPages(reorderedPages);
-              }}
-              onReorderGroups={(groupIds) => {
-                const reorderedGroups = groupIds
-                  .map((id, index) => {
-                    const group = groups.find((g) => g.id === id);
-                    return group ? { ...group, orderIndex: index } : null;
-                  })
-                  .filter(Boolean) as IPowerGroup[];
-                onReorderGroups(reorderedGroups);
-              }}
-              onItemSelect={onItemSelect}
-            />
+          {/* Content Area with Sidebar */}
+          <div className="flex flex-1 overflow-hidden">
+            {/* Navigation Sidebar */}
+            <div
+              className={cn(
+                "transition-all duration-300 ease-in-out overflow-hidden",
+                isLeftSidebarOpen ? "w-80" : "w-0"
+              )}
+            >
+              <NavigationSidebar
+                systemId={system.id}
+                isOpen={isLeftSidebarOpen}
+                onToggle={onToggleLeftSidebar}
+                groups={groups}
+                pages={pages}
+                currentPageId={currentPage?.id}
+                isEditMode={isEditMode}
+                onPageSelect={onPageSelect}
+                onCreateGroup={onOpenCreateGroupModal}
+                onCreatePage={onOpenCreatePageModal}
+                onEditGroup={(groupId, newName) =>
+                  onUpdateGroup(groupId, newName)
+                }
+                onDeleteGroup={onDeleteGroup}
+                onEditPage={(pageId, newName) => onUpdatePage(pageId, newName)}
+                onDeletePage={onDeletePage}
+                onDuplicatePage={onDuplicatePage}
+                onMovePage={onMovePage}
+                onReorderPages={(pageIds) => {
+                  const reorderedPages = pageIds
+                    .map((id, index) => {
+                      const page = pages.find((p) => p.id === id);
+                      return page ? { ...page, orderIndex: index } : null;
+                    })
+                    .filter(Boolean) as IPowerPage[];
+                  onReorderPages(reorderedPages);
+                }}
+                onReorderGroups={(groupIds) => {
+                  const reorderedGroups = groupIds
+                    .map((id, index) => {
+                      const group = groups.find((g) => g.id === id);
+                      return group ? { ...group, orderIndex: index } : null;
+                    })
+                    .filter(Boolean) as IPowerGroup[];
+                  onReorderGroups(reorderedGroups);
+                }}
+                onItemSelect={onItemSelect}
+              />
+            </div>
+
+            {/* Empty State - Simple message instead of CTA */}
+            <div className="flex-1 flex items-center justify-center">
+              <p className="text-muted-foreground">
+                {t("empty.no_pages_description")}
+              </p>
+            </div>
           </div>
 
-          {/* Empty State - Simple message instead of CTA */}
-          <div className="flex-1 flex items-center justify-center">
-            <p className="text-muted-foreground">
-              {t("empty.no_pages_description")}
-            </p>
-          </div>
-        </div>
+          {/* Modals */}
+          <EditSystemModal
+            isOpen={isEditSystemModalOpen}
+            system={system}
+            onClose={onCloseEditSystemModal}
+            onSubmit={onUpdateSystem}
+          />
+          <CreateGroupModal
+            isOpen={isCreateGroupModalOpen}
+            onClose={onCloseCreateGroupModal}
+            onSubmit={onCreateGroup}
+          />
+          <CreatePageModal
+            isOpen={isCreatePageModalOpen}
+            onClose={onCloseCreatePageModal}
+            onSubmit={onCreatePage}
+            groups={groups}
+            preselectedGroupId={selectedGroupForPage}
+          />
+          <CreateSectionModal
+            isOpen={isCreateSectionModalOpen}
+            onClose={onCloseCreateSectionModal}
+            onSubmit={onCreateSection}
+          />
+          <SelectBlockModal
+            isOpen={isSelectBlockModalOpen}
+            onClose={onCloseSelectBlockModal}
+            onSelect={(type) => {
+              if (selectedSectionForBlock) {
+                // Create default empty content for the block type
+                let defaultContent: BlockContent = {};
 
-        {/* Modals */}
-        <EditSystemModal
-          isOpen={isEditSystemModalOpen}
-          system={system}
-          onClose={onCloseEditSystemModal}
-          onSubmit={onUpdateSystem}
-        />
-        <CreateGroupModal
-          isOpen={isCreateGroupModalOpen}
-          onClose={onCloseCreateGroupModal}
-          onSubmit={onCreateGroup}
-        />
-        <CreatePageModal
-          isOpen={isCreatePageModalOpen}
-          onClose={onCloseCreatePageModal}
-          onSubmit={onCreatePage}
-          groups={groups}
-          preselectedGroupId={selectedGroupForPage}
-        />
-        <CreateSectionModal
-          isOpen={isCreateSectionModalOpen}
-          onClose={onCloseCreateSectionModal}
-          onSubmit={onCreateSection}
-        />
-        <SelectBlockModal
-          isOpen={isSelectBlockModalOpen}
-          onClose={onCloseSelectBlockModal}
-          onSelect={(type) => {
-            if (selectedSectionForBlock) {
-              // Create default empty content for the block type
-              let defaultContent: BlockContent = {};
+                switch (type) {
+                  case "heading":
+                    defaultContent = { text: "", level: 1, alignment: "left" };
+                    break;
+                  case "paragraph":
+                    defaultContent = { text: "" };
+                    break;
+                  case "unordered-list":
+                    defaultContent = { items: [] };
+                    break;
+                  case "numbered-list":
+                    defaultContent = { items: [] };
+                    break;
+                  case "tag-list":
+                    defaultContent = { tags: [] };
+                    break;
+                  case "dropdown":
+                    defaultContent = { options: [], selectedValue: "" };
+                    break;
+                  case "multi-dropdown":
+                    defaultContent = { options: [], selectedValues: [] };
+                    break;
+                  case "image":
+                    defaultContent = { imageUrl: "", caption: "" };
+                    break;
+                  case "icon":
+                    defaultContent = {
+                      imageUrl: "",
+                      title: "",
+                      description: "",
+                    };
+                    break;
+                  case "icon-group":
+                    defaultContent = { icons: [] };
+                    break;
+                  case "informative":
+                    defaultContent = { icon: "info", text: "" };
+                    break;
+                  case "divider":
+                    defaultContent = {};
+                    break;
+                  case "stars":
+                    defaultContent = { rating: 0 };
+                    break;
+                  case "attributes":
+                    defaultContent = { max: 5, current: 0 };
+                    break;
+                  case "navigator":
+                    defaultContent = { linkedPageId: undefined, title: "" };
+                    break;
+                  case "spacer":
+                    defaultContent = { size: "medium" };
+                    break;
+                }
 
-              switch (type) {
-                case "heading":
-                  defaultContent = { text: "", level: 1, alignment: "left" };
-                  break;
-                case "paragraph":
-                  defaultContent = { text: "" };
-                  break;
-                case "unordered-list":
-                  defaultContent = { items: [] };
-                  break;
-                case "numbered-list":
-                  defaultContent = { items: [] };
-                  break;
-                case "tag-list":
-                  defaultContent = { tags: [] };
-                  break;
-                case "dropdown":
-                  defaultContent = { options: [], selectedValue: "" };
-                  break;
-                case "multi-dropdown":
-                  defaultContent = { options: [], selectedValues: [] };
-                  break;
-                case "image":
-                  defaultContent = { imageUrl: "", caption: "" };
-                  break;
-                case "icon":
-                  defaultContent = { imageUrl: "", title: "", description: "" };
-                  break;
-                case "icon-group":
-                  defaultContent = { icons: [] };
-                  break;
-                case "informative":
-                  defaultContent = { icon: "info", text: "" };
-                  break;
-                case "divider":
-                  defaultContent = {};
-                  break;
-                case "stars":
-                  defaultContent = { rating: 0 };
-                  break;
-                case "attributes":
-                  defaultContent = { max: 5, current: 0 };
-                  break;
-                case "navigator":
-                  defaultContent = { linkedPageId: undefined, title: "" };
-                  break;
-                case "spacer":
-                  defaultContent = { size: "medium" };
-                  break;
+                onCreateBlock(selectedSectionForBlock, type, defaultContent);
               }
-
-              onCreateBlock(selectedSectionForBlock, type, defaultContent);
-            }
-          }}
-        />
-        <DeleteSystemModal
-          isOpen={isDeleteSystemModalOpen}
-          onClose={onCloseDeleteSystemModal}
-          onConfirm={onDeleteSystem}
-          systemName={system.name}
-        />
-      </div>
+            }}
+          />
+          <DeleteSystemModal
+            isOpen={isDeleteSystemModalOpen}
+            onClose={onCloseDeleteSystemModal}
+            onConfirm={onDeleteSystem}
+            systemName={system.name}
+          />
+        </div>
       </TooltipProvider>
     );
   }
@@ -485,9 +485,9 @@ export function PowerSystemDetailView({
 
   return (
     <TooltipProvider>
-    <div className="flex flex-col h-full overflow-hidden">
-      {/* Header */}
-      <div className="border-b bg-card px-6 py-3 flex items-center justify-between gap-4 shrink-0">
+      <div className="flex flex-col h-full overflow-hidden">
+        {/* Header */}
+        <div className="border-b bg-card px-6 py-3 flex items-center justify-between gap-4 shrink-0">
           <div className="flex items-center gap-2">
             {/* Back Button */}
             <Button
@@ -577,181 +577,183 @@ export function PowerSystemDetailView({
           </div>
         </div>
 
-      {/* Content Area with Sidebar */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Navigation Sidebar */}
-        <div
-          className={cn(
-            "transition-all duration-300 ease-in-out overflow-hidden",
-            isLeftSidebarOpen ? "w-80" : "w-0"
-          )}
-        >
-          <NavigationSidebar
-            systemId={system.id}
-            isOpen={isLeftSidebarOpen}
-            onToggle={onToggleLeftSidebar}
-            groups={groups}
-            pages={pages}
-            currentPageId={currentPage?.id}
-            isEditMode={isEditMode}
-            onPageSelect={onPageSelect}
-            onCreateGroup={onOpenCreateGroupModal}
-            onCreatePage={onOpenCreatePageModal}
-            onEditGroup={(groupId, newName) => onUpdateGroup(groupId, newName)}
-            onDeleteGroup={onDeleteGroup}
-            onEditPage={(pageId, newName) => onUpdatePage(pageId, newName)}
-            onDeletePage={onDeletePage}
-            onDuplicatePage={onDuplicatePage}
-            onMovePage={onMovePage}
-            onReorderPages={(pageIds) => {
-              const reorderedPages = pageIds
-                .map((id, index) => {
-                  const page = pages.find((p) => p.id === id);
-                  return page ? { ...page, orderIndex: index } : null;
-                })
-                .filter(Boolean) as IPowerPage[];
-              onReorderPages(reorderedPages);
-            }}
-            onReorderGroups={(groupIds) => {
-              const reorderedGroups = groupIds
-                .map((id, index) => {
-                  const group = groups.find((g) => g.id === id);
-                  return group ? { ...group, orderIndex: index } : null;
-                })
-                .filter(Boolean) as IPowerGroup[];
-              onReorderGroups(reorderedGroups);
-            }}
-            onItemSelect={onItemSelect}
-          />
-        </div>
-
-        {/* Page Content */}
-        <div className="flex-1 overflow-hidden">
-          {currentPage && system && (
-            <PageContent
-              system={system}
-              page={currentPage}
+        {/* Content Area with Sidebar */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Navigation Sidebar */}
+          <div
+            className={cn(
+              "transition-all duration-300 ease-in-out overflow-hidden",
+              isLeftSidebarOpen ? "w-80" : "w-0"
+            )}
+          >
+            <NavigationSidebar
+              systemId={system.id}
+              isOpen={isLeftSidebarOpen}
+              onToggle={onToggleLeftSidebar}
+              groups={groups}
               pages={pages}
-              sections={sections}
-              blocks={blocks}
-              bookId={bookId}
+              currentPageId={currentPage?.id}
               isEditMode={isEditMode}
-              onUpdatePageName={(name) => onUpdatePage(currentPage.id, name)}
-              onAddSection={onOpenCreateSectionModal}
-              onUpdateSection={onUpdateSection}
-              onDeleteSection={onDeleteSection}
-              onReorderSections={onReorderSections}
-              onAddBlock={onOpenSelectBlockModal}
-              onUpdateBlock={onUpdateBlock}
-              onDeleteBlock={onDeleteBlock}
-              onReorderBlocks={onReorderBlocks}
               onPageSelect={onPageSelect}
-              onManagePageLinks={onManagePageLinks}
-              onManageSectionLinks={onManageSectionLinks}
+              onCreateGroup={onOpenCreateGroupModal}
+              onCreatePage={onOpenCreatePageModal}
+              onEditGroup={(groupId, newName) =>
+                onUpdateGroup(groupId, newName)
+              }
+              onDeleteGroup={onDeleteGroup}
+              onEditPage={(pageId, newName) => onUpdatePage(pageId, newName)}
+              onDeletePage={onDeletePage}
+              onDuplicatePage={onDuplicatePage}
+              onMovePage={onMovePage}
+              onReorderPages={(pageIds) => {
+                const reorderedPages = pageIds
+                  .map((id, index) => {
+                    const page = pages.find((p) => p.id === id);
+                    return page ? { ...page, orderIndex: index } : null;
+                  })
+                  .filter(Boolean) as IPowerPage[];
+                onReorderPages(reorderedPages);
+              }}
+              onReorderGroups={(groupIds) => {
+                const reorderedGroups = groupIds
+                  .map((id, index) => {
+                    const group = groups.find((g) => g.id === id);
+                    return group ? { ...group, orderIndex: index } : null;
+                  })
+                  .filter(Boolean) as IPowerGroup[];
+                onReorderGroups(reorderedGroups);
+              }}
+              onItemSelect={onItemSelect}
             />
-          )}
+          </div>
+
+          {/* Page Content */}
+          <div className="flex-1 overflow-hidden">
+            {currentPage && system && (
+              <PageContent
+                system={system}
+                page={currentPage}
+                pages={pages}
+                sections={sections}
+                blocks={blocks}
+                bookId={bookId}
+                isEditMode={isEditMode}
+                onUpdatePageName={(name) => onUpdatePage(currentPage.id, name)}
+                onAddSection={onOpenCreateSectionModal}
+                onUpdateSection={onUpdateSection}
+                onDeleteSection={onDeleteSection}
+                onReorderSections={onReorderSections}
+                onAddBlock={onOpenSelectBlockModal}
+                onUpdateBlock={onUpdateBlock}
+                onDeleteBlock={onDeleteBlock}
+                onReorderBlocks={onReorderBlocks}
+                onPageSelect={onPageSelect}
+                onManagePageLinks={onManagePageLinks}
+                onManageSectionLinks={onManageSectionLinks}
+              />
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Modals */}
-      <EditSystemModal
-        isOpen={isEditSystemModalOpen}
-        system={system}
-        onClose={onCloseEditSystemModal}
-        onSubmit={onUpdateSystem}
-      />
-      <CreateGroupModal
-        isOpen={isCreateGroupModalOpen}
-        onClose={onCloseCreateGroupModal}
-        onSubmit={onCreateGroup}
-      />
-      <CreatePageModal
-        isOpen={isCreatePageModalOpen}
-        onClose={onCloseCreatePageModal}
-        onSubmit={onCreatePage}
-        groups={groups}
-        preselectedGroupId={selectedGroupForPage}
-      />
-      <CreateSectionModal
-        isOpen={isCreateSectionModalOpen}
-        onClose={onCloseCreateSectionModal}
-        onSubmit={onCreateSection}
-      />
-      <SelectBlockModal
-        isOpen={isSelectBlockModalOpen}
-        onClose={() => {
-          onCloseSelectBlockModal();
-        }}
-        onSelect={(type) => {
-          if (selectedSectionForBlock) {
-            // Create default empty content for the block type
-            let defaultContent: BlockContent = {};
+        {/* Modals */}
+        <EditSystemModal
+          isOpen={isEditSystemModalOpen}
+          system={system}
+          onClose={onCloseEditSystemModal}
+          onSubmit={onUpdateSystem}
+        />
+        <CreateGroupModal
+          isOpen={isCreateGroupModalOpen}
+          onClose={onCloseCreateGroupModal}
+          onSubmit={onCreateGroup}
+        />
+        <CreatePageModal
+          isOpen={isCreatePageModalOpen}
+          onClose={onCloseCreatePageModal}
+          onSubmit={onCreatePage}
+          groups={groups}
+          preselectedGroupId={selectedGroupForPage}
+        />
+        <CreateSectionModal
+          isOpen={isCreateSectionModalOpen}
+          onClose={onCloseCreateSectionModal}
+          onSubmit={onCreateSection}
+        />
+        <SelectBlockModal
+          isOpen={isSelectBlockModalOpen}
+          onClose={() => {
+            onCloseSelectBlockModal();
+          }}
+          onSelect={(type) => {
+            if (selectedSectionForBlock) {
+              // Create default empty content for the block type
+              let defaultContent: BlockContent = {};
 
-            switch (type) {
-              case "heading":
-                defaultContent = { text: "", level: 1, alignment: "left" };
-                break;
-              case "paragraph":
-                defaultContent = { text: "" };
-                break;
-              case "unordered-list":
-                defaultContent = { items: [] };
-                break;
-              case "numbered-list":
-                defaultContent = { items: [] };
-                break;
-              case "tag-list":
-                defaultContent = { tags: [] };
-                break;
-              case "dropdown":
-                defaultContent = { options: [], selectedValue: "" };
-                break;
-              case "multi-dropdown":
-                defaultContent = { options: [], selectedValues: [] };
-                break;
-              case "image":
-                defaultContent = { imageUrl: "", caption: "" };
-                break;
-              case "icon":
-                defaultContent = { imageUrl: "", title: "", description: "" };
-                break;
-              case "icon-group":
-                defaultContent = { icons: [] };
-                break;
-              case "informative":
-                defaultContent = { icon: "info", text: "" };
-                break;
-              case "divider":
-                defaultContent = {};
-                break;
-              case "stars":
-                defaultContent = { rating: 0 };
-                break;
-              case "attributes":
-                defaultContent = { max: 5, current: 0 };
-                break;
-              case "navigator":
-                defaultContent = { linkedPageId: undefined, title: "" };
-                break;
-              case "spacer":
-                defaultContent = { size: "medium" };
-                break;
+              switch (type) {
+                case "heading":
+                  defaultContent = { text: "", level: 1, alignment: "left" };
+                  break;
+                case "paragraph":
+                  defaultContent = { text: "" };
+                  break;
+                case "unordered-list":
+                  defaultContent = { items: [] };
+                  break;
+                case "numbered-list":
+                  defaultContent = { items: [] };
+                  break;
+                case "tag-list":
+                  defaultContent = { tags: [] };
+                  break;
+                case "dropdown":
+                  defaultContent = { options: [], selectedValue: "" };
+                  break;
+                case "multi-dropdown":
+                  defaultContent = { options: [], selectedValues: [] };
+                  break;
+                case "image":
+                  defaultContent = { imageUrl: "", caption: "" };
+                  break;
+                case "icon":
+                  defaultContent = { imageUrl: "", title: "", description: "" };
+                  break;
+                case "icon-group":
+                  defaultContent = { icons: [] };
+                  break;
+                case "informative":
+                  defaultContent = { icon: "info", text: "" };
+                  break;
+                case "divider":
+                  defaultContent = {};
+                  break;
+                case "stars":
+                  defaultContent = { rating: 0 };
+                  break;
+                case "attributes":
+                  defaultContent = { max: 5, current: 0 };
+                  break;
+                case "navigator":
+                  defaultContent = { linkedPageId: undefined, title: "" };
+                  break;
+                case "spacer":
+                  defaultContent = { size: "medium" };
+                  break;
+              }
+
+              onCreateBlock(selectedSectionForBlock, type, defaultContent);
             }
+          }}
+        />
+        <DeleteSystemModal
+          isOpen={isDeleteSystemModalOpen}
+          onClose={onCloseDeleteSystemModal}
+          onConfirm={onDeleteSystem}
+          systemName={system.name}
+        />
 
-            onCreateBlock(selectedSectionForBlock, type, defaultContent);
-          }
-        }}
-      />
-      <DeleteSystemModal
-        isOpen={isDeleteSystemModalOpen}
-        onClose={onCloseDeleteSystemModal}
-        onConfirm={onDeleteSystem}
-        systemName={system.name}
-      />
-
-      {/* Render children (for ManageLinksModal) */}
-      {children}
-    </div>
+        {/* Render children (for ManageLinksModal) */}
+        {children}
+      </div>
     </TooltipProvider>
   );
 }

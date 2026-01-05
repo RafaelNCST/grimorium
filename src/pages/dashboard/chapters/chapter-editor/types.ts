@@ -5,7 +5,13 @@ export type ChapterStatus =
   | "finished"
   | "published";
 
-export type AnnotationColor = "purple" | "blue" | "green" | "yellow" | "orange" | "pink";
+export type AnnotationColor =
+  | "purple"
+  | "blue"
+  | "green"
+  | "yellow"
+  | "orange"
+  | "pink";
 
 // Annotation color styles with weak (default) and strong (selected) tones
 // Color names are localized via i18n: annotation_colors.{colorKey}

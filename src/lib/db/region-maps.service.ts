@@ -6,8 +6,9 @@ import {
   BaseDirectory,
 } from "@tauri-apps/plugin-fs";
 
-import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
+
+import { getDB } from "./index";
 
 /**
  * Region Map Types
@@ -132,87 +133,87 @@ export async function uploadMapImage(
   versionId: string | null = null
 ): Promise<IRegionMap> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const now = Date.now();
+    const db = await getDB();
+    const now = Date.now();
 
-  // Ensure maps directory exists
-  await ensureMapsDirectory();
+    // Ensure maps directory exists
+    await ensureMapsDirectory();
 
-  // Extract extension from source file
-  const originalFileName =
-    sourceFilePath.split(/[\\/]/).pop() || `map_${regionId}_${now}`;
-  const lastDot = originalFileName.lastIndexOf(".");
-  const ext = lastDot > 0 ? originalFileName.substring(lastDot) : ".jpg";
+    // Extract extension from source file
+    const originalFileName =
+      sourceFilePath.split(/[\\/]/).pop() || `map_${regionId}_${now}`;
+    const lastDot = originalFileName.lastIndexOf(".");
+    const ext = lastDot > 0 ? originalFileName.substring(lastDot) : ".jpg";
 
-  // Create unique filename with UUID to avoid conflicts between versions
-  const uniqueId = crypto.randomUUID();
-  const fileName = `map_${regionId}_${versionId || "main"}_${uniqueId}${ext}`;
-  const relativePath = `maps/${fileName}`;
+    // Create unique filename with UUID to avoid conflicts between versions
+    const uniqueId = crypto.randomUUID();
+    const fileName = `map_${regionId}_${versionId || "main"}_${uniqueId}${ext}`;
+    const relativePath = `maps/${fileName}`;
 
-  // Copy file to maps directory
-  await copyFile(sourceFilePath, relativePath, {
-    toPathBaseDir: BaseDirectory.AppData,
-  });
+    // Copy file to maps directory
+    await copyFile(sourceFilePath, relativePath, {
+      toPathBaseDir: BaseDirectory.AppData,
+    });
 
-  // Check if map already exists for this region and version
-  const existingMap = await getMapByRegionId(regionId, versionId);
+    // Check if map already exists for this region and version
+    const existingMap = await getMapByRegionId(regionId, versionId);
 
-  if (existingMap) {
-    // Delete all markers for this map before updating
-    await db.execute("DELETE FROM region_map_markers WHERE map_id = $1", [
-      existingMap.id,
-    ]);
+    if (existingMap) {
+      // Delete all markers for this map before updating
+      await db.execute("DELETE FROM region_map_markers WHERE map_id = $1", [
+        existingMap.id,
+      ]);
 
-    // Update existing map
-    await db.execute(
-      `UPDATE region_maps SET image_path = $1, updated_at = $2 WHERE region_id = $3 AND ${versionId ? "version_id = $4" : "version_id IS NULL"}`,
-      versionId
-        ? [relativePath, now, regionId, versionId]
-        : [relativePath, now, regionId]
-    );
+      // Update existing map
+      await db.execute(
+        `UPDATE region_maps SET image_path = $1, updated_at = $2 WHERE region_id = $3 AND ${versionId ? "version_id = $4" : "version_id IS NULL"}`,
+        versionId
+          ? [relativePath, now, regionId, versionId]
+          : [relativePath, now, regionId]
+      );
 
-    // Delete old image file if it's different
-    if (existingMap.imagePath !== relativePath) {
-      try {
-        const oldFileExists = await exists(existingMap.imagePath, {
-          baseDir: BaseDirectory.AppData,
-        });
-        if (oldFileExists) {
-          await remove(existingMap.imagePath, {
+      // Delete old image file if it's different
+      if (existingMap.imagePath !== relativePath) {
+        try {
+          const oldFileExists = await exists(existingMap.imagePath, {
             baseDir: BaseDirectory.AppData,
           });
+          if (oldFileExists) {
+            await remove(existingMap.imagePath, {
+              baseDir: BaseDirectory.AppData,
+            });
+          }
+        } catch (error) {
+          console.error("[region-maps] Failed to delete old image:", error);
         }
-      } catch (error) {
-        console.error("[region-maps] Failed to delete old image:", error);
       }
-    }
 
-    return {
-      ...existingMap,
-      imagePath: relativePath,
-      updatedAt: now,
-    };
-  } else {
-    // Create new map
-    const id = crypto.randomUUID();
-    const newMap: IRegionMap = {
-      id,
-      regionId,
-      versionId,
-      imagePath: relativePath,
-      createdAt: now,
-      updatedAt: now,
-    };
+      return {
+        ...existingMap,
+        imagePath: relativePath,
+        updatedAt: now,
+      };
+    } else {
+      // Create new map
+      const id = crypto.randomUUID();
+      const newMap: IRegionMap = {
+        id,
+        regionId,
+        versionId,
+        imagePath: relativePath,
+        createdAt: now,
+        updatedAt: now,
+      };
 
-    await db.execute(
-      `INSERT INTO region_maps (id, region_id, version_id, image_path, created_at, updated_at)
+      await db.execute(
+        `INSERT INTO region_maps (id, region_id, version_id, image_path, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, $6)`,
-      [id, regionId, versionId, relativePath, now, now]
-    );
+        [id, regionId, versionId, relativePath, now, now]
+      );
 
-    return newMap;
-  }
-}, 'uploadMapImage');
+      return newMap;
+    }
+  }, "uploadMapImage");
 }
 
 /**
@@ -223,16 +224,16 @@ export async function getMapByRegionId(
   versionId: string | null = null
 ): Promise<IRegionMap | null> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const query = versionId
-    ? "SELECT * FROM region_maps WHERE region_id = $1 AND version_id = $2"
-    : "SELECT * FROM region_maps WHERE region_id = $1 AND version_id IS NULL";
-  const params = versionId ? [regionId, versionId] : [regionId];
+    const db = await getDB();
+    const query = versionId
+      ? "SELECT * FROM region_maps WHERE region_id = $1 AND version_id = $2"
+      : "SELECT * FROM region_maps WHERE region_id = $1 AND version_id IS NULL";
+    const params = versionId ? [regionId, versionId] : [regionId];
 
-  const result = await db.select<DBRegionMap[]>(query, params);
+    const result = await db.select<DBRegionMap[]>(query, params);
 
-  return result.length > 0 ? dbRegionMapToRegionMap(result[0]) : null;
-}, 'getMapByRegionId');
+    return result.length > 0 ? dbRegionMapToRegionMap(result[0]) : null;
+  }, "getMapByRegionId");
 }
 
 /**
@@ -240,30 +241,30 @@ export async function getMapByRegionId(
  */
 export async function deleteMap(regionId: string): Promise<void> {
   return safeDBOperation(async () => {
-  const db = await getDB();
+    const db = await getDB();
 
-  // Get the map to find the image path
-  const map = await getMapByRegionId(regionId);
+    // Get the map to find the image path
+    const map = await getMapByRegionId(regionId);
 
-  if (map) {
-    // Delete the image file
-    try {
-      const fileExists = await exists(map.imagePath, {
-        baseDir: BaseDirectory.AppData,
-      });
-      if (fileExists) {
-        await remove(map.imagePath, { baseDir: BaseDirectory.AppData });
+    if (map) {
+      // Delete the image file
+      try {
+        const fileExists = await exists(map.imagePath, {
+          baseDir: BaseDirectory.AppData,
+        });
+        if (fileExists) {
+          await remove(map.imagePath, { baseDir: BaseDirectory.AppData });
+        }
+      } catch (error) {
+        console.error("[region-maps] Failed to delete image file:", error);
       }
-    } catch (error) {
-      console.error("[region-maps] Failed to delete image file:", error);
-    }
 
-    // Delete from database
-    await db.execute("DELETE FROM region_maps WHERE region_id = $1", [
-      regionId,
-    ]);
-  }
-}, 'deleteMap');
+      // Delete from database
+      await db.execute("DELETE FROM region_maps WHERE region_id = $1", [
+        regionId,
+      ]);
+    }
+  }, "deleteMap");
 }
 
 /**
@@ -280,44 +281,44 @@ export async function addMarker(
   scale: number = 1.0
 ): Promise<IRegionMapMarker> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const now = Date.now();
-  const id = crypto.randomUUID();
+    const db = await getDB();
+    const now = Date.now();
+    const id = crypto.randomUUID();
 
-  const newMarker: IRegionMapMarker = {
-    id,
-    mapId,
-    parentRegionId,
-    childRegionId,
-    positionX: Math.round(x),
-    positionY: Math.round(y),
-    color,
-    showLabel,
-    scale,
-    createdAt: now,
-    updatedAt: now,
-  };
-
-  await db.execute(
-    `INSERT INTO region_map_markers (id, map_id, parent_region_id, child_region_id, position_x, position_y, color, show_label, scale, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-    [
+    const newMarker: IRegionMapMarker = {
       id,
       mapId,
       parentRegionId,
       childRegionId,
-      Math.round(x),
-      Math.round(y),
+      positionX: Math.round(x),
+      positionY: Math.round(y),
       color,
-      showLabel ? 1 : 0,
+      showLabel,
       scale,
-      now,
-      now,
-    ]
-  );
+      createdAt: now,
+      updatedAt: now,
+    };
 
-  return newMarker;
-}, 'addMarker');
+    await db.execute(
+      `INSERT INTO region_map_markers (id, map_id, parent_region_id, child_region_id, position_x, position_y, color, show_label, scale, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+      [
+        id,
+        mapId,
+        parentRegionId,
+        childRegionId,
+        Math.round(x),
+        Math.round(y),
+        color,
+        showLabel ? 1 : 0,
+        scale,
+        now,
+        now,
+      ]
+    );
+
+    return newMarker;
+  }, "addMarker");
 }
 
 /**
@@ -329,14 +330,14 @@ export async function updateMarkerPosition(
   y: number
 ): Promise<void> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const now = Date.now();
+    const db = await getDB();
+    const now = Date.now();
 
-  await db.execute(
-    `UPDATE region_map_markers SET position_x = $1, position_y = $2, updated_at = $3 WHERE id = $4`,
-    [Math.round(x), Math.round(y), now, markerId]
-  );
-}, 'updateMarkerPosition');
+    await db.execute(
+      `UPDATE region_map_markers SET position_x = $1, position_y = $2, updated_at = $3 WHERE id = $4`,
+      [Math.round(x), Math.round(y), now, markerId]
+    );
+  }, "updateMarkerPosition");
 }
 
 /**
@@ -347,14 +348,14 @@ export async function updateMarkerColor(
   color: string
 ): Promise<void> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const now = Date.now();
+    const db = await getDB();
+    const now = Date.now();
 
-  await db.execute(
-    `UPDATE region_map_markers SET color = $1, updated_at = $2 WHERE id = $3`,
-    [color, now, markerId]
-  );
-}, 'updateMarkerColor');
+    await db.execute(
+      `UPDATE region_map_markers SET color = $1, updated_at = $2 WHERE id = $3`,
+      [color, now, markerId]
+    );
+  }, "updateMarkerColor");
 }
 
 /**
@@ -365,14 +366,14 @@ export async function updateMarkerLabelVisibility(
   showLabel: boolean
 ): Promise<void> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const now = Date.now();
+    const db = await getDB();
+    const now = Date.now();
 
-  await db.execute(
-    `UPDATE region_map_markers SET show_label = $1, updated_at = $2 WHERE id = $3`,
-    [showLabel ? 1 : 0, now, markerId]
-  );
-}, 'updateMarkerLabelVisibility');
+    await db.execute(
+      `UPDATE region_map_markers SET show_label = $1, updated_at = $2 WHERE id = $3`,
+      [showLabel ? 1 : 0, now, markerId]
+    );
+  }, "updateMarkerLabelVisibility");
 }
 
 /**
@@ -383,14 +384,14 @@ export async function updateMarkerScale(
   scale: number
 ): Promise<void> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const now = Date.now();
+    const db = await getDB();
+    const now = Date.now();
 
-  await db.execute(
-    `UPDATE region_map_markers SET scale = $1, updated_at = $2 WHERE id = $3`,
-    [scale, now, markerId]
-  );
-}, 'updateMarkerScale');
+    await db.execute(
+      `UPDATE region_map_markers SET scale = $1, updated_at = $2 WHERE id = $3`,
+      [scale, now, markerId]
+    );
+  }, "updateMarkerScale");
 }
 
 /**
@@ -398,9 +399,11 @@ export async function updateMarkerScale(
  */
 export async function removeMarker(markerId: string): Promise<void> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  await db.execute("DELETE FROM region_map_markers WHERE id = $1", [markerId]);
-}, 'removeMarker');
+    const db = await getDB();
+    await db.execute("DELETE FROM region_map_markers WHERE id = $1", [
+      markerId,
+    ]);
+  }, "removeMarker");
 }
 
 /**
@@ -410,14 +413,14 @@ export async function getMarkersByMapId(
   mapId: string
 ): Promise<IRegionMapMarker[]> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const result = await db.select<DBRegionMapMarker[]>(
-    "SELECT * FROM region_map_markers WHERE map_id = $1",
-    [mapId]
-  );
+    const db = await getDB();
+    const result = await db.select<DBRegionMapMarker[]>(
+      "SELECT * FROM region_map_markers WHERE map_id = $1",
+      [mapId]
+    );
 
-  return result.map(dbMarkerToMarker);
-}, 'getMarkersByMapId');
+    return result.map(dbMarkerToMarker);
+  }, "getMarkersByMapId");
 }
 
 /**
@@ -427,14 +430,14 @@ export async function getMarkersByRegion(
   parentRegionId: string
 ): Promise<IRegionMapMarker[]> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const result = await db.select<DBRegionMapMarker[]>(
-    "SELECT * FROM region_map_markers WHERE parent_region_id = $1",
-    [parentRegionId]
-  );
+    const db = await getDB();
+    const result = await db.select<DBRegionMapMarker[]>(
+      "SELECT * FROM region_map_markers WHERE parent_region_id = $1",
+      [parentRegionId]
+    );
 
-  return result.map(dbMarkerToMarker);
-}, 'getMarkersByRegion');
+    return result.map(dbMarkerToMarker);
+  }, "getMarkersByRegion");
 }
 
 /**
@@ -445,14 +448,14 @@ export async function getMarkerByChildRegion(
   childRegionId: string
 ): Promise<IRegionMapMarker | null> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  const result = await db.select<DBRegionMapMarker[]>(
-    "SELECT * FROM region_map_markers WHERE map_id = $1 AND child_region_id = $2",
-    [mapId, childRegionId]
-  );
+    const db = await getDB();
+    const result = await db.select<DBRegionMapMarker[]>(
+      "SELECT * FROM region_map_markers WHERE map_id = $1 AND child_region_id = $2",
+      [mapId, childRegionId]
+    );
 
-  return result.length > 0 ? dbMarkerToMarker(result[0]) : null;
-}, 'getMarkerByChildRegion');
+    return result.length > 0 ? dbMarkerToMarker(result[0]) : null;
+  }, "getMarkerByChildRegion");
 }
 
 /**
@@ -463,7 +466,7 @@ export async function hasMarker(
   childRegionId: string
 ): Promise<boolean> {
   return safeDBOperation(async () => {
-  const marker = await getMarkerByChildRegion(mapId, childRegionId);
-  return marker !== null;
-}, 'hasMarker');
+    const marker = await getMarkerByChildRegion(mapId, childRegionId);
+    return marker !== null;
+  }, "hasMarker");
 }

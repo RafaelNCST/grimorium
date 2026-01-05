@@ -16,9 +16,7 @@ export function EntityGalleryEmptyState({
     return (
       <div className="flex flex-col items-center justify-center h-full px-4 text-center">
         <Image className="h-16 w-16 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium">
-          {t("empty_state.no_results")}
-        </h3>
+        <h3 className="text-lg font-medium">{t("empty_state.no_results")}</h3>
         <p className="text-muted-foreground mt-1 max-w-sm">
           {t("empty_state.no_results_description")}
         </p>

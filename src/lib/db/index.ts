@@ -1,4 +1,5 @@
 import Database from "@tauri-apps/plugin-sql";
+
 import { safeParseStringArray } from "./safe-json-parse";
 
 let db: Database | null = null;
@@ -669,7 +670,6 @@ async function runMigrations(database: Database): Promise<void> {
       // Column already exists or other error - safe to ignore
     }
 
-
     // Add scale column to region_map_markers table
     try {
       await database.execute(
@@ -747,7 +747,9 @@ async function runMigrations(database: Database): Promise<void> {
 
     // Add section_visibility column to items table
     try {
-      await database.execute("ALTER TABLE items ADD COLUMN section_visibility TEXT");
+      await database.execute(
+        "ALTER TABLE items ADD COLUMN section_visibility TEXT"
+      );
     } catch (_error) {
       // Column already exists - safe to ignore
     }
@@ -817,9 +819,7 @@ async function runMigrations(database: Database): Promise<void> {
 
     // Add timeline field to regions table
     try {
-      await database.execute(
-        "ALTER TABLE regions ADD COLUMN timeline TEXT"
-      );
+      await database.execute("ALTER TABLE regions ADD COLUMN timeline TEXT");
     } catch (_error) {
       // Column already exists - safe to ignore
     }
@@ -989,7 +989,9 @@ async function runMigrations(database: Database): Promise<void> {
         tableInfo.length > 0 &&
         tableInfo[0].sql.includes("thumbnail_base64 TEXT NOT NULL")
       ) {
-        console.log('[Migration] Making thumbnail_base64 nullable in gallery_items...');
+        console.log(
+          "[Migration] Making thumbnail_base64 nullable in gallery_items..."
+        );
 
         // Create new table with nullable thumbnail_base64
         await database.execute(`
@@ -1037,10 +1039,13 @@ async function runMigrations(database: Database): Promise<void> {
           "CREATE INDEX IF NOT EXISTS idx_gallery_items_order ON gallery_items(book_id, order_index)"
         );
 
-        console.log('[Migration] gallery_items migration complete');
+        console.log("[Migration] gallery_items migration complete");
       }
     } catch (migrationError) {
-      console.error('[Migration] Error migrating gallery_items:', migrationError);
+      console.error(
+        "[Migration] Error migrating gallery_items:",
+        migrationError
+      );
       // Don't throw - this is a non-critical migration that can be retried
     }
 

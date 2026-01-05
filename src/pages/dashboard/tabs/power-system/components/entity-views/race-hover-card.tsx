@@ -127,8 +127,7 @@ export function RaceHoverCard({ raceId, children }: RaceHoverCardProps) {
                     const { icon: DomainIcon, colorConfig } =
                       getDomainDisplayData(domainValue, t);
 
-                    if (!DomainIcon || !colorConfig || !domainData)
-                      return null;
+                    if (!DomainIcon || !colorConfig || !domainData) return null;
 
                     return (
                       <Badge

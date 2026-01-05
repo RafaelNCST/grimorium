@@ -3,9 +3,7 @@
  * Defines the types for the hierarchical region management system
  */
 
-import type {
-  ISectionVisibility,
-} from "@/components/detail-page/visibility-helpers";
+import type { ISectionVisibility } from "@/components/detail-page/visibility-helpers";
 
 /**
  * Region Scale - represents the scope/size of a region

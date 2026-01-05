@@ -1,20 +1,11 @@
-import {
-  ICharacter,
-  ICharacterRelationship,
-} from "@/types/character-types";
+import { ICharacter, ICharacterRelationship } from "@/types/character-types";
 
-import {
-  DBCharacter,
-  DBRelationship,
-} from "./types";
-
-import { getDB } from "./index";
-import { safeDBOperation } from "./safe-db-operation";
 import {
   cleanCommonEntityReferences,
   removeFromJSONArray,
   removeFromNestedJSONArray,
 } from "./cleanup-helpers";
+import { safeDBOperation } from "./safe-db-operation";
 import {
   safeParseStringArray,
   safeParseEntityRefs,
@@ -24,6 +15,9 @@ import {
   safeJSONParse,
   hierarchySchema,
 } from "./safe-json-parse";
+import { DBCharacter, DBRelationship } from "./types";
+
+import { getDB } from "./index";
 
 // Convert ICharacter to DBCharacter
 function characterToDBCharacter(
@@ -127,7 +121,7 @@ export async function getCharactersByBookId(
       [bookId]
     );
     return result.map(dbCharacterToCharacter);
-  }, 'getCharactersByBookId');
+  }, "getCharactersByBookId");
 }
 
 export async function getCharacterById(id: string): Promise<ICharacter | null> {
@@ -138,7 +132,7 @@ export async function getCharacterById(id: string): Promise<ICharacter | null> {
       [id]
     );
     return result.length > 0 ? dbCharacterToCharacter(result[0]) : null;
-  }, 'getCharacterById');
+  }, "getCharacterById");
 }
 
 export async function createCharacter(
@@ -198,7 +192,7 @@ export async function createCharacter(
         dbChar.updated_at,
       ]
     );
-  }, 'createCharacter');
+  }, "createCharacter");
 }
 
 export async function updateCharacter(
@@ -228,7 +222,10 @@ export async function updateCharacter(
       ...updates,
     };
 
-    const dbChar = characterToDBCharacter(bookIdResult[0].book_id, fullCharacter);
+    const dbChar = characterToDBCharacter(
+      bookIdResult[0].book_id,
+      fullCharacter
+    );
     dbChar.updated_at = now;
 
     await db.execute(
@@ -276,7 +273,7 @@ export async function updateCharacter(
         id,
       ]
     );
-  }, 'updateCharacter');
+  }, "updateCharacter");
 }
 
 export async function deleteCharacter(id: string): Promise<void> {
@@ -346,7 +343,7 @@ export async function deleteCharacter(id: string): Promise<void> {
 
     // 7. Finally, delete the character (CASCADE will handle versions, relationships, power_character_links)
     await db.execute("DELETE FROM characters WHERE id = $1", [id]);
-  }, 'deleteCharacter');
+  }, "deleteCharacter");
 }
 
 // Relationships
@@ -366,7 +363,7 @@ export async function getCharacterRelationships(
       type: rel.type as ICharacterRelationship["type"],
       intensity: rel.intensity,
     }));
-  }, 'getCharacterRelationships');
+  }, "getCharacterRelationships");
 }
 
 export async function saveCharacterRelationships(
@@ -397,5 +394,5 @@ export async function saveCharacterRelationships(
         ]
       );
     }
-  }, 'saveCharacterRelationships');
+  }, "saveCharacterRelationships");
 }

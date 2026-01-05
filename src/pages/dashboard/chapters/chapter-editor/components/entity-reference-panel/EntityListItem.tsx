@@ -1,4 +1,12 @@
-import { User, MapPin, Shield, Sparkles, Users, Pin, PinOff } from "lucide-react";
+import {
+  User,
+  MapPin,
+  Shield,
+  Sparkles,
+  Users,
+  Pin,
+  PinOff,
+} from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";

@@ -30,9 +30,7 @@ export const PLOT_ARC_CHAPTER_LIMITS: Record<PlotArcSize, PlotArcChapterLimit> =
     },
   };
 
-export function getChapterLimitForSize(
-  size: PlotArcSize
-): PlotArcChapterLimit {
+export function getChapterLimitForSize(size: PlotArcSize): PlotArcChapterLimit {
   return PLOT_ARC_CHAPTER_LIMITS[size];
 }
 

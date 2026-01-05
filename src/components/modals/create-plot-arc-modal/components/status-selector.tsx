@@ -52,7 +52,9 @@ export function StatusSelector({
 
   return (
     <div className="space-y-3">
-      <Label className={`text-sm font-medium ${error ? "text-destructive" : "text-primary"}`}>
+      <Label
+        className={`text-sm font-medium ${error ? "text-destructive" : "text-primary"}`}
+      >
         {t("modal.arc_status")} <span className="text-destructive">*</span>
       </Label>
 

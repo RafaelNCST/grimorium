@@ -129,7 +129,9 @@ export function DropdownBlock({
       case "races":
         return <RaceHoverCard raceId={entityId}>{children}</RaceHoverCard>;
       case "regions":
-        return <RegionHoverCard regionId={entityId}>{children}</RegionHoverCard>;
+        return (
+          <RegionHoverCard regionId={entityId}>{children}</RegionHoverCard>
+        );
       default:
         return children;
     }

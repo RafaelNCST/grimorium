@@ -20,8 +20,6 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import {
   Accordion,
@@ -29,6 +27,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -323,7 +322,8 @@ export function FactionTimeline({
   useEffect(() => {
     const checkScroll = () => {
       if (scrollContainerCreateEraRef.current) {
-        const { scrollHeight, clientHeight } = scrollContainerCreateEraRef.current;
+        const { scrollHeight, clientHeight } =
+          scrollContainerCreateEraRef.current;
         setHasScrollCreateEra(scrollHeight > clientHeight);
       }
     };
@@ -344,7 +344,8 @@ export function FactionTimeline({
   useEffect(() => {
     const checkScroll = () => {
       if (scrollContainerEditEraRef.current) {
-        const { scrollHeight, clientHeight } = scrollContainerEditEraRef.current;
+        const { scrollHeight, clientHeight } =
+          scrollContainerEditEraRef.current;
         setHasScrollEditEra(scrollHeight > clientHeight);
       }
     };
@@ -587,28 +588,54 @@ export function FactionTimeline({
                                         event.itemsInvolved.length > 0) && (
                                         <div className="mt-3 pt-3 border-t border-border/30">
                                           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                                            {event.charactersInvolved.length > 0 && (
+                                            {event.charactersInvolved.length >
+                                              0 && (
                                               <div className="flex items-center gap-1">
                                                 <Users className="w-3 h-3" />
-                                                <span>{t("timeline.characters_involved")}: {event.charactersInvolved.length}</span>
+                                                <span>
+                                                  {t(
+                                                    "timeline.characters_involved"
+                                                  )}
+                                                  :{" "}
+                                                  {
+                                                    event.charactersInvolved
+                                                      .length
+                                                  }
+                                                </span>
                                               </div>
                                             )}
-                                            {event.factionsInvolved.length > 0 && (
+                                            {event.factionsInvolved.length >
+                                              0 && (
                                               <div className="flex items-center gap-1">
                                                 <Building className="w-3 h-3" />
-                                                <span>{t("timeline.factions_involved")}: {event.factionsInvolved.length}</span>
+                                                <span>
+                                                  {t(
+                                                    "timeline.factions_involved"
+                                                  )}
+                                                  :{" "}
+                                                  {
+                                                    event.factionsInvolved
+                                                      .length
+                                                  }
+                                                </span>
                                               </div>
                                             )}
                                             {event.racesInvolved.length > 0 && (
                                               <div className="flex items-center gap-1">
                                                 <Swords className="w-3 h-3" />
-                                                <span>{t("timeline.races_involved")}: {event.racesInvolved.length}</span>
+                                                <span>
+                                                  {t("timeline.races_involved")}
+                                                  : {event.racesInvolved.length}
+                                                </span>
                                               </div>
                                             )}
                                             {event.itemsInvolved.length > 0 && (
                                               <div className="flex items-center gap-1">
                                                 <Package className="w-3 h-3" />
-                                                <span>{t("timeline.items_involved")}: {event.itemsInvolved.length}</span>
+                                                <span>
+                                                  {t("timeline.items_involved")}
+                                                  : {event.itemsInvolved.length}
+                                                </span>
                                               </div>
                                             )}
                                           </div>
@@ -942,7 +969,9 @@ export function FactionTimeline({
                     </h4>
                     <div className="flex flex-wrap gap-3">
                       {selectedEvent.charactersInvolved.map((id) => {
-                        const character = mockCharacters.find((c) => c.id === id);
+                        const character = mockCharacters.find(
+                          (c) => c.id === id
+                        );
                         return (
                           <div
                             key={id}
@@ -950,7 +979,10 @@ export function FactionTimeline({
                           >
                             {character?.image ? (
                               <Avatar className="w-8 h-8 rounded-full">
-                                <AvatarImage src={character.image} alt={character.name} />
+                                <AvatarImage
+                                  src={character.image}
+                                  alt={character.name}
+                                />
                               </Avatar>
                             ) : (
                               <div className="w-8 h-8 rounded-full bg-purple-950/40 flex items-center justify-center">
@@ -983,7 +1015,10 @@ export function FactionTimeline({
                           >
                             {faction?.image ? (
                               <Avatar className="w-8 h-8 rounded-sm">
-                                <AvatarImage src={faction.image} alt={faction.name} />
+                                <AvatarImage
+                                  src={faction.image}
+                                  alt={faction.name}
+                                />
                               </Avatar>
                             ) : (
                               <div className="w-8 h-8 rounded-sm bg-purple-950/40 flex items-center justify-center">
@@ -1195,7 +1230,10 @@ export function FactionTimeline({
                       id="era-end"
                       value={newEra.endDate}
                       onChange={(e) =>
-                        setNewEra((prev) => ({ ...prev, endDate: e.target.value }))
+                        setNewEra((prev) => ({
+                          ...prev,
+                          endDate: e.target.value,
+                        }))
                       }
                       placeholder={t("timeline.date_placeholder")}
                       maxLength={50}
@@ -1614,7 +1652,10 @@ export function FactionTimeline({
                       id="edit-era-end"
                       value={editEra.endDate}
                       onChange={(e) =>
-                        setEditEra((prev) => ({ ...prev, endDate: e.target.value }))
+                        setEditEra((prev) => ({
+                          ...prev,
+                          endDate: e.target.value,
+                        }))
                       }
                       placeholder={t("timeline.date_placeholder")}
                       maxLength={50}

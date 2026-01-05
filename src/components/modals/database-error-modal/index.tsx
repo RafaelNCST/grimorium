@@ -1,7 +1,10 @@
-import { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { SQLiteErrorType } from '@/lib/db/error-handler';
-import { DatabaseErrorModalView } from './view';
+import { useCallback } from "react";
+
+import { useTranslation } from "react-i18next";
+
+import { SQLiteErrorType } from "@/lib/db/error-handler";
+
+import { DatabaseErrorModalView } from "./view";
 
 interface DatabaseErrorModalProps {
   isOpen: boolean;
@@ -24,9 +27,9 @@ interface DatabaseErrorModalProps {
 export function DatabaseErrorModal({
   isOpen,
   errorType,
-  onClose
+  onClose,
 }: DatabaseErrorModalProps) {
-  const { t } = useTranslation('errors');
+  const { t } = useTranslation("errors");
 
   const handleClose = useCallback(() => {
     onClose();

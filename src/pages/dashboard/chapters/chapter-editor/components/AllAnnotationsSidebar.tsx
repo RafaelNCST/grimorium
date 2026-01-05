@@ -94,7 +94,10 @@ export function AllAnnotationsSidebar({
                 const sortedNotes = [...annotation.notes].sort((a, b) => {
                   if (a.isImportant && !b.isImportant) return -1;
                   if (!a.isImportant && b.isImportant) return 1;
-                  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+                  return (
+                    new Date(b.createdAt).getTime() -
+                    new Date(a.createdAt).getTime()
+                  );
                 });
 
                 return (

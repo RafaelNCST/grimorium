@@ -1,8 +1,9 @@
 import type { EntityMention } from "@/components/modals/create-chapter-modal";
 import type { Annotation, ChapterData } from "@/stores/chapters-store";
 
-import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
+
+import { getDB } from "./index";
 
 // Função auxiliar para calcular diferenças entre arrays
 function _diffArrays<T>(
@@ -152,93 +153,93 @@ export async function getChapterMetadataByBookId(
       [bookId]
     );
 
-  // Buscar todas as menções de uma vez
-  const chapterIds = chapters.map((ch) => ch.id);
-  if (chapterIds.length === 0) return [];
+    // Buscar todas as menções de uma vez
+    const chapterIds = chapters.map((ch) => ch.id);
+    if (chapterIds.length === 0) return [];
 
-  const placeholders = chapterIds.map((_, i) => `$${i + 1}`).join(",");
-  const mentions = await db.select<DBEntityMention[]>(
-    `SELECT * FROM chapter_entity_mentions WHERE chapter_id IN (${placeholders})`,
-    chapterIds
-  );
+    const placeholders = chapterIds.map((_, i) => `$${i + 1}`).join(",");
+    const mentions = await db.select<DBEntityMention[]>(
+      `SELECT * FROM chapter_entity_mentions WHERE chapter_id IN (${placeholders})`,
+      chapterIds
+    );
 
-  // Organizar menções por capítulo e tipo
-  const mentionsByChapter = new Map<
-    string,
-    {
-      characters: EntityMention[];
-      regions: EntityMention[];
-      items: EntityMention[];
-      factions: EntityMention[];
-      races: EntityMention[];
+    // Organizar menções por capítulo e tipo
+    const mentionsByChapter = new Map<
+      string,
+      {
+        characters: EntityMention[];
+        regions: EntityMention[];
+        items: EntityMention[];
+        factions: EntityMention[];
+        races: EntityMention[];
+      }
+    >();
+
+    for (const mention of mentions) {
+      if (!mentionsByChapter.has(mention.chapter_id)) {
+        mentionsByChapter.set(mention.chapter_id, {
+          characters: [],
+          regions: [],
+          items: [],
+          factions: [],
+          races: [],
+        });
+      }
+
+      const chapterMentions = mentionsByChapter.get(mention.chapter_id)!;
+      const entityMention = dbEntityToEntityMention(mention);
+
+      switch (mention.entity_type) {
+        case "character":
+          chapterMentions.characters.push(entityMention);
+          break;
+        case "region":
+          chapterMentions.regions.push(entityMention);
+          break;
+        case "item":
+          chapterMentions.items.push(entityMention);
+          break;
+        case "faction":
+          chapterMentions.factions.push(entityMention);
+          break;
+        case "race":
+          chapterMentions.races.push(entityMention);
+          break;
+      }
     }
-  >();
 
-  for (const mention of mentions) {
-    if (!mentionsByChapter.has(mention.chapter_id)) {
-      mentionsByChapter.set(mention.chapter_id, {
+    // Converter para ChapterMetadata
+    const chapterMetadata = chapters.map((ch) => {
+      const chapterMentions = mentionsByChapter.get(ch.id) || {
         characters: [],
         regions: [],
         items: [],
         factions: [],
         races: [],
-      });
-    }
+      };
 
-    const chapterMentions = mentionsByChapter.get(mention.chapter_id)!;
-    const entityMention = dbEntityToEntityMention(mention);
+      return {
+        id: ch.id,
+        chapterNumber: ch.chapter_number,
+        title: ch.title,
+        status: ch.status,
+        plotArcId: ch.plot_arc_id,
+        summary: ch.summary,
+        wordCount: ch.word_count,
+        characterCount: ch.character_count,
+        characterCountWithSpaces: ch.character_count_with_spaces,
+        lastEdited: new Date(ch.last_edited).toISOString(),
+        mentionedCharacters: chapterMentions.characters,
+        mentionedRegions: chapterMentions.regions,
+        mentionedItems: chapterMentions.items,
+        mentionedFactions: chapterMentions.factions,
+        mentionedRaces: chapterMentions.races,
+      };
+    });
 
-    switch (mention.entity_type) {
-      case "character":
-        chapterMentions.characters.push(entityMention);
-        break;
-      case "region":
-        chapterMentions.regions.push(entityMention);
-        break;
-      case "item":
-        chapterMentions.items.push(entityMention);
-        break;
-      case "faction":
-        chapterMentions.factions.push(entityMention);
-        break;
-      case "race":
-        chapterMentions.races.push(entityMention);
-        break;
-    }
-  }
-
-  // Converter para ChapterMetadata
-  const chapterMetadata = chapters.map((ch) => {
-    const chapterMentions = mentionsByChapter.get(ch.id) || {
-      characters: [],
-      regions: [],
-      items: [],
-      factions: [],
-      races: [],
-    };
-
-    return {
-      id: ch.id,
-      chapterNumber: ch.chapter_number,
-      title: ch.title,
-      status: ch.status,
-      plotArcId: ch.plot_arc_id,
-      summary: ch.summary,
-      wordCount: ch.word_count,
-      characterCount: ch.character_count,
-      characterCountWithSpaces: ch.character_count_with_spaces,
-      lastEdited: new Date(ch.last_edited).toISOString(),
-      mentionedCharacters: chapterMentions.characters,
-      mentionedRegions: chapterMentions.regions,
-      mentionedItems: chapterMentions.items,
-      mentionedFactions: chapterMentions.factions,
-      mentionedRaces: chapterMentions.races,
-    };
-  });
-
-  // Apply JavaScript sorting for proper order (integer, decimal, status)
-  return sortChaptersByNumber(chapterMetadata);
-  }, 'getChapterMetadataByBookId');
+    // Apply JavaScript sorting for proper order (integer, decimal, status)
+    return sortChaptersByNumber(chapterMetadata);
+  }, "getChapterMetadataByBookId");
 }
 
 // Buscar dados mínimos para navegação (ultra-leve, otimizado para 1000+ capítulos)
@@ -280,7 +281,7 @@ export async function getChapterNavigationDataByBookId(
       chapterNumber: ch.chapterNumber,
       title: ch.title,
     }));
-  }, 'getChapterNavigationDataByBookId');
+  }, "getChapterNavigationDataByBookId");
 }
 
 // Buscar capítulo completo (com conteúdo)
@@ -299,90 +300,94 @@ export async function getChapterById(
     if (chapters.length === 0) return null;
     const chapter = chapters[0];
 
-  // Buscar menções
-  const mentions = await db.select<DBEntityMention[]>(
-    "SELECT * FROM chapter_entity_mentions WHERE chapter_id = $1",
-    [chapterId]
-  );
-
-  const mentionedCharacters: EntityMention[] = [];
-  const mentionedRegions: EntityMention[] = [];
-  const mentionedItems: EntityMention[] = [];
-  const mentionedFactions: EntityMention[] = [];
-  const mentionedRaces: EntityMention[] = [];
-
-  for (const mention of mentions) {
-    const entityMention = dbEntityToEntityMention(mention);
-    switch (mention.entity_type) {
-      case "character":
-        mentionedCharacters.push(entityMention);
-        break;
-      case "region":
-        mentionedRegions.push(entityMention);
-        break;
-      case "item":
-        mentionedItems.push(entityMention);
-        break;
-      case "faction":
-        mentionedFactions.push(entityMention);
-        break;
-      case "race":
-        mentionedRaces.push(entityMention);
-        break;
-    }
-  }
-
-  // Buscar anotações
-  const dbAnnotations = await db.select<DBAnnotation[]>(
-    "SELECT * FROM chapter_annotations WHERE chapter_id = $1",
-    [chapterId]
-  );
-
-  const annotations: Annotation[] = [];
-  for (const dbAnnotation of dbAnnotations) {
-    // Buscar notas da anotação
-    const dbNotes = await db.select<DBAnnotationNote[]>(
-      "SELECT * FROM chapter_annotation_notes WHERE annotation_id = $1",
-      [dbAnnotation.id]
+    // Buscar menções
+    const mentions = await db.select<DBEntityMention[]>(
+      "SELECT * FROM chapter_entity_mentions WHERE chapter_id = $1",
+      [chapterId]
     );
 
-    annotations.push({
-      id: dbAnnotation.id,
-      startOffset: dbAnnotation.start_offset,
-      endOffset: dbAnnotation.end_offset,
-      text: dbAnnotation.text,
-      createdAt: new Date(dbAnnotation.created_at).toISOString(),
-      notes: dbNotes.map((note) => ({
-        id: note.id,
-        text: note.text,
-        isImportant: note.is_important === 1,
-        createdAt: new Date(note.created_at).toISOString(),
-        updatedAt: new Date(note.updated_at).toISOString(),
-      })),
-    });
-  }
+    const mentionedCharacters: EntityMention[] = [];
+    const mentionedRegions: EntityMention[] = [];
+    const mentionedItems: EntityMention[] = [];
+    const mentionedFactions: EntityMention[] = [];
+    const mentionedRaces: EntityMention[] = [];
 
-  return {
-    id: chapter.id,
-    chapterNumber: chapter.chapter_number,
-    title: chapter.title,
-    status: chapter.status,
-    plotArcId: chapter.plot_arc_id,
-    summary: chapter.summary || "",
-    content: chapter.content,
-    textAlignment: (chapter.text_alignment || "left") as "left" | "center" | "right" | "justify",
-    wordCount: chapter.word_count,
-    characterCount: chapter.character_count,
-    characterCountWithSpaces: chapter.character_count_with_spaces,
-    lastEdited: new Date(chapter.last_edited).toISOString(),
-    mentionedCharacters,
-    mentionedRegions,
-    mentionedItems,
-    mentionedFactions,
-    mentionedRaces,
-    annotations,
-  };
-  }, 'getChapterById');
+    for (const mention of mentions) {
+      const entityMention = dbEntityToEntityMention(mention);
+      switch (mention.entity_type) {
+        case "character":
+          mentionedCharacters.push(entityMention);
+          break;
+        case "region":
+          mentionedRegions.push(entityMention);
+          break;
+        case "item":
+          mentionedItems.push(entityMention);
+          break;
+        case "faction":
+          mentionedFactions.push(entityMention);
+          break;
+        case "race":
+          mentionedRaces.push(entityMention);
+          break;
+      }
+    }
+
+    // Buscar anotações
+    const dbAnnotations = await db.select<DBAnnotation[]>(
+      "SELECT * FROM chapter_annotations WHERE chapter_id = $1",
+      [chapterId]
+    );
+
+    const annotations: Annotation[] = [];
+    for (const dbAnnotation of dbAnnotations) {
+      // Buscar notas da anotação
+      const dbNotes = await db.select<DBAnnotationNote[]>(
+        "SELECT * FROM chapter_annotation_notes WHERE annotation_id = $1",
+        [dbAnnotation.id]
+      );
+
+      annotations.push({
+        id: dbAnnotation.id,
+        startOffset: dbAnnotation.start_offset,
+        endOffset: dbAnnotation.end_offset,
+        text: dbAnnotation.text,
+        createdAt: new Date(dbAnnotation.created_at).toISOString(),
+        notes: dbNotes.map((note) => ({
+          id: note.id,
+          text: note.text,
+          isImportant: note.is_important === 1,
+          createdAt: new Date(note.created_at).toISOString(),
+          updatedAt: new Date(note.updated_at).toISOString(),
+        })),
+      });
+    }
+
+    return {
+      id: chapter.id,
+      chapterNumber: chapter.chapter_number,
+      title: chapter.title,
+      status: chapter.status,
+      plotArcId: chapter.plot_arc_id,
+      summary: chapter.summary || "",
+      content: chapter.content,
+      textAlignment: (chapter.text_alignment || "left") as
+        | "left"
+        | "center"
+        | "right"
+        | "justify",
+      wordCount: chapter.word_count,
+      characterCount: chapter.character_count,
+      characterCountWithSpaces: chapter.character_count_with_spaces,
+      lastEdited: new Date(chapter.last_edited).toISOString(),
+      mentionedCharacters,
+      mentionedRegions,
+      mentionedItems,
+      mentionedFactions,
+      mentionedRaces,
+      annotations,
+    };
+  }, "getChapterById");
 }
 
 // Criar novo capítulo
@@ -394,195 +399,49 @@ export async function createChapter(
     const db = await getDB();
     const now = Date.now();
 
-  // Inserir capítulo principal
-  await db.execute(
-    `INSERT INTO chapters (
+    // Inserir capítulo principal
+    await db.execute(
+      `INSERT INTO chapters (
       id, book_id, chapter_number, title, status, plot_arc_id, summary, content,
       word_count, character_count, character_count_with_spaces,
       created_at, updated_at, last_edited
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
-    [
-      chapterData.id,
-      bookId,
-      chapterData.chapterNumber,
-      chapterData.title,
-      chapterData.status,
-      chapterData.plotArcId,
-      chapterData.summary,
-      chapterData.content,
-      chapterData.wordCount,
-      chapterData.characterCount,
-      chapterData.characterCountWithSpaces || chapterData.characterCount,
-      now,
-      now,
-      Date.parse(chapterData.lastEdited) || now,
-    ]
-  );
-
-  // Inserir menções de entidades
-  const entityMentions: Array<{
-    type: string;
-    mentions: EntityMention[];
-  }> = [
-    { type: "character", mentions: chapterData.mentionedCharacters },
-    { type: "region", mentions: chapterData.mentionedRegions },
-    { type: "item", mentions: chapterData.mentionedItems },
-    { type: "faction", mentions: chapterData.mentionedFactions },
-    { type: "race", mentions: chapterData.mentionedRaces },
-  ];
-
-  for (const { type, mentions } of entityMentions) {
-    for (const mention of mentions) {
-      const dbEntity = entityMentionToDBEntity(chapterData.id, type, mention);
-      await db.execute(
-        `INSERT INTO chapter_entity_mentions (id, chapter_id, entity_id, entity_type, entity_name, entity_image, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-        [
-          dbEntity.id,
-          dbEntity.chapter_id,
-          dbEntity.entity_id,
-          dbEntity.entity_type,
-          dbEntity.entity_name,
-          dbEntity.entity_image,
-          now,
-        ]
-      );
-    }
-  }
-
-  // Inserir anotações
-  if (chapterData.annotations) {
-    for (const annotation of chapterData.annotations) {
-      await db.execute(
-        `INSERT INTO chapter_annotations (id, chapter_id, start_offset, end_offset, text, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [
-          annotation.id,
-          chapterData.id,
-          annotation.startOffset,
-          annotation.endOffset,
-          annotation.text,
-          Date.parse(annotation.createdAt) || now,
-        ]
-      );
-
-      // Inserir notas da anotação
-      for (const note of annotation.notes) {
-        await db.execute(
-          `INSERT INTO chapter_annotation_notes (id, annotation_id, text, is_important, created_at, updated_at)
-           VALUES ($1, $2, $3, $4, $5, $6)`,
-          [
-            note.id,
-            annotation.id,
-            note.text,
-            note.isImportant ? 1 : 0,
-            Date.parse(note.createdAt) || now,
-            Date.parse(note.updatedAt) || now,
-          ]
-        );
-      }
-    }
-  }
-  }, 'createChapter');
-}
-
-// Atualizar capítulo
-export async function updateChapter(
-  chapterId: string,
-  updates: Partial<ChapterData>
-): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    const now = Date.now();
-
-  // Construir query dinâmica para campos do capítulo principal
-  const fields: string[] = [];
-  const values: unknown[] = [];
-  let paramIndex = 1;
-
-  if (updates.chapterNumber !== undefined) {
-    fields.push(`chapter_number = $${paramIndex++}`);
-    values.push(updates.chapterNumber);
-  }
-  if (updates.title !== undefined) {
-    fields.push(`title = $${paramIndex++}`);
-    values.push(updates.title);
-  }
-  if (updates.status !== undefined) {
-    fields.push(`status = $${paramIndex++}`);
-    values.push(updates.status);
-  }
-  if (updates.plotArcId !== undefined) {
-    fields.push(`plot_arc_id = $${paramIndex++}`);
-    values.push(updates.plotArcId);
-  }
-  if (updates.summary !== undefined) {
-    fields.push(`summary = $${paramIndex++}`);
-    values.push(updates.summary);
-  }
-  if (updates.content !== undefined) {
-    fields.push(`content = $${paramIndex++}`);
-    values.push(updates.content);
-  }
-  if (updates.textAlignment !== undefined) {
-    fields.push(`text_alignment = $${paramIndex++}`);
-    values.push(updates.textAlignment);
-  }
-  if (updates.wordCount !== undefined) {
-    fields.push(`word_count = $${paramIndex++}`);
-    values.push(updates.wordCount);
-  }
-  if (updates.characterCount !== undefined) {
-    fields.push(`character_count = $${paramIndex++}`);
-    values.push(updates.characterCount);
-  }
-  if (updates.characterCountWithSpaces !== undefined) {
-    fields.push(`character_count_with_spaces = $${paramIndex++}`);
-    values.push(updates.characterCountWithSpaces);
-  }
-
-  // Sempre atualizar updated_at e last_edited
-  fields.push(`updated_at = $${paramIndex++}`);
-  values.push(now);
-  fields.push(`last_edited = $${paramIndex++}`);
-  values.push(now);
-
-  // Adicionar chapterId
-  values.push(chapterId);
-
-  if (fields.length > 0) {
-    await db.execute(
-      `UPDATE chapters SET ${fields.join(", ")} WHERE id = $${paramIndex}`,
-      values
+      [
+        chapterData.id,
+        bookId,
+        chapterData.chapterNumber,
+        chapterData.title,
+        chapterData.status,
+        chapterData.plotArcId,
+        chapterData.summary,
+        chapterData.content,
+        chapterData.wordCount,
+        chapterData.characterCount,
+        chapterData.characterCountWithSpaces || chapterData.characterCount,
+        now,
+        now,
+        Date.parse(chapterData.lastEdited) || now,
+      ]
     );
-  }
 
-  // Atualizar menções de entidades se fornecidas
-  const entityMentionUpdates: Array<{
-    type: string;
-    mentions?: EntityMention[];
-  }> = [
-    { type: "character", mentions: updates.mentionedCharacters },
-    { type: "region", mentions: updates.mentionedRegions },
-    { type: "item", mentions: updates.mentionedItems },
-    { type: "faction", mentions: updates.mentionedFactions },
-    { type: "race", mentions: updates.mentionedRaces },
-  ];
+    // Inserir menções de entidades
+    const entityMentions: Array<{
+      type: string;
+      mentions: EntityMention[];
+    }> = [
+      { type: "character", mentions: chapterData.mentionedCharacters },
+      { type: "region", mentions: chapterData.mentionedRegions },
+      { type: "item", mentions: chapterData.mentionedItems },
+      { type: "faction", mentions: chapterData.mentionedFactions },
+      { type: "race", mentions: chapterData.mentionedRaces },
+    ];
 
-  for (const { type, mentions } of entityMentionUpdates) {
-    if (mentions !== undefined) {
-      // Deletar menções antigas deste tipo
-      await db.execute(
-        "DELETE FROM chapter_entity_mentions WHERE chapter_id = $1 AND entity_type = $2",
-        [chapterId, type]
-      );
-
-      // Inserir novas menções
+    for (const { type, mentions } of entityMentions) {
       for (const mention of mentions) {
-        const dbEntity = entityMentionToDBEntity(chapterId, type, mention);
+        const dbEntity = entityMentionToDBEntity(chapterData.id, type, mention);
         await db.execute(
           `INSERT INTO chapter_entity_mentions (id, chapter_id, entity_id, entity_type, entity_name, entity_image, created_at)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
           [
             dbEntity.id,
             dbEntity.chapter_id,
@@ -595,48 +454,195 @@ export async function updateChapter(
         );
       }
     }
-  }
 
-  // Atualizar anotações se fornecidas (Simplificado - DELETE + INSERT é mais seguro)
-  if (updates.annotations !== undefined) {
-    // Deletar anotações antigas (e suas notas via CASCADE)
-    await db.execute("DELETE FROM chapter_annotations WHERE chapter_id = $1", [
-      chapterId,
-    ]);
-
-    // Inserir novas anotações
-    for (const annotation of updates.annotations) {
-      await db.execute(
-        `INSERT INTO chapter_annotations (id, chapter_id, start_offset, end_offset, text, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [
-          annotation.id,
-          chapterId,
-          annotation.startOffset,
-          annotation.endOffset,
-          annotation.text,
-          Date.parse(annotation.createdAt) || now,
-        ]
-      );
-
-      // Inserir notas da anotação
-      for (const note of annotation.notes) {
+    // Inserir anotações
+    if (chapterData.annotations) {
+      for (const annotation of chapterData.annotations) {
         await db.execute(
-          `INSERT INTO chapter_annotation_notes (id, annotation_id, text, is_important, created_at, updated_at)
-           VALUES ($1, $2, $3, $4, $5, $6)`,
+          `INSERT INTO chapter_annotations (id, chapter_id, start_offset, end_offset, text, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
           [
-            note.id,
             annotation.id,
-            note.text,
-            note.isImportant ? 1 : 0,
-            Date.parse(note.createdAt) || now,
-            Date.parse(note.updatedAt) || now,
+            chapterData.id,
+            annotation.startOffset,
+            annotation.endOffset,
+            annotation.text,
+            Date.parse(annotation.createdAt) || now,
           ]
         );
+
+        // Inserir notas da anotação
+        for (const note of annotation.notes) {
+          await db.execute(
+            `INSERT INTO chapter_annotation_notes (id, annotation_id, text, is_important, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+            [
+              note.id,
+              annotation.id,
+              note.text,
+              note.isImportant ? 1 : 0,
+              Date.parse(note.createdAt) || now,
+              Date.parse(note.updatedAt) || now,
+            ]
+          );
+        }
       }
     }
-  }
-  }, 'updateChapter');
+  }, "createChapter");
+}
+
+// Atualizar capítulo
+export async function updateChapter(
+  chapterId: string,
+  updates: Partial<ChapterData>
+): Promise<void> {
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const now = Date.now();
+
+    // Construir query dinâmica para campos do capítulo principal
+    const fields: string[] = [];
+    const values: unknown[] = [];
+    let paramIndex = 1;
+
+    if (updates.chapterNumber !== undefined) {
+      fields.push(`chapter_number = $${paramIndex++}`);
+      values.push(updates.chapterNumber);
+    }
+    if (updates.title !== undefined) {
+      fields.push(`title = $${paramIndex++}`);
+      values.push(updates.title);
+    }
+    if (updates.status !== undefined) {
+      fields.push(`status = $${paramIndex++}`);
+      values.push(updates.status);
+    }
+    if (updates.plotArcId !== undefined) {
+      fields.push(`plot_arc_id = $${paramIndex++}`);
+      values.push(updates.plotArcId);
+    }
+    if (updates.summary !== undefined) {
+      fields.push(`summary = $${paramIndex++}`);
+      values.push(updates.summary);
+    }
+    if (updates.content !== undefined) {
+      fields.push(`content = $${paramIndex++}`);
+      values.push(updates.content);
+    }
+    if (updates.textAlignment !== undefined) {
+      fields.push(`text_alignment = $${paramIndex++}`);
+      values.push(updates.textAlignment);
+    }
+    if (updates.wordCount !== undefined) {
+      fields.push(`word_count = $${paramIndex++}`);
+      values.push(updates.wordCount);
+    }
+    if (updates.characterCount !== undefined) {
+      fields.push(`character_count = $${paramIndex++}`);
+      values.push(updates.characterCount);
+    }
+    if (updates.characterCountWithSpaces !== undefined) {
+      fields.push(`character_count_with_spaces = $${paramIndex++}`);
+      values.push(updates.characterCountWithSpaces);
+    }
+
+    // Sempre atualizar updated_at e last_edited
+    fields.push(`updated_at = $${paramIndex++}`);
+    values.push(now);
+    fields.push(`last_edited = $${paramIndex++}`);
+    values.push(now);
+
+    // Adicionar chapterId
+    values.push(chapterId);
+
+    if (fields.length > 0) {
+      await db.execute(
+        `UPDATE chapters SET ${fields.join(", ")} WHERE id = $${paramIndex}`,
+        values
+      );
+    }
+
+    // Atualizar menções de entidades se fornecidas
+    const entityMentionUpdates: Array<{
+      type: string;
+      mentions?: EntityMention[];
+    }> = [
+      { type: "character", mentions: updates.mentionedCharacters },
+      { type: "region", mentions: updates.mentionedRegions },
+      { type: "item", mentions: updates.mentionedItems },
+      { type: "faction", mentions: updates.mentionedFactions },
+      { type: "race", mentions: updates.mentionedRaces },
+    ];
+
+    for (const { type, mentions } of entityMentionUpdates) {
+      if (mentions !== undefined) {
+        // Deletar menções antigas deste tipo
+        await db.execute(
+          "DELETE FROM chapter_entity_mentions WHERE chapter_id = $1 AND entity_type = $2",
+          [chapterId, type]
+        );
+
+        // Inserir novas menções
+        for (const mention of mentions) {
+          const dbEntity = entityMentionToDBEntity(chapterId, type, mention);
+          await db.execute(
+            `INSERT INTO chapter_entity_mentions (id, chapter_id, entity_id, entity_type, entity_name, entity_image, created_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [
+              dbEntity.id,
+              dbEntity.chapter_id,
+              dbEntity.entity_id,
+              dbEntity.entity_type,
+              dbEntity.entity_name,
+              dbEntity.entity_image,
+              now,
+            ]
+          );
+        }
+      }
+    }
+
+    // Atualizar anotações se fornecidas (Simplificado - DELETE + INSERT é mais seguro)
+    if (updates.annotations !== undefined) {
+      // Deletar anotações antigas (e suas notas via CASCADE)
+      await db.execute(
+        "DELETE FROM chapter_annotations WHERE chapter_id = $1",
+        [chapterId]
+      );
+
+      // Inserir novas anotações
+      for (const annotation of updates.annotations) {
+        await db.execute(
+          `INSERT INTO chapter_annotations (id, chapter_id, start_offset, end_offset, text, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+          [
+            annotation.id,
+            chapterId,
+            annotation.startOffset,
+            annotation.endOffset,
+            annotation.text,
+            Date.parse(annotation.createdAt) || now,
+          ]
+        );
+
+        // Inserir notas da anotação
+        for (const note of annotation.notes) {
+          await db.execute(
+            `INSERT INTO chapter_annotation_notes (id, annotation_id, text, is_important, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+            [
+              note.id,
+              annotation.id,
+              note.text,
+              note.isImportant ? 1 : 0,
+              Date.parse(note.createdAt) || now,
+              Date.parse(note.updatedAt) || now,
+            ]
+          );
+        }
+      }
+    }
+  }, "updateChapter");
 }
 
 // Deletar capítulo
@@ -645,7 +651,7 @@ export async function deleteChapter(chapterId: string): Promise<void> {
     const db = await getDB();
     // As tabelas relacionadas serão deletadas via CASCADE
     await db.execute("DELETE FROM chapters WHERE id = $1", [chapterId]);
-  }, 'deleteChapter');
+  }, "deleteChapter");
 }
 
 // Buscar capítulos por status
@@ -661,92 +667,92 @@ export async function getChaptersByStatus(
       [bookId, status]
     );
 
-  // Buscar menções para esses capítulos
-  const chapterIds = chapters.map((ch) => ch.id);
-  if (chapterIds.length === 0) return [];
+    // Buscar menções para esses capítulos
+    const chapterIds = chapters.map((ch) => ch.id);
+    if (chapterIds.length === 0) return [];
 
-  const placeholders = chapterIds.map((_, i) => `$${i + 1}`).join(",");
-  const mentions = await db.select<DBEntityMention[]>(
-    `SELECT * FROM chapter_entity_mentions WHERE chapter_id IN (${placeholders})`,
-    chapterIds
-  );
+    const placeholders = chapterIds.map((_, i) => `$${i + 1}`).join(",");
+    const mentions = await db.select<DBEntityMention[]>(
+      `SELECT * FROM chapter_entity_mentions WHERE chapter_id IN (${placeholders})`,
+      chapterIds
+    );
 
-  // Organizar menções por capítulo
-  const mentionsByChapter = new Map<
-    string,
-    {
-      characters: EntityMention[];
-      regions: EntityMention[];
-      items: EntityMention[];
-      factions: EntityMention[];
-      races: EntityMention[];
+    // Organizar menções por capítulo
+    const mentionsByChapter = new Map<
+      string,
+      {
+        characters: EntityMention[];
+        regions: EntityMention[];
+        items: EntityMention[];
+        factions: EntityMention[];
+        races: EntityMention[];
+      }
+    >();
+
+    for (const mention of mentions) {
+      if (!mentionsByChapter.has(mention.chapter_id)) {
+        mentionsByChapter.set(mention.chapter_id, {
+          characters: [],
+          regions: [],
+          items: [],
+          factions: [],
+          races: [],
+        });
+      }
+
+      const chapterMentions = mentionsByChapter.get(mention.chapter_id)!;
+      const entityMention = dbEntityToEntityMention(mention);
+
+      switch (mention.entity_type) {
+        case "character":
+          chapterMentions.characters.push(entityMention);
+          break;
+        case "region":
+          chapterMentions.regions.push(entityMention);
+          break;
+        case "item":
+          chapterMentions.items.push(entityMention);
+          break;
+        case "faction":
+          chapterMentions.factions.push(entityMention);
+          break;
+        case "race":
+          chapterMentions.races.push(entityMention);
+          break;
+      }
     }
-  >();
 
-  for (const mention of mentions) {
-    if (!mentionsByChapter.has(mention.chapter_id)) {
-      mentionsByChapter.set(mention.chapter_id, {
+    const chapterMetadata = chapters.map((ch) => {
+      const chapterMentions = mentionsByChapter.get(ch.id) || {
         characters: [],
         regions: [],
         items: [],
         factions: [],
         races: [],
-      });
-    }
+      };
 
-    const chapterMentions = mentionsByChapter.get(mention.chapter_id)!;
-    const entityMention = dbEntityToEntityMention(mention);
+      return {
+        id: ch.id,
+        chapterNumber: ch.chapter_number,
+        title: ch.title,
+        status: ch.status,
+        plotArcId: ch.plot_arc_id,
+        summary: ch.summary,
+        wordCount: ch.word_count,
+        characterCount: ch.character_count,
+        characterCountWithSpaces: ch.character_count_with_spaces,
+        lastEdited: new Date(ch.last_edited).toISOString(),
+        mentionedCharacters: chapterMentions.characters,
+        mentionedRegions: chapterMentions.regions,
+        mentionedItems: chapterMentions.items,
+        mentionedFactions: chapterMentions.factions,
+        mentionedRaces: chapterMentions.races,
+      };
+    });
 
-    switch (mention.entity_type) {
-      case "character":
-        chapterMentions.characters.push(entityMention);
-        break;
-      case "region":
-        chapterMentions.regions.push(entityMention);
-        break;
-      case "item":
-        chapterMentions.items.push(entityMention);
-        break;
-      case "faction":
-        chapterMentions.factions.push(entityMention);
-        break;
-      case "race":
-        chapterMentions.races.push(entityMention);
-        break;
-    }
-  }
-
-  const chapterMetadata = chapters.map((ch) => {
-    const chapterMentions = mentionsByChapter.get(ch.id) || {
-      characters: [],
-      regions: [],
-      items: [],
-      factions: [],
-      races: [],
-    };
-
-    return {
-      id: ch.id,
-      chapterNumber: ch.chapter_number,
-      title: ch.title,
-      status: ch.status,
-      plotArcId: ch.plot_arc_id,
-      summary: ch.summary,
-      wordCount: ch.word_count,
-      characterCount: ch.character_count,
-      characterCountWithSpaces: ch.character_count_with_spaces,
-      lastEdited: new Date(ch.last_edited).toISOString(),
-      mentionedCharacters: chapterMentions.characters,
-      mentionedRegions: chapterMentions.regions,
-      mentionedItems: chapterMentions.items,
-      mentionedFactions: chapterMentions.factions,
-      mentionedRaces: chapterMentions.races,
-    };
-  });
-
-  // Apply JavaScript sorting for proper order (integer, decimal, status)
-  return sortChaptersByNumber(chapterMetadata);
-  }, 'getChaptersByStatus');
+    // Apply JavaScript sorting for proper order (integer, decimal, status)
+    return sortChaptersByNumber(chapterMetadata);
+  }, "getChaptersByStatus");
 }
 
 /**
@@ -797,7 +803,7 @@ function compareChapters(
  * - [5(draft), 5(published), 5(in-progress)] → [5(draft), 5(in-progress), 5(published)]
  */
 export function sortChaptersByNumber<
-  T extends { chapterNumber: string; status: ChapterStatus }
+  T extends { chapterNumber: string; status: ChapterStatus },
 >(chapters: T[]): T[] {
   return [...chapters].sort(compareChapters);
 }

@@ -374,7 +374,7 @@ export interface DBGalleryItem {
   title: string;
   description?: string;
   thumbnail_base64?: string; // DEPRECATED: migrar para thumbnail_path
-  thumbnail_path?: string;   // Path para thumbnail no filesystem
+  thumbnail_path?: string; // Path para thumbnail no filesystem
   original_path: string;
   original_filename: string;
   file_size: number;

@@ -1,5 +1,6 @@
-import { parseDatabaseError, DatabaseError } from './error-handler';
-import { useErrorModalStore } from '@/stores/error-modal-store';
+import { useErrorModalStore } from "@/stores/error-modal-store";
+
+import { parseDatabaseError, DatabaseError } from "./error-handler";
 
 /**
  * Wrapper seguro para operações de banco de dados
@@ -33,7 +34,7 @@ export async function safeDBOperation<T>(
     const dbError = parseDatabaseError(error);
 
     // Log detalhado para debug
-    console.error(`[DB Error] ${operationName || 'Operation'}:`, {
+    console.error(`[DB Error] ${operationName || "Operation"}:`, {
       type: dbError.type,
       message: dbError.message,
       originalError: dbError.originalError,

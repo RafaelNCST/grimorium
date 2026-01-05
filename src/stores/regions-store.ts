@@ -140,7 +140,9 @@ export const useRegionsStore = create<RegionsState>((set, get) => ({
 
         Object.keys(newCache).forEach((bookId) => {
           const cached = newCache[bookId];
-          const regionIndex = cached.regions.findIndex((r) => r.id === regionId);
+          const regionIndex = cached.regions.findIndex(
+            (r) => r.id === regionId
+          );
 
           if (regionIndex !== -1) {
             const updatedRegions = [...cached.regions];
