@@ -543,6 +543,17 @@ function ChapterEditorContent() {
 
   // Update annotations (called when text is modified)
   const handleUpdateAnnotations = (updatedAnnotations: Annotation[]) => {
+    // DEFENSIVE: Log annotation updates to track potential bugs
+    if (updatedAnnotations.length === 0 && chapter.annotations.length > 0) {
+      console.warn('[ChapterEditor] WARNING: Trying to replace', chapter.annotations.length, 'annotations with empty array!');
+      console.trace(); // Log stack trace to see where this is being called from
+    }
+
+    console.log('[ChapterEditor] Updating annotations:', {
+      before: chapter.annotations.length,
+      after: updatedAnnotations.length
+    });
+
     setChapter((prev) => ({
       ...prev,
       annotations: updatedAnnotations,

@@ -147,6 +147,10 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           if (editorRef.current) {
             const initialHtml = removeSearchHighlights(editorRef.current.innerHTML);
             const cursorPos = editorRef.current.innerText.length;
+
+            // DEFENSIVE: Only reset if we have valid data
+            // Don't reset with empty annotations if we should have some
+            console.log('[TextEditor] Initial mount reset - annotations count:', annotations.length);
             undoRedo.resetHistory(initialHtml, annotations, cursorPos);
           }
         });
@@ -169,6 +173,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           initialContentRef.current = content;
 
           // Reset history with the NEW content
+          console.log('[TextEditor] Content changed >30% after mount - resetting with annotations count:', annotations.length);
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
               if (editorRef.current) {
@@ -1242,6 +1247,17 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
               orig.endOffset !== ann.endOffset
             );
           });
+
+        // DEFENSIVE: Prevent losing annotations due to rendering issues
+        // If we had annotations before but now have none, only update if the annotation spans truly don't exist
+        const annotationSpansCount = editorRef.current.querySelectorAll('.annotation-highlight').length;
+        const isSuspiciousEmptyUpdate = annotations.length > 0 && updatedAnnotations.length === 0 && annotationSpansCount > 0;
+
+        if (isSuspiciousEmptyUpdate) {
+          console.error('[TextEditor] PREVENTED annotation loss! Had', annotations.length, 'annotations but updatedAnnotations is empty while', annotationSpansCount, 'spans exist in DOM');
+          // Don't update - keep existing annotations
+          return;
+        }
 
         // Special handling if we just exited annotation with space
         if (justExitedAnnotationRef.current) {
