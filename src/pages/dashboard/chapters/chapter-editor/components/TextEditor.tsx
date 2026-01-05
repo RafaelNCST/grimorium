@@ -49,6 +49,7 @@ interface TextEditorProps {
   onRedo?: () => void;
   canUndo?: boolean;
   canRedo?: boolean;
+  bookId?: string;
 }
 
 export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
@@ -71,6 +72,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       onRedo: externalOnRedo,
       canUndo: _externalCanUndo,
       canRedo: _externalCanRedo,
+      bookId,
     },
     ref
   ) => {
@@ -92,6 +94,8 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     const lastActionTypeRef = useRef<'insert' | 'delete' | null>(null);
     const lastShowAnnotationHighlightsRef = useRef(settings?.showAnnotationHighlights);
     const lastAnnotationsRef = useRef<Annotation[]>(annotations);
+    const mountTimeRef = useRef(Date.now());
+    const initialContentRef = useRef(content);
 
     const undoRedo = useUndoRedo(content, annotations, {
       maxHistorySize: 50,
@@ -120,6 +124,8 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         isImmediateActionRef.current = true;
       },
       resetHistory: () => {
+        // Reset history by reading current state from DOM
+        // This ensures we always use the actual rendered content
         if (editorRef.current) {
           const currentHtml = removeSearchHighlights(editorRef.current.innerHTML);
           const cursorPos = editorRef.current.innerText.length;
@@ -128,21 +134,56 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       },
     }), [undoRedo, annotations]);
 
+    // CRITICAL: Reset history on EVERY mount (component remounts when chapter changes due to key prop)
+    // This ensures each chapter starts with a clean history
     useEffect(() => {
-      requestAnimationFrame(() => {
-        if (editorRef.current) {
-          const initialHtml = removeSearchHighlights(editorRef.current.innerHTML);
-          const cursorPos = editorRef.current.innerText.length;
-          undoRedo.resetHistory(initialHtml, annotations, cursorPos);
-        }
-      });
-    }, []);
+      // Reset mount time
+      mountTimeRef.current = Date.now();
+      initialContentRef.current = content;
 
+      // Use multiple requestAnimationFrame to ensure DOM is fully rendered
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (editorRef.current) {
+            const initialHtml = removeSearchHighlights(editorRef.current.innerHTML);
+            const cursorPos = editorRef.current.innerText.length;
+            undoRedo.resetHistory(initialHtml, annotations, cursorPos);
+          }
+        });
+      });
+    }, []); // Empty deps = runs only on mount (which happens every chapter change)
+
+    // CRITICAL: If content changes drastically shortly after mount, reset history again
+    // This handles the case where component mounts with old props during fast navigation
     useEffect(() => {
-      return () => {
-        undoRedo.resetHistory("", []);
-      };
-    }, []);
+      const timeSinceMount = Date.now() - mountTimeRef.current;
+
+      // Only check in the first 2 seconds after mount
+      if (timeSinceMount < 2000 && content !== initialContentRef.current) {
+        const lengthDiff = Math.abs(content.length - initialContentRef.current.length);
+        const avgLength = (content.length + initialContentRef.current.length) / 2;
+        const changePercentage = avgLength > 0 ? lengthDiff / avgLength : 0;
+
+        // If content changed by more than 30%, it's likely new chapter content loaded
+        if (changePercentage > 0.3) {
+          initialContentRef.current = content;
+
+          // Reset history with the NEW content
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              if (editorRef.current) {
+                const currentHtml = removeSearchHighlights(editorRef.current.innerHTML);
+                const cursorPos = editorRef.current.innerText.length;
+                undoRedo.resetHistory(currentHtml, annotations, cursorPos);
+              }
+            });
+          });
+        }
+      }
+    }, [content, annotations, undoRedo]);
+
+    // Note: The parent component uses key={chapterId} which forces complete remount
+    // This ensures each chapter has its own independent undo/redo history
 
     // CRITICAL: Detect external annotation changes (like color changes from sidebar)
     // and add to undo/redo history

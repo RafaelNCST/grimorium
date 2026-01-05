@@ -201,13 +201,9 @@ function ChapterEditorContent() {
     loadChapter();
   }, [editorChaptersId, getChapter, setCachedChapter]);
 
-  // Reset undo/redo history when navigating between chapters
-  useEffect(() => {
-    // Reset editor history when chapter changes
-    if (textEditorRef.current) {
-      textEditorRef.current.resetHistory();
-    }
-  }, [editorChaptersId]);
+  // Note: TextEditor component uses key={editorChaptersId} which forces
+  // a complete remount when navigating between chapters, ensuring each
+  // chapter has its own independent undo/redo history
 
   // Handle settings change - updates both local state and book store
   const handleSettingsChange = useCallback(
@@ -864,6 +860,7 @@ function ChapterEditorContent() {
         {/* Text Editor */}
         <div className="flex-1 overflow-hidden">
           <TextEditor
+            key={editorChaptersId} // Force remount when chapter changes - ensures independent undo/redo history
             ref={textEditorRef}
             content={chapter.content}
             annotations={chapter.annotations}
@@ -872,7 +869,6 @@ function ChapterEditorContent() {
             fontFamily={editorSettings.fontFamily}
             settings={editorSettings}
             bookId={dashboardId}
-            chapterId={editorChaptersId}
             summarySection={
               <SummarySection
                 bookId={dashboardId!}
