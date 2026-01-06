@@ -3,10 +3,10 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { useEntityFilters } from "@/hooks/use-entity-filters";
-import { getCharactersByBookId } from "@/lib/db/characters.service";
-import { getFactionsByBookId } from "@/lib/db/factions.service";
-import { getItemsByBookId } from "@/lib/db/items.service";
-import { getRacesByBookId } from "@/lib/db/races.service";
+import { useCharactersStore } from "@/stores/characters-store";
+import { useFactionsStore } from "@/stores/factions-store";
+import { useItemsStore } from "@/stores/items-store";
+import { useRacesStore } from "@/stores/races-store";
 import { useRegionsStore } from "@/stores/regions-store";
 import { calculateEntityStats } from "@/utils/calculate-entity-stats";
 
@@ -31,57 +31,63 @@ export function WorldTab({ bookId }: WorldTabProps) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showHierarchyModal, setShowHierarchyModal] = useState(false);
 
-  // Use store to manage regions - optimized selectors
+  // Stores para cache de dados
   const regions = useRegionsStore(
     (state) => state.cache[bookId]?.regions ?? EMPTY_ARRAY
   );
   const hierarchy = useRegionsStore(
     (state) => state.cache[bookId]?.hierarchy ?? EMPTY_HIERARCHY
   );
+  const charactersCache = useCharactersStore((state) => state.cache);
+  const factionsCache = useFactionsStore((state) => state.cache);
+  const racesCache = useRacesStore((state) => state.cache);
+  const itemsCache = useItemsStore((state) => state.cache);
 
-  // Separate store functions
+  // Funções de fetch dos stores
   const fetchRegions = useRegionsStore((state) => state.fetchRegions);
+  const fetchCharacters = useCharactersStore((state) => state.fetchCharacters);
+  const fetchFactions = useFactionsStore((state) => state.fetchFactions);
+  const fetchRaces = useRacesStore((state) => state.fetchRaces);
+  const fetchItems = useItemsStore((state) => state.fetchItems);
   const addRegion = useRegionsStore((state) => state.addRegion);
 
-  // Data for multi-select dropdowns
-  const [characters, setCharacters] = useState<
-    Array<{ id: string; name: string }>
-  >([]);
-  const [factions, setFactions] = useState<Array<{ id: string; name: string }>>(
-    []
+  // Dados relacionados vindos dos caches (mapeados para formato simplificado)
+  const characters = useMemo(
+    () =>
+      charactersCache[bookId]?.characters.map((c) => ({
+        id: c.id,
+        name: c.name,
+      })) || [],
+    [charactersCache, bookId]
   );
-  const [races, setRaces] = useState<Array<{ id: string; name: string }>>([]);
-  const [items, setItems] = useState<Array<{ id: string; name: string }>>([]);
+  const factions = useMemo(
+    () =>
+      factionsCache[bookId]?.factions.map((f) => ({ id: f.id, name: f.name })) ||
+      [],
+    [factionsCache, bookId]
+  );
+  const races = useMemo(
+    () =>
+      racesCache[bookId]?.races.map((r) => ({ id: r.id, name: r.name })) || [],
+    [racesCache, bookId]
+  );
+  const items = useMemo(
+    () =>
+      itemsCache[bookId]?.items.map((i) => ({ id: i.id, name: i.name })) || [],
+    [itemsCache, bookId]
+  );
 
-  // Load regions from cache or database on mount
+  // Fetch todos os caches em paralelo (usa cache se já tiver)
   useEffect(() => {
-    fetchRegions(bookId);
+    Promise.all([
+      fetchRegions(bookId),
+      fetchCharacters(bookId),
+      fetchFactions(bookId),
+      fetchRaces(bookId),
+      fetchItems(bookId),
+    ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookId]); // Only bookId as dependency
-
-  // Load related data for dropdowns
-  useEffect(() => {
-    const loadRelatedData = async () => {
-      try {
-        const [charactersData, factionsData, racesData, itemsData] =
-          await Promise.all([
-            getCharactersByBookId(bookId),
-            getFactionsByBookId(bookId),
-            getRacesByBookId(bookId),
-            getItemsByBookId(bookId),
-          ]);
-
-        setCharacters(charactersData.map((c) => ({ id: c.id, name: c.name })));
-        setFactions(factionsData.map((f) => ({ id: f.id, name: f.name })));
-        setRaces(racesData.map((r) => ({ id: r.id, name: r.name })));
-        setItems(itemsData.map((i) => ({ id: i.id, name: i.name })));
-      } catch (error) {
-        console.error("Failed to load related data:", error);
-      }
-    };
-
-    loadRelatedData();
-  }, [bookId]);
 
   // Use entity filters hook
   const {

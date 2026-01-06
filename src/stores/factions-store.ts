@@ -33,63 +33,81 @@ interface FactionsState {
   setHasAnimated: (bookId: string) => void;
 }
 
+// Map para rastrear fetches em andamento e prevenir race conditions
+const fetchingPromises = new Map<string, Promise<void>>();
+
 export const useFactionsStore = create<FactionsState>((set, get) => ({
   cache: {},
 
   fetchFactions: async (bookId: string, forceRefresh = false) => {
-    const { cache } = get();
-    const cached = cache[bookId];
-
-    // Se já existe em cache e não é forceRefresh, não buscar novamente
-    if (cached && !forceRefresh && cached.factions.length > 0) {
-      return;
+    // Se já está fetchando e não é force refresh, retornar a promise existente
+    if (fetchingPromises.has(bookId) && !forceRefresh) {
+      return fetchingPromises.get(bookId);
     }
 
-    // Se já está carregando, não iniciar nova busca
-    if (cached?.isLoading) {
-      return;
-    }
+    const promise = (async () => {
+      const cached = get().cache[bookId];
 
-    // Marcar como loading
-    set((state) => ({
-      cache: {
-        ...state.cache,
-        [bookId]: {
-          factions: cached?.factions || [],
-          isLoading: true,
-          lastFetched: cached?.lastFetched || 0,
-          hasAnimated: cached?.hasAnimated || false,
-        },
-      },
-    }));
+      // Verificar cache se não for forceRefresh
+      if (!forceRefresh && cached?.factions && cached.factions.length > 0) {
+        return;
+      }
 
-    try {
-      const factions = await getFactionsByBookId(bookId);
-      set((state) => ({
-        cache: {
-          ...state.cache,
-          [bookId]: {
-            factions,
-            isLoading: false,
-            lastFetched: Date.now(),
-            hasAnimated: cached?.hasAnimated || false,
-          },
-        },
-      }));
-    } catch (error) {
-      console.error("Error fetching factions:", error);
-      // Em caso de erro, marcar como não carregando
+      // Marcar como loading
       set((state) => ({
         cache: {
           ...state.cache,
           [bookId]: {
             factions: cached?.factions || [],
-            isLoading: false,
+            isLoading: true,
             lastFetched: cached?.lastFetched || 0,
             hasAnimated: cached?.hasAnimated || false,
           },
         },
       }));
+
+      try {
+        // Fetch do DB
+        const factions = await getFactionsByBookId(bookId);
+        const now = Date.now();
+
+        // Atualizar cache com sucesso
+        set((state) => ({
+          cache: {
+            ...state.cache,
+            [bookId]: {
+              factions,
+              isLoading: false,
+              lastFetched: now,
+              hasAnimated: cached?.hasAnimated || false,
+            },
+          },
+        }));
+      } catch (error) {
+        console.error("Error fetching factions:", error);
+        // Atualizar cache com erro
+        set((state) => ({
+          cache: {
+            ...state.cache,
+            [bookId]: {
+              factions: cached?.factions || [],
+              isLoading: false,
+              lastFetched: cached?.lastFetched || 0,
+              hasAnimated: cached?.hasAnimated || false,
+            },
+          },
+        }));
+        throw error;
+      }
+    })();
+
+    fetchingPromises.set(bookId, promise);
+
+    try {
+      await promise;
+    } finally {
+      // Limpar após conclusão
+      fetchingPromises.delete(bookId);
     }
   },
 

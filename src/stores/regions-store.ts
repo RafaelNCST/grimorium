@@ -18,6 +18,7 @@ interface RegionsCache {
     hierarchy: IRegionWithChildren[];
     isLoading: boolean;
     lastFetched: number;
+    hasAnimated: boolean;
   };
 }
 
@@ -34,69 +35,91 @@ interface RegionsState {
   getRegions: (bookId: string) => IRegion[];
   getHierarchy: (bookId: string) => IRegionWithChildren[];
   isLoading: (bookId: string) => boolean;
+  hasAnimated: (bookId: string) => boolean;
+  setHasAnimated: (bookId: string) => void;
 }
+
+// Map para rastrear fetches em andamento e prevenir race conditions
+const fetchingPromises = new Map<string, Promise<void>>();
 
 export const useRegionsStore = create<RegionsState>((set, get) => ({
   cache: {},
 
   fetchRegions: async (bookId: string, forceRefresh = false) => {
-    const { cache } = get();
-    const cached = cache[bookId];
-
-    // Se já existe em cache e não é forceRefresh, não buscar novamente
-    if (cached && !forceRefresh && cached.regions.length > 0) {
-      return;
+    // Se já está fetchando e não é force refresh, retornar a promise existente
+    if (fetchingPromises.has(bookId) && !forceRefresh) {
+      return fetchingPromises.get(bookId);
     }
 
-    // Se já está carregando, não iniciar nova busca
-    if (cached?.isLoading) {
-      return;
-    }
+    const promise = (async () => {
+      const cached = get().cache[bookId];
 
-    // Marcar como loading
-    set((state) => ({
-      cache: {
-        ...state.cache,
-        [bookId]: {
-          regions: cached?.regions || [],
-          hierarchy: cached?.hierarchy || [],
-          isLoading: true,
-          lastFetched: cached?.lastFetched || 0,
-        },
-      },
-    }));
+      // Verificar cache se não for forceRefresh
+      if (!forceRefresh && cached?.regions && cached.regions.length > 0) {
+        return;
+      }
 
-    try {
-      const [regionsData, hierarchyData] = await Promise.all([
-        getRegionsByBookId(bookId),
-        getRegionHierarchy(bookId),
-      ]);
-
-      set((state) => ({
-        cache: {
-          ...state.cache,
-          [bookId]: {
-            regions: regionsData,
-            hierarchy: hierarchyData,
-            isLoading: false,
-            lastFetched: Date.now(),
-          },
-        },
-      }));
-    } catch (error) {
-      console.error("Error fetching regions:", error);
-      // Em caso de erro, marcar como não carregando
+      // Marcar como loading
       set((state) => ({
         cache: {
           ...state.cache,
           [bookId]: {
             regions: cached?.regions || [],
             hierarchy: cached?.hierarchy || [],
-            isLoading: false,
+            isLoading: true,
             lastFetched: cached?.lastFetched || 0,
+            hasAnimated: cached?.hasAnimated || false,
           },
         },
       }));
+
+      try {
+        // Fetch regions e hierarchy em paralelo
+        const [regionsData, hierarchyData] = await Promise.all([
+          getRegionsByBookId(bookId),
+          getRegionHierarchy(bookId),
+        ]);
+        const now = Date.now();
+
+        // Atualizar cache com sucesso
+        set((state) => ({
+          cache: {
+            ...state.cache,
+            [bookId]: {
+              regions: regionsData,
+              hierarchy: hierarchyData,
+              isLoading: false,
+              lastFetched: now,
+              hasAnimated: cached?.hasAnimated || false,
+            },
+          },
+        }));
+      } catch (error) {
+        console.error("Error fetching regions:", error);
+        // Atualizar cache com erro
+        set((state) => ({
+          cache: {
+            ...state.cache,
+            [bookId]: {
+              regions: cached?.regions || [],
+              hierarchy: cached?.hierarchy || [],
+              isLoading: false,
+              lastFetched: cached?.lastFetched || 0,
+              hasAnimated: cached?.hasAnimated || false,
+            },
+          },
+        }));
+        throw error;
+      }
+    })();
+
+    fetchingPromises.set(bookId, promise);
+
+    try {
+      await promise;
+    } finally {
+      // Limpar após conclusão
+      fetchingPromises.delete(bookId);
     }
   },
 
@@ -120,6 +143,7 @@ export const useRegionsStore = create<RegionsState>((set, get) => ({
               hierarchy: hierarchyData,
               isLoading: false,
               lastFetched: cached?.lastFetched || Date.now(),
+              hasAnimated: cached?.hasAnimated || false,
             },
           },
         };
@@ -200,6 +224,7 @@ export const useRegionsStore = create<RegionsState>((set, get) => ({
               hierarchy: hierarchyData,
               isLoading: false,
               lastFetched: cached?.lastFetched || Date.now(),
+              hasAnimated: cached?.hasAnimated || false,
             },
           },
         };
@@ -231,5 +256,27 @@ export const useRegionsStore = create<RegionsState>((set, get) => ({
   isLoading: (bookId: string) => {
     const { cache } = get();
     return cache[bookId]?.isLoading || false;
+  },
+
+  hasAnimated: (bookId: string) => {
+    const { cache } = get();
+    return cache[bookId]?.hasAnimated || false;
+  },
+
+  setHasAnimated: (bookId: string) => {
+    set((state) => {
+      const cached = state.cache[bookId];
+      if (!cached) return state;
+
+      return {
+        cache: {
+          ...state.cache,
+          [bookId]: {
+            ...cached,
+            hasAnimated: true,
+          },
+        },
+      };
+    });
   },
 }));

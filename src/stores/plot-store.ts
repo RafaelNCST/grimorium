@@ -13,6 +13,7 @@ interface PlotCache {
     arcs: IPlotArc[];
     isLoading: boolean;
     lastFetched: number;
+    hasAnimated: boolean;
   };
 }
 
@@ -33,6 +34,10 @@ interface PlotState {
   // Getters
   getArcs: (bookId: string) => IPlotArc[];
   isLoading: (bookId: string) => boolean;
+  hasAnimated: (bookId: string) => boolean;
+
+  // Setters
+  setHasAnimated: (bookId: string) => void;
 
   // Cache management
   invalidateCache: (bookId: string) => void;
@@ -67,6 +72,7 @@ export const usePlotStore = create<PlotState>((set, get) => ({
             arcs: cached?.arcs || [],
             isLoading: true,
             lastFetched: cached?.lastFetched || 0,
+            hasAnimated: cached?.hasAnimated || false,
           },
         },
       }));
@@ -84,6 +90,7 @@ export const usePlotStore = create<PlotState>((set, get) => ({
               arcs,
               isLoading: false,
               lastFetched: now,
+              hasAnimated: cached?.hasAnimated || false,
             },
           },
         }));
@@ -97,6 +104,7 @@ export const usePlotStore = create<PlotState>((set, get) => ({
               arcs: cached?.arcs || [],
               isLoading: false,
               lastFetched: cached?.lastFetched || 0,
+              hasAnimated: cached?.hasAnimated || false,
             },
           },
         }));
@@ -128,6 +136,7 @@ export const usePlotStore = create<PlotState>((set, get) => ({
               arcs: [arc, ...(cached?.arcs || [])],
               isLoading: false,
               lastFetched: cached?.lastFetched || Date.now(),
+              hasAnimated: cached?.hasAnimated || false,
             },
           },
         };
@@ -186,6 +195,7 @@ export const usePlotStore = create<PlotState>((set, get) => ({
               arcs: cached.arcs.filter((a) => a.id !== arcId),
               isLoading: false,
               lastFetched: cached?.lastFetched || Date.now(),
+              hasAnimated: cached?.hasAnimated || false,
             },
           },
         };
@@ -204,6 +214,28 @@ export const usePlotStore = create<PlotState>((set, get) => ({
   isLoading: (bookId: string) => {
     const { cache } = get();
     return cache[bookId]?.isLoading || false;
+  },
+
+  hasAnimated: (bookId: string) => {
+    const { cache } = get();
+    return cache[bookId]?.hasAnimated || false;
+  },
+
+  setHasAnimated: (bookId: string) => {
+    set((state) => {
+      const cached = state.cache[bookId];
+      if (!cached) return state;
+
+      return {
+        cache: {
+          ...state.cache,
+          [bookId]: {
+            ...cached,
+            hasAnimated: true,
+          },
+        },
+      };
+    });
   },
 
   invalidateCache: (bookId: string) => {

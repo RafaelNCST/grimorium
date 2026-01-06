@@ -13,6 +13,7 @@ interface RacesCache {
     races: IRace[];
     isLoading: boolean;
     lastFetched: number;
+    hasAnimated: boolean;
   };
 }
 
@@ -25,62 +26,85 @@ interface RacesState {
   invalidateCache: (bookId: string) => void;
   getRaces: (bookId: string) => IRace[];
   isLoading: (bookId: string) => boolean;
+  hasAnimated: (bookId: string) => boolean;
+  setHasAnimated: (bookId: string) => void;
 }
+
+// Map para rastrear fetches em andamento e prevenir race conditions
+const fetchingPromises = new Map<string, Promise<void>>();
 
 export const useRacesStore = create<RacesState>((set, get) => ({
   cache: {},
 
   fetchRaces: async (bookId: string, forceRefresh = false) => {
-    const { cache } = get();
-    const cached = cache[bookId];
-
-    // Se já existe em cache e não é forceRefresh, não buscar novamente
-    if (cached && !forceRefresh && cached.races.length > 0) {
-      return;
+    // Se já está fetchando e não é force refresh, retornar a promise existente
+    if (fetchingPromises.has(bookId) && !forceRefresh) {
+      return fetchingPromises.get(bookId);
     }
 
-    // Se já está carregando, não iniciar nova busca
-    if (cached?.isLoading) {
-      return;
-    }
+    const promise = (async () => {
+      const cached = get().cache[bookId];
 
-    // Marcar como loading
-    set((state) => ({
-      cache: {
-        ...state.cache,
-        [bookId]: {
-          races: cached?.races || [],
-          isLoading: true,
-          lastFetched: cached?.lastFetched || 0,
-        },
-      },
-    }));
+      // Verificar cache se não for forceRefresh
+      if (!forceRefresh && cached?.races && cached.races.length > 0) {
+        return;
+      }
 
-    try {
-      const races = await getRacesByBookId(bookId);
-      set((state) => ({
-        cache: {
-          ...state.cache,
-          [bookId]: {
-            races,
-            isLoading: false,
-            lastFetched: Date.now(),
-          },
-        },
-      }));
-    } catch (error) {
-      console.error("Error fetching races:", error);
-      // Em caso de erro, marcar como não carregando
+      // Marcar como loading
       set((state) => ({
         cache: {
           ...state.cache,
           [bookId]: {
             races: cached?.races || [],
-            isLoading: false,
+            isLoading: true,
             lastFetched: cached?.lastFetched || 0,
+            hasAnimated: cached?.hasAnimated || false,
           },
         },
       }));
+
+      try {
+        // Fetch do DB
+        const races = await getRacesByBookId(bookId);
+        const now = Date.now();
+
+        // Atualizar cache com sucesso
+        set((state) => ({
+          cache: {
+            ...state.cache,
+            [bookId]: {
+              races,
+              isLoading: false,
+              lastFetched: now,
+              hasAnimated: cached?.hasAnimated || false,
+            },
+          },
+        }));
+      } catch (error) {
+        console.error("Error fetching races:", error);
+        // Atualizar cache com erro
+        set((state) => ({
+          cache: {
+            ...state.cache,
+            [bookId]: {
+              races: cached?.races || [],
+              isLoading: false,
+              lastFetched: cached?.lastFetched || 0,
+              hasAnimated: cached?.hasAnimated || false,
+            },
+          },
+        }));
+        throw error;
+      }
+    })();
+
+    fetchingPromises.set(bookId, promise);
+
+    try {
+      await promise;
+    } finally {
+      // Limpar após conclusão
+      fetchingPromises.delete(bookId);
     }
   },
 
@@ -98,6 +122,7 @@ export const useRacesStore = create<RacesState>((set, get) => ({
               races: [...(cached?.races || []), race],
               isLoading: false,
               lastFetched: cached?.lastFetched || Date.now(),
+              hasAnimated: cached?.hasAnimated || false,
             },
           },
         };
@@ -156,6 +181,7 @@ export const useRacesStore = create<RacesState>((set, get) => ({
               races: (cached?.races || []).filter((r) => r.id !== raceId),
               isLoading: false,
               lastFetched: cached?.lastFetched || Date.now(),
+              hasAnimated: cached?.hasAnimated || false,
             },
           },
         };
@@ -182,5 +208,27 @@ export const useRacesStore = create<RacesState>((set, get) => ({
   isLoading: (bookId: string) => {
     const { cache } = get();
     return cache[bookId]?.isLoading || false;
+  },
+
+  hasAnimated: (bookId: string) => {
+    const { cache } = get();
+    return cache[bookId]?.hasAnimated || false;
+  },
+
+  setHasAnimated: (bookId: string) => {
+    set((state) => {
+      const cached = state.cache[bookId];
+      if (!cached) return state;
+
+      return {
+        cache: {
+          ...state.cache,
+          [bookId]: {
+            ...cached,
+            hasAnimated: true,
+          },
+        },
+      };
+    });
   },
 }));

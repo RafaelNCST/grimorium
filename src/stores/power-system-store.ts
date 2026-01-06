@@ -41,69 +41,87 @@ interface PowerSystemState {
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+// Map para rastrear fetches em andamento e prevenir race conditions
+const fetchingPromises = new Map<string, Promise<void>>();
+
 export const usePowerSystemStore = create<PowerSystemState>((set, get) => ({
   cache: {},
 
   fetchSystems: async (bookId: string, forceRefresh = false) => {
-    const { cache } = get();
-    const cached = cache[bookId];
-    const now = Date.now();
-
-    // If data is fresh (< 5 minutes old) and not forcing refresh, return cached data
-    if (
-      cached &&
-      !forceRefresh &&
-      cached.systems.length > 0 &&
-      now - cached.lastFetched < CACHE_TTL
-    ) {
-      return;
+    // Se já está fetchando e não é force refresh, retornar a promise existente
+    if (fetchingPromises.has(bookId) && !forceRefresh) {
+      return fetchingPromises.get(bookId);
     }
 
-    // If already loading, don't start a new fetch
-    if (cached?.isLoading) {
-      return;
-    }
+    const promise = (async () => {
+      const cached = get().cache[bookId];
+      const now = Date.now();
 
-    // Mark as loading
-    set((state) => ({
-      cache: {
-        ...state.cache,
-        [bookId]: {
-          systems: cached?.systems || [],
-          isLoading: true,
-          lastFetched: cached?.lastFetched || 0,
-          hasAnimated: cached?.hasAnimated || false,
-        },
-      },
-    }));
+      // Verificar cache se não for forceRefresh (com TTL de 5 minutos)
+      if (
+        !forceRefresh &&
+        cached?.systems &&
+        cached.systems.length > 0 &&
+        now - cached.lastFetched < CACHE_TTL
+      ) {
+        return;
+      }
 
-    try {
-      const systems = await getPowerSystemsByBookId(bookId);
-      set((state) => ({
-        cache: {
-          ...state.cache,
-          [bookId]: {
-            systems,
-            isLoading: false,
-            lastFetched: Date.now(),
-            hasAnimated: cached?.hasAnimated || false,
-          },
-        },
-      }));
-    } catch (error) {
-      console.error("Error fetching power systems:", error);
-      // On error, mark as not loading
+      // Marcar como loading
       set((state) => ({
         cache: {
           ...state.cache,
           [bookId]: {
             systems: cached?.systems || [],
-            isLoading: false,
+            isLoading: true,
             lastFetched: cached?.lastFetched || 0,
             hasAnimated: cached?.hasAnimated || false,
           },
         },
       }));
+
+      try {
+        // Fetch do DB
+        const systems = await getPowerSystemsByBookId(bookId);
+        const now = Date.now();
+
+        // Atualizar cache com sucesso
+        set((state) => ({
+          cache: {
+            ...state.cache,
+            [bookId]: {
+              systems,
+              isLoading: false,
+              lastFetched: now,
+              hasAnimated: cached?.hasAnimated || false,
+            },
+          },
+        }));
+      } catch (error) {
+        console.error("Error fetching power systems:", error);
+        // Atualizar cache com erro
+        set((state) => ({
+          cache: {
+            ...state.cache,
+            [bookId]: {
+              systems: cached?.systems || [],
+              isLoading: false,
+              lastFetched: cached?.lastFetched || 0,
+              hasAnimated: cached?.hasAnimated || false,
+            },
+          },
+        }));
+        throw error;
+      }
+    })();
+
+    fetchingPromises.set(bookId, promise);
+
+    try {
+      await promise;
+    } finally {
+      // Limpar após conclusão
+      fetchingPromises.delete(bookId);
     }
   },
 

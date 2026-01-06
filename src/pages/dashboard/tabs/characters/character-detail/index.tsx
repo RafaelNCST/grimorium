@@ -11,7 +11,6 @@ import { EntityLogsModal } from "@/components/modals/entity-logs-modal";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   getCharacterById,
-  getCharactersByBookId,
   getCharacterRelationships,
   saveCharacterRelationships,
 } from "@/lib/db/characters.service";
@@ -20,13 +19,13 @@ import {
   updatePowerCharacterLinkLabel,
   deletePowerCharacterLink,
 } from "@/lib/db/power-system.service";
-import { getRacesByBookId } from "@/lib/db/races.service";
-import { getRegionsByBookId } from "@/lib/db/regions.service";
 import { CharacterSchema } from "@/lib/validation/character-schema";
 import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
 import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import type { IRegion } from "@/pages/dashboard/tabs/world/types/region-types";
 import { useCharactersStore } from "@/stores/characters-store";
+import { useRacesStore } from "@/stores/races-store";
+import { useRegionsStore } from "@/stores/regions-store";
 import { type ICharacter } from "@/types/character-types";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
@@ -50,7 +49,17 @@ export function CharacterDetail() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Usar o store para atualizar personagens
+  // Stores para cache de dados relacionados
+  const charactersCache = useCharactersStore((state) => state.cache);
+  const racesCache = useRacesStore((state) => state.cache);
+  const regionsCache = useRegionsStore((state) => state.cache);
+
+  // Funções de fetch dos stores
+  const fetchCharacters = useCharactersStore((state) => state.fetchCharacters);
+  const fetchRaces = useRacesStore((state) => state.fetchRaces);
+  const fetchRegions = useRegionsStore((state) => state.fetchRegions);
+
+  // Funções de update/delete
   const updateCharacterInStore = useCharactersStore(
     (state) => state.updateCharacterInCache
   );
@@ -102,10 +111,14 @@ export function CharacterDetail() {
     return stored ? JSON.parse(stored) : false;
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [allCharacters, setAllCharacters] = useState<ICharacter[]>([]);
-  const [regions, setRegions] = useState<IRegion[]>([]);
-  const [races, setRaces] = useState<IRace[]>([]);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+
+  // Dados relacionados vindos dos caches dos stores
+  const allCharacters = dashboardId
+    ? charactersCache[dashboardId]?.characters || []
+    : [];
+  const regions = dashboardId ? regionsCache[dashboardId]?.regions || [] : [];
+  const races = dashboardId ? racesCache[dashboardId]?.races || [] : [];
 
   // Power links state
   const [characterPowerLinks, setCharacterPowerLinks] = useState<
@@ -309,29 +322,28 @@ export function CharacterDetail() {
     originalSectionVisibility,
   ]);
 
+  // Fetch caches em paralelo (usa cache se já tiver)
+  useEffect(() => {
+    if (dashboardId) {
+      Promise.all([
+        fetchCharacters(dashboardId),
+        fetchRaces(dashboardId),
+        fetchRegions(dashboardId),
+      ]);
+    }
+  }, [dashboardId]);
+
   // Load character from database
   useEffect(() => {
     let isMounted = true;
 
     const loadCharacter = async () => {
       try {
-        // Execute all independent queries in parallel for better performance
-        const [
-          characterFromDB,
-          relationships,
-          allCharsFromBook,
-          powerLinks,
-          regionsFromDB,
-          racesFromDB,
-        ] = await Promise.all([
+        // Buscar apenas o character específico e relationships
+        const [characterFromDB, relationships, powerLinks] = await Promise.all([
           getCharacterById(characterId),
           getCharacterRelationships(characterId),
-          dashboardId
-            ? getCharactersByBookId(dashboardId)
-            : Promise.resolve([]),
           getPowerLinksWithTitlesByCharacterId(characterId),
-          dashboardId ? getRegionsByBookId(dashboardId) : Promise.resolve([]),
-          dashboardId ? getRacesByBookId(dashboardId) : Promise.resolve([]),
         ]);
 
         // Only update state if component is still mounted
@@ -351,13 +363,6 @@ export function CharacterDetail() {
 
           // Set power links
           setCharacterPowerLinks(powerLinks);
-
-          // Set all characters from the same book
-          setAllCharacters(allCharsFromBook);
-
-          // Set regions and races from the same book
-          setRegions(regionsFromDB);
-          setRaces(racesFromDB);
 
           // Initialize original section visibility with current state
           setOriginalSectionVisibility(sectionVisibility);
@@ -381,7 +386,7 @@ export function CharacterDetail() {
     return () => {
       isMounted = false;
     };
-  }, [characterId, dashboardId]);
+  }, [characterId]);
 
   async function loadPowerLinks() {
     try {
