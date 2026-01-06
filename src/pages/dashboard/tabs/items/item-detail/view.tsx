@@ -109,6 +109,8 @@ interface ItemDetailViewProps {
   setHasChapterMetrics: (value: boolean | null) => void;
   isLogsModalOpen: boolean;
   onLogsModalToggle: () => void;
+  extraSectionsOpenState: Record<string, boolean>;
+  onExtraSectionsOpenStateChange: (state: Record<string, boolean>) => void;
 }
 
 export const ItemDetailView = React.memo(
@@ -152,6 +154,8 @@ export const ItemDetailView = React.memo(
     setHasChapterMetrics,
     isLogsModalOpen,
     onLogsModalToggle,
+    extraSectionsOpenState,
+    onExtraSectionsOpenStateChange,
   }: ItemDetailViewProps) => {
     const { t } = useTranslation(["item-detail", "create-item"]);
 
@@ -812,6 +816,8 @@ export const ItemDetailView = React.memo(
               advancedSectionTitle={t("item-detail:sections.advanced_info")}
               advancedSectionOpen={advancedSectionOpen}
               onAdvancedSectionToggle={onAdvancedSectionToggle}
+              extraSectionsOpenState={extraSectionsOpenState}
+              onExtraSectionsOpenStateChange={onExtraSectionsOpenStateChange}
               extraSections={[
                 {
                   id: "chapter-metrics",

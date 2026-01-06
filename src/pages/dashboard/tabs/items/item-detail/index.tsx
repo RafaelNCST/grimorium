@@ -18,6 +18,7 @@ import {
 } from "@/lib/db/items.service";
 import { ItemSchema, ItemSchemaBase } from "@/lib/validation/item-schema";
 import { useItemsStore } from "@/stores/items-store";
+import { useEntityUIStateStore } from "@/stores/entity-ui-state-store";
 import { type IFieldVisibility } from "@/types/character-types";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
@@ -35,6 +36,10 @@ export default function ItemDetail() {
   const deleteItemFromStore = useItemsStore(
     (state) => state.deleteItemFromCache
   );
+
+  // Entity UI State store
+  const getUIState = useEntityUIStateStore((state) => state.getUIState);
+  const setUIStateInStore = useEntityUIStateStore((state) => state.setUIState);
 
   const emptyItem: IItem = {
     id: "",
@@ -66,12 +71,7 @@ export default function ItemDetail() {
   const [sectionVisibility, setSectionVisibility] = useState<
     Record<string, boolean>
   >({});
-  const sectionVisibilityRef =
-    useRef<Record<string, boolean>>(sectionVisibility);
-  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
-    const stored = localStorage.getItem("itemDetailAdvancedSectionOpen");
-    return stored ? JSON.parse(stored) : false;
-  });
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     alternativeNames: false,
   });
@@ -89,24 +89,47 @@ export default function ItemDetail() {
   const [originalSectionVisibility, setOriginalSectionVisibility] = useState<
     Record<string, boolean>
   >({});
+  const [originalAdvancedSectionOpen, setOriginalAdvancedSectionOpen] = useState(false);
+  const [extraSectionsOpenState, setExtraSectionsOpenState] = useState<
+    Record<string, boolean>
+  >({});
+  const [originalExtraSectionsOpenState, setOriginalExtraSectionsOpenState] = useState<
+    Record<string, boolean>
+  >({});
   const [isLoading, setIsLoading] = useState(true);
   const [allItems, setAllItems] = useState<IItem[]>([]);
 
-  // Keep ref synced with state
+  // Refs to always have current values (avoid stale closures)
+  const advancedSectionOpenRef = useRef(advancedSectionOpen);
+  const sectionVisibilityRef = useRef(sectionVisibility);
+  const extraSectionsOpenStateRef = useRef(extraSectionsOpenState);
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    advancedSectionOpenRef.current = advancedSectionOpen;
+  }, [advancedSectionOpen]);
+
   useEffect(() => {
     sectionVisibilityRef.current = sectionVisibility;
   }, [sectionVisibility]);
 
-  // Save advanced section state to localStorage
   useEffect(() => {
-    localStorage.setItem(
-      "itemDetailAdvancedSectionOpen",
-      JSON.stringify(advancedSectionOpen)
-    );
-  }, [advancedSectionOpen]);
+    extraSectionsOpenStateRef.current = extraSectionsOpenState;
+  }, [extraSectionsOpenState]);
 
   useEffect(() => {
     const loadItem = async () => {
+      // CRITICAL: Reset ALL UI states immediately when itemId changes
+      // (component is not unmounted when navigating between items)
+      setSectionVisibility({});
+      setAdvancedSectionOpen(false);
+      setOriginalSectionVisibility({});
+      setOriginalAdvancedSectionOpen(false);
+      setExtraSectionsOpenState({});
+      setOriginalExtraSectionsOpenState({});
+      sectionVisibilityRef.current = {};
+      extraSectionsOpenStateRef.current = {};
+
       try {
         const itemFromDB = await getItemById(itemId);
         if (itemFromDB) {
@@ -116,10 +139,48 @@ export default function ItemDetail() {
           setFieldVisibility(itemFromDB.fieldVisibility || {});
           setOriginalFieldVisibility(itemFromDB.fieldVisibility || {});
 
-          const loadedSectionVisibility = itemFromDB.sectionVisibility || {};
-          setSectionVisibility(loadedSectionVisibility);
-          setOriginalSectionVisibility(loadedSectionVisibility);
-          sectionVisibilityRef.current = loadedSectionVisibility;
+          // Priority 1: Check in-memory cache
+          let cachedUIState = getUIState("items", itemId);
+
+          // Priority 2: Load from database if not in cache
+          if (!cachedUIState && itemFromDB.uiState) {
+            cachedUIState = itemFromDB.uiState;
+            // Save to cache for future use
+            setUIStateInStore("items", itemId, cachedUIState);
+          }
+
+          // Priority 3: Use defaults if no cache and no database value
+          if (!cachedUIState) {
+            // Create NEW object references for each entity (prevent sharing)
+            cachedUIState = {
+              advancedSectionOpen: false,
+              sectionVisibility: {}, // New object reference
+              extraSectionsOpenState: {}, // New object reference
+            };
+            // Save defaults to cache
+            setUIStateInStore("items", itemId, cachedUIState);
+          }
+
+          // Apply UI state to local state (deep copy to avoid reference sharing)
+          const loadedAdvancedSectionOpen =
+            cachedUIState.advancedSectionOpen ?? false;
+          const loadedSectionVisibility =
+            cachedUIState.sectionVisibility || {};
+          const loadedExtraSectionsOpenState =
+            cachedUIState.extraSectionsOpenState || {};
+
+          // Create TWO separate deep copies to avoid sharing between current and original states
+          const sectionVisibilityCopy = { ...loadedSectionVisibility };
+          const sectionVisibilityOriginalCopy = { ...loadedSectionVisibility };
+          const extraSectionsOpenStateCopy = { ...loadedExtraSectionsOpenState };
+          const extraSectionsOpenStateOriginalCopy = { ...loadedExtraSectionsOpenState };
+
+          setAdvancedSectionOpen(loadedAdvancedSectionOpen);
+          setOriginalAdvancedSectionOpen(loadedAdvancedSectionOpen);
+          setSectionVisibility(sectionVisibilityCopy);
+          setOriginalSectionVisibility(sectionVisibilityOriginalCopy);
+          setExtraSectionsOpenState(extraSectionsOpenStateCopy);
+          setOriginalExtraSectionsOpenState(extraSectionsOpenStateOriginalCopy);
 
           if (dashboardId) {
             const allItemsFromBook = await getItemsByBookId(dashboardId);
@@ -134,7 +195,7 @@ export default function ItemDetail() {
     };
 
     loadItem();
-  }, [itemId, dashboardId]);
+  }, [itemId, dashboardId, getUIState, setUIStateInStore]);
 
   const currentCategory = useMemo(
     () => ITEM_CATEGORIES_CONSTANT.find((c) => c.value === item.category),
@@ -314,6 +375,9 @@ export default function ItemDetail() {
     )
       return true;
 
+    // Check if advanced section state has changed
+    if (advancedSectionOpen !== originalAdvancedSectionOpen) return true;
+
     return false;
   }, [
     item,
@@ -323,6 +387,8 @@ export default function ItemDetail() {
     originalFieldVisibility,
     sectionVisibility,
     originalSectionVisibility,
+    advancedSectionOpen,
+    originalAdvancedSectionOpen,
   ]);
 
   const handleSave = useCallback(async () => {
@@ -344,13 +410,15 @@ export default function ItemDetail() {
         alternativeNames: editData.alternativeNames,
       });
 
-      // Use ref to get the most recent sectionVisibility (setState is async)
-      const currentSectionVisibility = sectionVisibilityRef.current;
-
       const updatedItem = {
         ...editData,
         fieldVisibility,
-        sectionVisibility: currentSectionVisibility,
+        // sectionVisibility removed - now only saved in uiState
+        uiState: {
+          advancedSectionOpen,
+          sectionVisibility: sectionVisibilityRef.current,
+          extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+        },
       };
       setItem(updatedItem);
       setImagePreview(updatedItem.image || "");
@@ -362,7 +430,9 @@ export default function ItemDetail() {
 
       // Update original visibility to match saved state
       setOriginalFieldVisibility(fieldVisibility);
-      setOriginalSectionVisibility(currentSectionVisibility);
+      setOriginalSectionVisibility(sectionVisibility);
+      setOriginalAdvancedSectionOpen(advancedSectionOpen);
+      setOriginalExtraSectionsOpenState(extraSectionsOpenState);
 
       setErrors({}); // Limpar erros
       setIsEditing(false);
@@ -415,19 +485,23 @@ export default function ItemDetail() {
     setImagePreview(item.image || "");
     setFieldVisibility(originalFieldVisibility);
     setSectionVisibility(originalSectionVisibility);
+    setAdvancedSectionOpen(originalAdvancedSectionOpen);
+    setExtraSectionsOpenState(originalExtraSectionsOpenState);
     setErrors({});
     setIsEditing(false);
-  }, [item, originalFieldVisibility, originalSectionVisibility, hasChanges]);
+  }, [item, originalFieldVisibility, originalSectionVisibility, originalAdvancedSectionOpen, originalExtraSectionsOpenState, hasChanges]);
 
   const handleConfirmCancel = useCallback(() => {
     setEditData(item);
     setImagePreview(item.image || "");
     setFieldVisibility(originalFieldVisibility);
     setSectionVisibility(originalSectionVisibility);
+    setAdvancedSectionOpen(originalAdvancedSectionOpen);
+    setExtraSectionsOpenState(originalExtraSectionsOpenState);
     setErrors({});
     setIsEditing(false);
     setShowUnsavedChangesDialog(false);
-  }, [item, originalFieldVisibility, originalSectionVisibility]);
+  }, [item, originalFieldVisibility, originalSectionVisibility, originalAdvancedSectionOpen, originalExtraSectionsOpenState]);
 
   const handleBack = useCallback(() => {
     navigateToItemsTab();
@@ -454,9 +528,21 @@ export default function ItemDetail() {
 
   const handleEdit = useCallback(() => {
     setOriginalSectionVisibility(sectionVisibility);
+    setOriginalAdvancedSectionOpen(advancedSectionOpen);
+    setOriginalExtraSectionsOpenState(extraSectionsOpenState);
     setIsEditing(true);
     setIsNavigationSidebarOpen(false);
-  }, [sectionVisibility]);
+  }, [sectionVisibility, advancedSectionOpen, extraSectionsOpenState]);
+
+  const handleExtraSectionsOpenStateChange = useCallback((newState: Record<string, boolean>) => {
+    const newUiState = {
+      advancedSectionOpen: advancedSectionOpenRef.current,
+      sectionVisibility: { ...sectionVisibilityRef.current },
+      extraSectionsOpenState: { ...newState },
+    };
+    setExtraSectionsOpenState(newState);
+    setUIStateInStore("items", itemId, newUiState);
+  }, [itemId, setUIStateInStore]);
 
   const handleDeleteModalOpen = useCallback(() => {
     setShowDeleteModal(true);
@@ -487,15 +573,37 @@ export default function ItemDetail() {
   }, []);
 
   const handleSectionVisibilityToggle = useCallback((sectionId: string) => {
-    setSectionVisibility((prev) => ({
-      ...prev,
-      [sectionId]: prev[sectionId] === false ? true : false,
-    }));
-  }, []);
+    setSectionVisibility((prev) => {
+      const newVisibility = {
+        ...prev,
+        [sectionId]: prev[sectionId] === false ? true : false,
+      };
+
+      // Deep copy to avoid reference sharing, use refs to avoid stale closures
+      setUIStateInStore("items", itemId, {
+        advancedSectionOpen: advancedSectionOpenRef.current,
+        sectionVisibility: { ...newVisibility },
+        extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+      });
+
+      return newVisibility;
+    });
+  }, [itemId, setUIStateInStore]);
 
   const handleAdvancedSectionToggle = useCallback(() => {
-    setAdvancedSectionOpen((prev) => !prev);
-  }, []);
+    setAdvancedSectionOpen((prev) => {
+      const newValue = !prev;
+
+      // Deep copy to avoid reference sharing, use refs to avoid stale closures
+      setUIStateInStore("items", itemId, {
+        advancedSectionOpen: newValue,
+        sectionVisibility: { ...sectionVisibilityRef.current },
+        extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+      });
+
+      return newValue;
+    });
+  }, [itemId, setUIStateInStore]);
 
   const toggleSection = useCallback((sectionName: string) => {
     setOpenSections((prev) => ({
@@ -576,6 +684,8 @@ export default function ItemDetail() {
         setHasChapterMetrics={setHasChapterMetrics}
         isLogsModalOpen={isLogsModalOpen}
         onLogsModalToggle={() => setIsLogsModalOpen(!isLogsModalOpen)}
+        extraSectionsOpenState={extraSectionsOpenState}
+        onExtraSectionsOpenStateChange={handleExtraSectionsOpenStateChange}
       />
     </>
   );

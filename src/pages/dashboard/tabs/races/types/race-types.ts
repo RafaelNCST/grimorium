@@ -15,6 +15,15 @@ export type RaceType =
   | "Espacial"
   | "Espiritual";
 
+export interface IRaceUIState {
+  advancedSectionOpen?: boolean;
+  sectionVisibility?: {
+    relationships?: boolean;
+    "chapter-metrics"?: boolean;
+  };
+  extraSectionsOpenState?: Record<string, boolean>;
+}
+
 export interface IRace {
   id: string;
 
@@ -59,9 +68,12 @@ export interface IRace {
   storyMotivation?: string;
   inspirations?: string;
 
-  // UI State (optional)
-  fieldVisibility?: Record<string, boolean>;
-  sectionVisibility?: Record<string, boolean>;
+  // UI State (legacy - to be removed)
+  fieldVisibility?: Record<string, boolean>; // DEPRECATED
+  sectionVisibility?: Record<string, boolean>; // DEPRECATED - to be migrated to uiState
+
+  // UI State (for persisting UI preferences)
+  uiState?: IRaceUIState;
 
   // Legacy field for backwards compatibility
   speciesId: string;

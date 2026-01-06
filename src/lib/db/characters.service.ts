@@ -63,6 +63,7 @@ function characterToDBCharacter(
       ? JSON.stringify(character.nicknames)
       : JSON.stringify([]),
     past: character.past,
+    ui_state: character.uiState ? JSON.stringify(character.uiState) : undefined,
     created_at: character.createdAt
       ? new Date(character.createdAt).getTime()
       : Date.now(),
@@ -106,6 +107,7 @@ function dbCharacterToCharacter(dbChar: DBCharacter): ICharacter {
     organization: dbChar.organization,
     nicknames: safeParseStringArray(dbChar.nicknames),
     past: dbChar.past,
+    uiState: dbChar.ui_state ? safeParseUnknownObject(dbChar.ui_state) : undefined,
     createdAt: new Date(dbChar.created_at).toISOString(),
     updatedAt: new Date(dbChar.updated_at).toISOString(),
   };
@@ -149,11 +151,11 @@ export async function createCharacter(
         height, weight, skin_tone, skin_tone_color, physical_type, hair, eyes, face,
         distinguishing_features, species_and_race, archetype, personality, hobbies,
         dreams_and_goals, fears_and_traumas, favorite_food, favorite_music,
-        birth_place, affiliated_place, organization, nicknames, past,
+        birth_place, affiliated_place, organization, nicknames, past, ui_state,
         created_at, updated_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17,
-        $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34
+        $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35
       )`,
       [
         dbChar.id,
@@ -188,6 +190,7 @@ export async function createCharacter(
         dbChar.organization,
         dbChar.nicknames,
         dbChar.past,
+        dbChar.ui_state,
         dbChar.created_at,
         dbChar.updated_at,
       ]
@@ -236,8 +239,8 @@ export async function updateCharacter(
         distinguishing_features = $17, species_and_race = $18, archetype = $19,
         personality = $20, hobbies = $21, dreams_and_goals = $22, fears_and_traumas = $23,
         favorite_food = $24, favorite_music = $25, birth_place = $26, affiliated_place = $27,
-        organization = $28, nicknames = $29, past = $30, updated_at = $31
-      WHERE id = $32`,
+        organization = $28, nicknames = $29, past = $30, ui_state = $31, updated_at = $32
+      WHERE id = $33`,
       [
         dbChar.name,
         dbChar.age,
@@ -269,6 +272,7 @@ export async function updateCharacter(
         dbChar.organization,
         dbChar.nicknames,
         dbChar.past,
+        dbChar.ui_state,
         dbChar.updated_at,
         id,
       ]

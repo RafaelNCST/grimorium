@@ -52,8 +52,11 @@ interface DBRegion {
   region_mysteries: string | null;
   inspirations: string | null;
 
-  // Visibility configuration
+  // Visibility configuration (legacy - to be removed)
   section_visibility: string | null;
+
+  // UI State
+  ui_state: string | null;
 
   // Timeline data
   timeline: string | null;
@@ -101,6 +104,9 @@ function regionToDBRegion(region: IRegion): DBRegion {
     // Visibility configuration
     section_visibility: region.sectionVisibility || null,
 
+    // UI State
+    ui_state: region.uiState ? JSON.stringify(region.uiState) : null,
+
     // Timeline data
     timeline: region.timeline || null,
   };
@@ -147,6 +153,9 @@ function dbRegionToRegion(dbRegion: DBRegion): IRegion {
 
     // Visibility configuration
     sectionVisibility: dbRegion.section_visibility || undefined,
+
+    // UI State
+    uiState: dbRegion.ui_state ? safeParseUnknownObject(dbRegion.ui_state) : undefined,
 
     // Timeline data
     timeline: dbRegion.timeline || undefined,
@@ -219,13 +228,13 @@ export async function createRegion(
       climate, current_season, custom_season_name, general_description, region_anomalies,
       resident_factions, dominant_factions, important_characters, races_found, items_found,
       narrative_purpose, unique_characteristics, political_importance, religious_importance, world_perception, region_mysteries, inspirations,
-      section_visibility, timeline
+      section_visibility, ui_state, timeline
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
       $11, $12, $13, $14, $15,
       $16, $17, $18, $19, $20,
       $21, $22, $23, $24, $25, $26, $27,
-      $28, $29
+      $28, $29, $30
     )`,
       [
         dbRegion.id,
@@ -256,6 +265,7 @@ export async function createRegion(
         dbRegion.region_mysteries,
         dbRegion.inspirations,
         dbRegion.section_visibility,
+        dbRegion.ui_state,
         dbRegion.timeline,
       ]
     );
@@ -317,8 +327,9 @@ export async function updateRegion(
       region_mysteries = $23,
       inspirations = $24,
       section_visibility = $25,
-      timeline = $26
-    WHERE id = $27`,
+      ui_state = $26,
+      timeline = $27
+    WHERE id = $28`,
       [
         dbRegion.name,
         dbRegion.parent_id,
@@ -345,6 +356,7 @@ export async function updateRegion(
         dbRegion.region_mysteries,
         dbRegion.inspirations,
         dbRegion.section_visibility,
+        dbRegion.ui_state,
         dbRegion.timeline,
         id,
       ]

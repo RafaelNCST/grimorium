@@ -22,6 +22,19 @@ export type RegionScale =
 export type RegionSeason = "spring" | "summer" | "autumn" | "winter" | "custom";
 
 /**
+ * Region UI State interface
+ */
+export interface IRegionUIState {
+  advancedSectionOpen?: boolean;
+  timelineSectionOpen?: boolean;
+  sectionVisibility?: {
+    timeline?: boolean;
+    "chapter-metrics"?: boolean;
+  };
+  extraSectionsOpenState?: Record<string, boolean>;
+}
+
+/**
  * Region Interface - represents a geographic/spatial region in the story world
  */
 export interface IRegion {
@@ -86,9 +99,13 @@ export interface IRegion {
   /** List of inspirations (JSON string array) */
   inspirations?: string;
 
-  // Visibility configuration
-  /** Section visibility configuration for special sections (timeline, map, etc.) */
+  // Visibility configuration (legacy - to be migrated to uiState)
+  /** Section visibility configuration for special sections (timeline, map, etc.) - DEPRECATED */
   sectionVisibility?: string;
+
+  // UI State (for persisting UI preferences)
+  /** UI state preferences */
+  uiState?: IRegionUIState;
 
   // Timeline data
   /** Timeline data (JSON string) */

@@ -137,9 +137,13 @@ async function runMigrations(database: Database): Promise<void> {
       narrative_purpose TEXT,
       usage_requirements TEXT,
       usage_consequences TEXT,
+      item_usage TEXT,
+
+      -- UI State (legacy - to be removed)
+      section_visibility TEXT,
 
       -- UI State
-      section_visibility TEXT,
+      ui_state TEXT,
 
       -- Metadata
       created_at INTEGER NOT NULL,
@@ -204,9 +208,12 @@ async function runMigrations(database: Database): Promise<void> {
       story_motivation TEXT,
       inspirations TEXT,
 
-      -- UI State
+      -- UI State (legacy - to be removed)
       field_visibility TEXT,
       section_visibility TEXT,
+
+      -- UI State
+      ui_state TEXT,
 
       -- Metadata
       created_at INTEGER NOT NULL,
@@ -300,6 +307,13 @@ async function runMigrations(database: Database): Promise<void> {
       important_regions TEXT,
       arc_message TEXT,
       world_impact TEXT,
+
+      -- UI State (legacy - to be removed)
+      field_visibility TEXT,
+
+      -- UI State
+      ui_state TEXT,
+
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     );
@@ -868,6 +882,41 @@ async function runMigrations(database: Database): Promise<void> {
     // Add ui_state column to factions table (JSON object for UI state persistence)
     try {
       await database.execute("ALTER TABLE factions ADD COLUMN ui_state TEXT");
+    } catch (_error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add ui_state column to characters table (JSON object for UI state persistence)
+    try {
+      await database.execute("ALTER TABLE characters ADD COLUMN ui_state TEXT");
+    } catch (_error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add ui_state column to items table (JSON object for UI state persistence)
+    try {
+      await database.execute("ALTER TABLE items ADD COLUMN ui_state TEXT");
+    } catch (_error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add ui_state column to races table (JSON object for UI state persistence)
+    try {
+      await database.execute("ALTER TABLE races ADD COLUMN ui_state TEXT");
+    } catch (_error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add ui_state column to regions table (JSON object for UI state persistence)
+    try {
+      await database.execute("ALTER TABLE regions ADD COLUMN ui_state TEXT");
+    } catch (_error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add ui_state column to plot_arcs table (JSON object for UI state persistence)
+    try {
+      await database.execute("ALTER TABLE plot_arcs ADD COLUMN ui_state TEXT");
     } catch (_error) {
       // Column already exists - safe to ignore
     }

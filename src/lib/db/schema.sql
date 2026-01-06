@@ -61,6 +61,9 @@ CREATE TABLE IF NOT EXISTS characters (
   nicknames TEXT,
   past TEXT,
 
+  -- UI State
+  ui_state TEXT,
+
   -- Metadata
   created_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL,
@@ -115,9 +118,12 @@ CREATE TABLE IF NOT EXISTS regions (
   region_mysteries TEXT,
   inspirations TEXT,
 
-  -- Metadata
-  section_visibility TEXT,
+  -- Metadata (legacy)
+  section_visibility TEXT, -- DEPRECATED - use ui_state instead
   timeline TEXT,
+
+  -- UI State
+  ui_state TEXT,
 
   FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
   FOREIGN KEY (parent_id) REFERENCES regions(id) ON DELETE SET NULL
@@ -255,7 +261,8 @@ CREATE TABLE IF NOT EXISTS plot_arcs (
   important_regions TEXT,
   arc_message TEXT,
   world_impact TEXT,
-  field_visibility TEXT,
+  field_visibility TEXT, -- DEPRECATED - to be removed
+  ui_state TEXT,
   created_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL
 );

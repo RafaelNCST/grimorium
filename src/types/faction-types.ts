@@ -84,6 +84,8 @@ export interface IHierarchyTitle {
 export interface IFactionUIState {
   advancedSectionOpen?: boolean;
   sectionVisibility?: Record<string, boolean>;
+  extraSectionsOpenState?: Record<string, boolean>;
+  timelineOpenEras?: string[]; // IDs of open timeline eras
 }
 
 export interface IFaction {

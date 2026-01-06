@@ -109,6 +109,8 @@ interface RegionDetailViewProps {
   onTimelineSectionToggle: () => void;
   isLogsModalOpen: boolean;
   onLogsModalToggle: () => void;
+  extraSectionsOpenState: Record<string, boolean>;
+  onExtraSectionsOpenStateChange: (state: Record<string, boolean>) => void;
 }
 
 export function RegionDetailView({
@@ -155,6 +157,8 @@ export function RegionDetailView({
   onTimelineSectionToggle: _onTimelineSectionToggle,
   isLogsModalOpen,
   onLogsModalToggle,
+  extraSectionsOpenState,
+  onExtraSectionsOpenStateChange,
 }: RegionDetailViewProps) {
   const { t } = useTranslation([
     "region-detail",
@@ -1177,6 +1181,8 @@ export function RegionDetailView({
             advancedSectionOpen={advancedSectionOpen}
             onAdvancedSectionToggle={onAdvancedSectionToggle}
             // Extra sections
+            extraSectionsOpenState={extraSectionsOpenState}
+            onExtraSectionsOpenStateChange={onExtraSectionsOpenStateChange}
             extraSections={[
               {
                 id: "timeline",

@@ -12,6 +12,14 @@ import { DBItem } from "./types";
 
 import { getDB } from "./index";
 
+export interface IItemUIState {
+  advancedSectionOpen?: boolean;
+  sectionVisibility?: {
+    "chapter-metrics"?: boolean;
+  };
+  extraSectionsOpenState?: Record<string, boolean>;
+}
+
 export interface IItem {
   id: string;
   bookId: string;
@@ -31,8 +39,11 @@ export interface IItem {
   usageConsequences?: string;
   itemUsage?: string;
 
-  // UI State
+  // UI State (legacy - to be migrated to uiState)
   sectionVisibility?: Record<string, boolean>;
+
+  // UI State (for persisting UI preferences)
+  uiState?: IItemUIState;
 
   createdAt?: string;
   updatedAt?: string;
@@ -61,6 +72,7 @@ function itemToDBItem(bookId: string, item: IItem): DBItem {
     section_visibility: item.sectionVisibility
       ? JSON.stringify(item.sectionVisibility)
       : undefined,
+    ui_state: item.uiState ? JSON.stringify(item.uiState) : undefined,
     created_at: item.createdAt
       ? new Date(item.createdAt).getTime()
       : Date.now(),
@@ -91,6 +103,7 @@ function dbItemToItem(dbItem: DBItem): IItem {
     sectionVisibility: dbItem.section_visibility
       ? safeParseUnknownObject(dbItem.section_visibility)
       : undefined,
+    uiState: dbItem.ui_state ? safeParseUnknownObject(dbItem.ui_state) : undefined,
     createdAt: new Date(dbItem.created_at).toISOString(),
     updatedAt: new Date(dbItem.updated_at).toISOString(),
   };
@@ -127,10 +140,10 @@ export async function createItem(bookId: string, item: IItem): Promise<void> {
       `INSERT INTO items (
         id, book_id, name, status, category, custom_category, basic_description, image,
         appearance, origin, alternative_names, story_rarity, narrative_purpose,
-        usage_requirements, usage_consequences, item_usage, section_visibility,
+        usage_requirements, usage_consequences, item_usage, section_visibility, ui_state,
         created_at, updated_at
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20
       )`,
       [
         dbItem.id,
@@ -150,6 +163,7 @@ export async function createItem(bookId: string, item: IItem): Promise<void> {
         dbItem.usage_consequences,
         dbItem.item_usage,
         dbItem.section_visibility,
+        dbItem.ui_state,
         dbItem.created_at,
         dbItem.updated_at,
       ]
@@ -194,8 +208,8 @@ export async function updateItem(
         basic_description = $5, image = $6, appearance = $7, origin = $8,
         alternative_names = $9, story_rarity = $10, narrative_purpose = $11,
         usage_requirements = $12, usage_consequences = $13, item_usage = $14,
-        section_visibility = $15, updated_at = $16
-      WHERE id = $17`,
+        section_visibility = $15, ui_state = $16, updated_at = $17
+      WHERE id = $18`,
       [
         dbItem.name,
         dbItem.status,
@@ -212,6 +226,7 @@ export async function updateItem(
         dbItem.usage_consequences,
         dbItem.item_usage,
         dbItem.section_visibility,
+        dbItem.ui_state,
         dbItem.updated_at,
         id,
       ]

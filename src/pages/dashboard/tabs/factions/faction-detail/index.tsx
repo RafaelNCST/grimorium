@@ -12,6 +12,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { getFactionById } from "@/lib/db/factions.service";
 import { FactionSchema } from "@/lib/validation/faction-schema";
 import { useCharactersStore } from "@/stores/characters-store";
+import { useEntityUIStateStore } from "@/stores/entity-ui-state-store";
 import { useFactionsStore } from "@/stores/factions-store";
 import { useItemsStore } from "@/stores/items-store";
 import { useRacesStore } from "@/stores/races-store";
@@ -46,6 +47,10 @@ export function FactionDetail() {
   const regionsCache = useRegionsStore((state) => state.cache);
   const fetchRegions = useRegionsStore((state) => state.fetchRegions);
 
+  // Entity UI State store
+  const getUIState = useEntityUIStateStore((state) => state.getUIState);
+  const setUIStateInStore = useEntityUIStateStore((state) => state.setUIState);
+
   const emptyFaction: IFaction = {
     id: "",
     bookId: dashboardId,
@@ -69,36 +74,31 @@ export function FactionDetail() {
     null
   );
   const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
-  const [uiState, setUiState] = useState<IFactionUIState>(() => {
-    const stored = localStorage.getItem("factionDetailAdvancedSectionOpen");
-    return {
-      advancedSectionOpen: stored ? JSON.parse(stored) : false,
-      sectionVisibility: { timeline: true, hierarchy: true },
-    };
+  const [uiState, setUiState] = useState<IFactionUIState>({
+    advancedSectionOpen: false,
+    sectionVisibility: { timeline: true, hierarchy: true, "chapter-metrics": true },
+    extraSectionsOpenState: {},
+    timelineOpenEras: [],
   });
   const [originalUiState, setOriginalUiState] = useState<IFactionUIState>({
     advancedSectionOpen: false,
-    sectionVisibility: { timeline: true, hierarchy: true },
+    sectionVisibility: { timeline: true, hierarchy: true, "chapter-metrics": true },
+    extraSectionsOpenState: {},
+    timelineOpenEras: [],
   });
 
   // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Refs to always have current values (avoid stale closures)
   const uiStateRef = useRef<IFactionUIState>(uiState);
 
   // Keep ref in sync with state
   useEffect(() => {
     uiStateRef.current = uiState;
   }, [uiState]);
-
-  // Save advanced section state to localStorage (UI preference, not data)
-  useEffect(() => {
-    localStorage.setItem(
-      "factionDetailAdvancedSectionOpen",
-      JSON.stringify(uiState.advancedSectionOpen)
-    );
-  }, [uiState.advancedSectionOpen]);
 
   // Função de validação de campo individual (onBlur)
   const validateField = useCallback(
@@ -174,18 +174,17 @@ export function FactionDetail() {
     const dataChanged =
       JSON.stringify(factionData) !== JSON.stringify(editDataData);
 
-    // Check if UI state has changed (section visibility)
+    // Check if UI state has changed
     const uiStateChanged =
-      JSON.stringify(uiState.sectionVisibility) !==
-      JSON.stringify(originalUiState.sectionVisibility);
+      JSON.stringify(uiState) !== JSON.stringify(originalUiState);
 
     return dataChanged || uiStateChanged;
   }, [
     isEditing,
     faction,
     editData,
-    uiState.sectionVisibility,
-    originalUiState.sectionVisibility,
+    uiState,
+    originalUiState,
   ]);
 
   // Load all entity caches
@@ -212,6 +211,23 @@ export function FactionDetail() {
   // Load faction from database
   useEffect(() => {
     const loadFaction = async () => {
+      // CRITICAL: Reset ALL UI states immediately when factionId changes
+      // (component is not unmounted when navigating between factions)
+      const defaultUiState = {
+        advancedSectionOpen: false,
+        sectionVisibility: {
+          timeline: true,
+          hierarchy: true,
+          "chapter-metrics": true,
+        },
+        extraSectionsOpenState: {},
+        timelineOpenEras: [],
+      };
+      setUiState(defaultUiState);
+      setOriginalUiState(defaultUiState);
+      // Reset ref to prevent stale values
+      uiStateRef.current = defaultUiState;
+
       try {
         const factionFromDB = await getFactionById(factionId);
         if (factionFromDB) {
@@ -219,26 +235,64 @@ export function FactionDetail() {
           setEditData(factionFromDB);
           setImagePreview(factionFromDB.image || "");
 
-          // Load section visibility from database (olhinho - per faction)
-          // But keep advancedSectionOpen from localStorage (setinha - global preference)
-          const stored = localStorage.getItem(
-            "factionDetailAdvancedSectionOpen"
-          );
-          const loadedUiState = {
-            advancedSectionOpen: stored ? JSON.parse(stored) : false,
-            sectionVisibility: factionFromDB.uiState?.sectionVisibility ?? {
+          // Priority 1: Check in-memory cache
+          let cachedUIState = getUIState("factions", factionId);
+
+          // Priority 2: Load from database if not in cache
+          if (!cachedUIState && factionFromDB.uiState) {
+            cachedUIState = factionFromDB.uiState;
+            // Save to cache for future use
+            setUIStateInStore("factions", factionId, cachedUIState);
+          }
+
+          // Priority 3: Use defaults if no cache and no database value
+          if (!cachedUIState) {
+            // Create NEW object references for each entity (prevent sharing)
+            cachedUIState = {
+              advancedSectionOpen: false,
+              sectionVisibility: {
+                timeline: true,
+                hierarchy: true,
+                "chapter-metrics": true,
+              }, // New object reference
+              extraSectionsOpenState: {}, // New object reference
+              timelineOpenEras: [], // New array reference
+            };
+            // Save defaults to cache
+            setUIStateInStore("factions", factionId, cachedUIState);
+          }
+
+          // Apply UI state to local state (deep copy to avoid reference sharing)
+          const loadedAdvancedSectionOpen =
+            cachedUIState.advancedSectionOpen ?? false;
+          const loadedSectionVisibility =
+            cachedUIState.sectionVisibility || {
               timeline: true,
               hierarchy: true,
-            },
-          };
-          setUiState(loadedUiState);
-          setOriginalUiState(loadedUiState);
+              "chapter-metrics": true,
+            };
+          const loadedExtraSectionsOpenState =
+            cachedUIState.extraSectionsOpenState || {};
+          const loadedTimelineOpenEras =
+            cachedUIState.timelineOpenEras || [];
 
-          console.log(
-            "[Faction Load] factionFromDB.uiState:",
-            factionFromDB.uiState
-          );
-          console.log("[Faction Load] loadedUiState:", loadedUiState);
+          // Create TWO separate deep copies to avoid sharing between current and original states
+          const uiStateCopy = {
+            advancedSectionOpen: loadedAdvancedSectionOpen,
+            sectionVisibility: { ...loadedSectionVisibility },
+            extraSectionsOpenState: { ...loadedExtraSectionsOpenState },
+            timelineOpenEras: [...loadedTimelineOpenEras],
+          };
+          const uiStateOriginalCopy = {
+            advancedSectionOpen: loadedAdvancedSectionOpen,
+            sectionVisibility: { ...loadedSectionVisibility },
+            extraSectionsOpenState: { ...loadedExtraSectionsOpenState },
+            timelineOpenEras: [...loadedTimelineOpenEras],
+          };
+
+          // Apply UI state to local state
+          setUiState(uiStateCopy);
+          setOriginalUiState(uiStateOriginalCopy);
         }
       } catch (error) {
         console.error("Error loading faction:", error);
@@ -515,35 +569,65 @@ export function FactionDetail() {
 
   const handleAdvancedSectionToggle = useCallback(() => {
     const newUiState = {
-      ...uiState,
-      advancedSectionOpen: !uiState.advancedSectionOpen,
+      advancedSectionOpen: !uiStateRef.current.advancedSectionOpen, // use refs to avoid stale closures
+      sectionVisibility: { ...uiStateRef.current.sectionVisibility }, // Deep copy to avoid reference sharing
+      extraSectionsOpenState: { ...uiStateRef.current.extraSectionsOpenState }, // Deep copy
+      timelineOpenEras: [...(uiStateRef.current.timelineOpenEras || [])], // Deep copy
     };
     setUiState(newUiState);
-  }, [uiState]);
+    // Update cache immediately with ALL current UI state
+    setUIStateInStore("factions", factionId, newUiState);
+  }, [factionId, setUIStateInStore]);
 
   const handleSectionVisibilityChange = useCallback(
     (sectionName: string, isVisible: boolean) => {
-      console.log(
-        "[handleSectionVisibilityChange] sectionName:",
-        sectionName,
-        "isVisible:",
-        isVisible
-      );
-      console.log("[handleSectionVisibilityChange] current uiState:", uiState);
-
       const newUiState = {
-        ...uiState,
+        advancedSectionOpen: uiStateRef.current.advancedSectionOpen, // use refs to avoid stale closures
         sectionVisibility: {
-          ...uiState.sectionVisibility,
+          ...uiStateRef.current.sectionVisibility,
           [sectionName]: isVisible,
         },
+        extraSectionsOpenState: { ...uiStateRef.current.extraSectionsOpenState }, // Deep copy
+        timelineOpenEras: [...(uiStateRef.current.timelineOpenEras || [])], // Deep copy
       };
 
-      console.log("[handleSectionVisibilityChange] newUiState:", newUiState);
       setUiState(newUiState);
+      // Deep copy to avoid reference sharing
+      setUIStateInStore("factions", factionId, {
+        advancedSectionOpen: newUiState.advancedSectionOpen,
+        sectionVisibility: { ...newUiState.sectionVisibility },
+        extraSectionsOpenState: { ...newUiState.extraSectionsOpenState },
+        timelineOpenEras: [...newUiState.timelineOpenEras],
+      });
     },
-    [uiState]
+    [factionId, setUIStateInStore]
   );
+
+  const handleExtraSectionsOpenStateChange = useCallback((newState: Record<string, boolean>) => {
+    const newUiState = {
+      advancedSectionOpen: uiStateRef.current.advancedSectionOpen,
+      sectionVisibility: { ...uiStateRef.current.sectionVisibility },
+      extraSectionsOpenState: { ...newState },
+      timelineOpenEras: [...(uiStateRef.current.timelineOpenEras || [])],
+    };
+    setUiState(newUiState);
+
+    // Update cache immediately with ALL current UI state
+    setUIStateInStore("factions", factionId, newUiState);
+  }, [factionId, setUIStateInStore]);
+
+  const handleTimelineOpenErasChange = useCallback((newOpenEras: string[]) => {
+    const newUiState = {
+      advancedSectionOpen: uiStateRef.current.advancedSectionOpen,
+      sectionVisibility: { ...uiStateRef.current.sectionVisibility },
+      extraSectionsOpenState: { ...uiStateRef.current.extraSectionsOpenState },
+      timelineOpenEras: [...newOpenEras],
+    };
+    setUiState(newUiState);
+
+    // Update cache immediately with ALL current UI state
+    setUIStateInStore("factions", factionId, newUiState);
+  }, [factionId, setUIStateInStore]);
 
   const handleFactionSelect = useCallback(
     (newFactionId: string) => {
@@ -616,6 +700,10 @@ export function FactionDetail() {
             hierarchy: true,
           }
         }
+        extraSectionsOpenState={uiState.extraSectionsOpenState ?? {}}
+        onExtraSectionsOpenStateChange={handleExtraSectionsOpenStateChange}
+        timelineOpenEras={uiState.timelineOpenEras ?? []}
+        onTimelineOpenErasChange={handleTimelineOpenErasChange}
         mockRaces={races}
         mockCharacters={characters}
         mockFactions={factions}

@@ -24,6 +24,7 @@ import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/ty
 import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import type { IRegion } from "@/pages/dashboard/tabs/world/types/region-types";
 import { useCharactersStore } from "@/stores/characters-store";
+import { useEntityUIStateStore } from "@/stores/entity-ui-state-store";
 import { useRacesStore } from "@/stores/races-store";
 import { useRegionsStore } from "@/stores/regions-store";
 import { type ICharacter } from "@/types/character-types";
@@ -67,6 +68,10 @@ export function CharacterDetail() {
     (state) => state.deleteCharacterFromCache
   );
 
+  // Entity UI State store
+  const getUIState = useEntityUIStateStore((state) => state.getUIState);
+  const setUIStateInStore = useEntityUIStateStore((state) => state.setUIState);
+
   const emptyCharacter: ICharacter = {
     id: "",
     name: "",
@@ -100,16 +105,9 @@ export function CharacterDetail() {
   const [relationshipIntensity, setRelationshipIntensity] = useState([50]);
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
   const [sectionVisibility, setSectionVisibility] =
-    useState<ISectionVisibility>(() => {
-      const stored = localStorage.getItem(
-        `characterDetailSectionVisibility_${characterId}`
-      );
-      return stored ? JSON.parse(stored) : {};
-    });
-  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
-    const stored = localStorage.getItem("characterDetailAdvancedSectionOpen");
-    return stored ? JSON.parse(stored) : false;
-  });
+    useState<ISectionVisibility>({});
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
+  const [extraSectionsOpenState, setExtraSectionsOpenState] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
@@ -137,22 +135,28 @@ export function CharacterDetail() {
   // Original states for comparison
   const [originalSectionVisibility, setOriginalSectionVisibility] =
     useState<ISectionVisibility>({});
+  const [originalAdvancedSectionOpen, setOriginalAdvancedSectionOpen] =
+    useState(false);
+  const [originalExtraSectionsOpenState, setOriginalExtraSectionsOpenState] =
+    useState<Record<string, boolean>>({});
 
-  // Save advanced section state to localStorage
+  // Refs to always have current values (avoid stale closures)
+  const advancedSectionOpenRef = useRef(advancedSectionOpen);
+  const sectionVisibilityRef = useRef(sectionVisibility);
+  const extraSectionsOpenStateRef = useRef(extraSectionsOpenState);
+
+  // Keep refs in sync with state
   useEffect(() => {
-    localStorage.setItem(
-      "characterDetailAdvancedSectionOpen",
-      JSON.stringify(advancedSectionOpen)
-    );
+    advancedSectionOpenRef.current = advancedSectionOpen;
   }, [advancedSectionOpen]);
 
-  // Save section visibility state to localStorage
   useEffect(() => {
-    localStorage.setItem(
-      `characterDetailSectionVisibility_${characterId}`,
-      JSON.stringify(sectionVisibility)
-    );
-  }, [sectionVisibility, characterId]);
+    extraSectionsOpenStateRef.current = extraSectionsOpenState;
+  }, [extraSectionsOpenState]);
+
+  useEffect(() => {
+    sectionVisibilityRef.current = sectionVisibility;
+  }, [sectionVisibility]);
 
   // Função de validação de campo individual (onBlur)
   const validateField = useCallback(
@@ -248,6 +252,13 @@ export function CharacterDetail() {
     if (sectionVisibilityChanged(sectionVisibility, originalSectionVisibility))
       return true;
 
+    // Check if advanced section state has changed
+    if (advancedSectionOpen !== originalAdvancedSectionOpen) return true;
+
+    // Check if extra sections open state has changed
+    if (sectionVisibilityChanged(extraSectionsOpenState, originalExtraSectionsOpenState))
+      return true;
+
     // Helper function to compare arrays (order-independent for IDs, order-dependent for strings)
     const arraysEqual = (
       a: unknown[] | undefined,
@@ -320,6 +331,8 @@ export function CharacterDetail() {
     isEditing,
     sectionVisibility,
     originalSectionVisibility,
+    advancedSectionOpen,
+    originalAdvancedSectionOpen,
   ]);
 
   // Fetch caches em paralelo (usa cache se já tiver)
@@ -336,6 +349,19 @@ export function CharacterDetail() {
   // Load character from database
   useEffect(() => {
     let isMounted = true;
+
+    // CRITICAL: Reset ALL UI states immediately when characterId changes
+    // (component is not unmounted when navigating between characters)
+    setSectionVisibility({});
+    setAdvancedSectionOpen(false);
+    setExtraSectionsOpenState({});
+    setOriginalSectionVisibility({});
+    setOriginalAdvancedSectionOpen(false);
+    setOriginalExtraSectionsOpenState({});
+    // Reset refs to prevent stale values
+    sectionVisibilityRef.current = {};
+    advancedSectionOpenRef.current = false;
+    extraSectionsOpenStateRef.current = {};
 
     const loadCharacter = async () => {
       try {
@@ -364,8 +390,49 @@ export function CharacterDetail() {
           // Set power links
           setCharacterPowerLinks(powerLinks);
 
-          // Initialize original section visibility with current state
-          setOriginalSectionVisibility(sectionVisibility);
+          // Load UI state from cache or database
+          // Priority 1: Check in-memory cache
+          let cachedUIState = getUIState("characters", characterId);
+
+          // Priority 2: Load from database if not in cache
+          if (!cachedUIState && characterFromDB.uiState) {
+            cachedUIState = characterFromDB.uiState;
+            // Save to cache for future use
+            setUIStateInStore("characters", characterId, cachedUIState);
+          }
+
+          // Priority 3: Use defaults if no cache and no database value
+          if (!cachedUIState) {
+            // Create NEW object references for each entity (prevent sharing)
+            cachedUIState = {
+              advancedSectionOpen: false,
+              sectionVisibility: {}, // New object reference
+              extraSectionsOpenState: {}, // New object reference
+            };
+            // Save defaults to cache
+            setUIStateInStore("characters", characterId, cachedUIState);
+          }
+
+          // Apply UI state to local state (deep copy to avoid reference sharing)
+          const loadedAdvancedSectionOpen =
+            cachedUIState.advancedSectionOpen ?? false;
+          const loadedSectionVisibility =
+            cachedUIState.sectionVisibility || {};
+          const loadedExtraSectionsOpenState =
+            cachedUIState.extraSectionsOpenState || {};
+
+          // Create TWO separate deep copies to avoid sharing between current and original states
+          const sectionVisibilityCopy = { ...loadedSectionVisibility };
+          const sectionVisibilityOriginalCopy = { ...loadedSectionVisibility };
+          const extraSectionsOpenStateCopy = { ...loadedExtraSectionsOpenState };
+          const extraSectionsOpenStateOriginalCopy = { ...loadedExtraSectionsOpenState };
+
+          setAdvancedSectionOpen(loadedAdvancedSectionOpen);
+          setOriginalAdvancedSectionOpen(loadedAdvancedSectionOpen);
+          setSectionVisibility(sectionVisibilityCopy);
+          setOriginalSectionVisibility(sectionVisibilityOriginalCopy);
+          setExtraSectionsOpenState(extraSectionsOpenStateCopy);
+          setOriginalExtraSectionsOpenState(extraSectionsOpenStateOriginalCopy);
         }
       } catch (error) {
         // Don't log errors or show toasts if component is unmounted
@@ -451,7 +518,14 @@ export function CharacterDetail() {
         relationships: editData.relationships,
       });
 
-      const updatedCharacter = { ...editData };
+      const updatedCharacter = {
+        ...editData,
+        uiState: {
+          advancedSectionOpen,
+          sectionVisibility,
+          extraSectionsOpenState,
+        },
+      };
 
       setCharacter(updatedCharacter);
       setImagePreview(updatedCharacter.image || "");
@@ -469,8 +543,9 @@ export function CharacterDetail() {
 
       setErrors({}); // Limpar erros
       setIsEditing(false);
-      // Update original section visibility after successful save
+      // Update original UI states after successful save
       setOriginalSectionVisibility(sectionVisibility);
+      setOriginalAdvancedSectionOpen(advancedSectionOpen);
     } catch (error) {
       console.error("[handleSave] Error caught:", error);
       if (error instanceof z.ZodError) {
@@ -526,18 +601,20 @@ export function CharacterDetail() {
     setEditData({ ...character, relationships: character.relationships || [] });
     setImagePreview(character.image || "");
     setSectionVisibility(originalSectionVisibility);
+    setAdvancedSectionOpen(originalAdvancedSectionOpen);
     setErrors({});
     setIsEditing(false);
-  }, [character, originalSectionVisibility, hasChanges]);
+  }, [character, originalSectionVisibility, originalAdvancedSectionOpen, hasChanges]);
 
   const handleConfirmCancel = useCallback(() => {
     setEditData({ ...character, relationships: character.relationships || [] });
     setImagePreview(character.image || "");
     setSectionVisibility(originalSectionVisibility);
+    setAdvancedSectionOpen(originalAdvancedSectionOpen);
     setErrors({});
     setIsEditing(false);
     setShowUnsavedChangesDialog(false);
-  }, [character, originalSectionVisibility]);
+  }, [character, originalSectionVisibility, originalAdvancedSectionOpen]);
 
   const _handleAddQuality = useCallback(() => {
     if (newQuality.trim() && !editData.qualities.includes(newQuality.trim())) {
@@ -662,9 +739,10 @@ export function CharacterDetail() {
   const handleEdit = useCallback(() => {
     setIsEditing(true);
     setIsNavigationSidebarOpen(false);
-    // Capture current section visibility state when entering edit mode
+    // Capture current UI states when entering edit mode
     setOriginalSectionVisibility(sectionVisibility);
-  }, [sectionVisibility]);
+    setOriginalAdvancedSectionOpen(advancedSectionOpen);
+  }, [sectionVisibility, advancedSectionOpen]);
 
   const handleDeleteModalOpen = useCallback(() => {
     setShowDeleteModal(true);
@@ -706,15 +784,48 @@ export function CharacterDetail() {
   );
 
   const handleSectionVisibilityToggle = useCallback((sectionName: string) => {
-    setSectionVisibility((prev) => ({
-      ...prev,
-      [sectionName]: prev[sectionName] === false ? true : false,
-    }));
-  }, []);
+    setSectionVisibility((prev) => {
+      const newVisibility = {
+        ...prev,
+        [sectionName]: prev[sectionName] === false ? true : false,
+      };
+
+      // Update cache immediately with ALL current UI state (use refs to avoid stale closures)
+      setUIStateInStore("characters", characterId, {
+        advancedSectionOpen: advancedSectionOpenRef.current,
+        sectionVisibility: { ...newVisibility }, // Deep copy to avoid reference sharing
+        extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+      });
+
+      return newVisibility;
+    });
+  }, [characterId, setUIStateInStore]);
+
+  const handleExtraSectionsOpenStateChange = useCallback((newState: Record<string, boolean>) => {
+    setExtraSectionsOpenState(newState);
+
+    // Update cache immediately with ALL current UI state (use refs to avoid stale closures)
+    setUIStateInStore("characters", characterId, {
+      advancedSectionOpen: advancedSectionOpenRef.current,
+      sectionVisibility: { ...sectionVisibilityRef.current },
+      extraSectionsOpenState: { ...newState },
+    });
+  }, [characterId, setUIStateInStore]);
 
   const handleAdvancedSectionToggle = useCallback(() => {
-    setAdvancedSectionOpen((prev) => !prev);
-  }, []);
+    setAdvancedSectionOpen((prev) => {
+      const newValue = !prev;
+
+      // Update cache immediately with ALL current UI state (use refs to avoid stale closures)
+      setUIStateInStore("characters", characterId, {
+        advancedSectionOpen: newValue,
+        sectionVisibility: { ...sectionVisibilityRef.current }, // Deep copy to avoid reference sharing
+        extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+      });
+
+      return newValue;
+    });
+  }, [characterId, setUIStateInStore]);
 
   const toggleSection = useCallback((sectionName: string) => {
     setOpenSections((prev) => ({
@@ -845,6 +956,8 @@ export function CharacterDetail() {
         sectionVisibility={sectionVisibility}
         onSectionVisibilityToggle={handleSectionVisibilityToggle}
         onAdvancedSectionToggle={handleAdvancedSectionToggle}
+        extraSectionsOpenState={extraSectionsOpenState}
+        onExtraSectionsOpenStateChange={handleExtraSectionsOpenStateChange}
         getRelationshipTypeData={getRelationshipTypeData}
         onNavigateToPowerInstance={handleNavigateToPowerInstance}
         onEditPowerLink={handleEditLink}

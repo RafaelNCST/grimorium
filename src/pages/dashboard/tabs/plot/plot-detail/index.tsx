@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 
 import { useParams, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -11,6 +11,7 @@ import { getPlotArcsByBookId, getPlotArcById } from "@/lib/db/plot.service";
 import { getRegionsByBookId } from "@/lib/db/regions.service";
 import { canFinishArc } from "@/lib/utils/arc-validation";
 import { usePlotStore } from "@/stores/plot-store";
+import { useEntityUIStateStore } from "@/stores/entity-ui-state-store";
 import type { IPlotArc, IPlotEvent } from "@/types/plot-types";
 
 import { PlotArcDetailView } from "./view";
@@ -29,6 +30,10 @@ export function PlotArcDetail() {
   const deletePlotArcFromCache = usePlotStore(
     (state) => state.deletePlotArcFromCache
   );
+
+  // Entity UI State store
+  const getUIState = useEntityUIStateStore((state) => state.getUIState);
+  const setUIStateInStore = useEntityUIStateStore((state) => state.setUIState);
 
   // Data state
   const [arc, setArc] = useState<IPlotArc | null>(null);
@@ -65,29 +70,8 @@ export function PlotArcDetail() {
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
 
   // Section state
-  const [eventChainSectionOpen, setEventChainSectionOpen] = useState(() => {
-    const stored = localStorage.getItem("plotDetailEventChainSectionOpen");
-    return stored ? JSON.parse(stored) : true;
-  });
-  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
-    const stored = localStorage.getItem("plotDetailAdvancedSectionOpen");
-    return stored ? JSON.parse(stored) : false;
-  });
-
-  // Save section states to localStorage
-  useEffect(() => {
-    localStorage.setItem(
-      "plotDetailEventChainSectionOpen",
-      JSON.stringify(eventChainSectionOpen)
-    );
-  }, [eventChainSectionOpen]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "plotDetailAdvancedSectionOpen",
-      JSON.stringify(advancedSectionOpen)
-    );
-  }, [advancedSectionOpen]);
+  const [eventChainSectionOpen, setEventChainSectionOpen] = useState(true);
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
 
   // Field visibility state
   const [fieldVisibility, setFieldVisibility] = useState<
@@ -96,6 +80,32 @@ export function PlotArcDetail() {
   const [originalFieldVisibility, setOriginalFieldVisibility] = useState<
     Record<string, boolean>
   >({});
+  const [originalAdvancedSectionOpen, setOriginalAdvancedSectionOpen] = useState(false);
+  const [originalEventChainSectionOpen, setOriginalEventChainSectionOpen] = useState(true);
+  const [extraSectionsOpenState, setExtraSectionsOpenState] = useState<
+    Record<string, boolean>
+  >({});
+  const [originalExtraSectionsOpenState, setOriginalExtraSectionsOpenState] = useState<
+    Record<string, boolean>
+  >({});
+
+  // Refs to always have current values (avoid stale closures)
+  const advancedSectionOpenRef = useRef(advancedSectionOpen);
+  const eventChainSectionOpenRef = useRef(eventChainSectionOpen);
+  const extraSectionsOpenStateRef = useRef(extraSectionsOpenState);
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    advancedSectionOpenRef.current = advancedSectionOpen;
+  }, [advancedSectionOpen]);
+
+  useEffect(() => {
+    eventChainSectionOpenRef.current = eventChainSectionOpen;
+  }, [eventChainSectionOpen]);
+
+  useEffect(() => {
+    extraSectionsOpenStateRef.current = extraSectionsOpenState;
+  }, [extraSectionsOpenState]);
 
   // Validation state
   const [validationErrors, setValidationErrors] = useState<
@@ -110,13 +120,19 @@ export function PlotArcDetail() {
     const visibilityChanged =
       JSON.stringify(fieldVisibility) !==
       JSON.stringify(originalFieldVisibility);
-    return formChanged || visibilityChanged;
+    const advancedSectionChanged = advancedSectionOpen !== originalAdvancedSectionOpen;
+    const eventChainSectionChanged = eventChainSectionOpen !== originalEventChainSectionOpen;
+    return formChanged || visibilityChanged || advancedSectionChanged || eventChainSectionChanged;
   }, [
     editForm,
     originalData,
     isEditing,
     fieldVisibility,
     originalFieldVisibility,
+    advancedSectionOpen,
+    originalAdvancedSectionOpen,
+    eventChainSectionOpen,
+    originalEventChainSectionOpen,
   ]);
 
   // Check required fields
@@ -135,6 +151,19 @@ export function PlotArcDetail() {
   useEffect(() => {
     let mounted = true;
     setIsLoading(true);
+
+    // CRITICAL: Reset ALL UI states immediately when plotId changes
+    // (component is not unmounted when navigating between plots)
+    setAdvancedSectionOpen(false);
+    setEventChainSectionOpen(true);
+    setOriginalAdvancedSectionOpen(false);
+    setOriginalEventChainSectionOpen(true);
+    setExtraSectionsOpenState({});
+    setOriginalExtraSectionsOpenState({});
+    // Reset refs to prevent stale values
+    advancedSectionOpenRef.current = false;
+    eventChainSectionOpenRef.current = true;
+    extraSectionsOpenStateRef.current = {};
 
     const loadData = async () => {
       try {
@@ -161,6 +190,47 @@ export function PlotArcDetail() {
             setOriginalData(loadedArc);
             setFieldVisibility(loadedArc.fieldVisibility || {});
             setOriginalFieldVisibility(loadedArc.fieldVisibility || {});
+
+            // Priority 1: Check in-memory cache
+            let cachedUIState = getUIState("plotArcs", plotId);
+
+            // Priority 2: Load from database if not in cache
+            if (!cachedUIState && loadedArc.uiState) {
+              cachedUIState = loadedArc.uiState;
+              // Save to cache for future use
+              setUIStateInStore("plotArcs", plotId, cachedUIState);
+            }
+
+            // Priority 3: Use defaults if no cache and no database value
+            if (!cachedUIState) {
+              // Create NEW object references for each entity (prevent sharing)
+              cachedUIState = {
+                advancedSectionOpen: false,
+                eventChainSectionOpen: true,
+                extraSectionsOpenState: {},
+              };
+              // Save defaults to cache
+              setUIStateInStore("plotArcs", plotId, cachedUIState);
+            }
+
+            // Apply UI state to local state (deep copy to avoid reference sharing)
+            const loadedAdvancedSectionOpen =
+              cachedUIState.advancedSectionOpen ?? false;
+            const loadedEventChainSectionOpen =
+              cachedUIState.eventChainSectionOpen ?? true;
+            const loadedExtraSectionsOpenState =
+              cachedUIState.extraSectionsOpenState || {};
+
+            // Create TWO separate deep copies to avoid sharing between current and original states
+            const extraSectionsOpenStateCopy = { ...loadedExtraSectionsOpenState };
+            const extraSectionsOpenStateOriginalCopy = { ...loadedExtraSectionsOpenState };
+
+            setAdvancedSectionOpen(loadedAdvancedSectionOpen);
+            setOriginalAdvancedSectionOpen(loadedAdvancedSectionOpen);
+            setEventChainSectionOpen(loadedEventChainSectionOpen);
+            setOriginalEventChainSectionOpen(loadedEventChainSectionOpen);
+            setExtraSectionsOpenState(extraSectionsOpenStateCopy);
+            setOriginalExtraSectionsOpenState(extraSectionsOpenStateOriginalCopy);
           }
           setCharacters(
             loadedCharacters.map((c) => ({
@@ -210,7 +280,7 @@ export function PlotArcDetail() {
     return () => {
       mounted = false;
     };
-  }, [plotId, dashboardId]);
+  }, [plotId, dashboardId, getUIState, setUIStateInStore]);
 
   // Navigation handlers
   const handleBack = useCallback(() => {
@@ -223,8 +293,22 @@ export function PlotArcDetail() {
       setEditForm({ ...arc });
       setOriginalData({ ...arc });
     }
+    setOriginalFieldVisibility(fieldVisibility);
+    setOriginalAdvancedSectionOpen(advancedSectionOpen);
+    setOriginalEventChainSectionOpen(eventChainSectionOpen);
+    setOriginalExtraSectionsOpenState(extraSectionsOpenState);
     setIsEditing(true);
-  }, [arc]);
+  }, [arc, fieldVisibility, advancedSectionOpen, eventChainSectionOpen, extraSectionsOpenState]);
+
+  const handleExtraSectionsOpenStateChange = useCallback((newState: Record<string, boolean>) => {
+    const newUiState = {
+      advancedSectionOpen: advancedSectionOpenRef.current,
+      eventChainSectionOpen: eventChainSectionOpenRef.current,
+      extraSectionsOpenState: { ...newState },
+    };
+    setExtraSectionsOpenState(newState);
+    setUIStateInStore("plotArcs", plotId, newUiState);
+  }, [plotId, setUIStateInStore]);
 
   const handleCancel = useCallback(() => {
     if (!arc) return;
@@ -238,18 +322,24 @@ export function PlotArcDetail() {
     // If no changes, cancel immediately
     setEditForm({ ...arc });
     setFieldVisibility(originalFieldVisibility);
+    setAdvancedSectionOpen(originalAdvancedSectionOpen);
+    setEventChainSectionOpen(originalEventChainSectionOpen);
+    setExtraSectionsOpenState(originalExtraSectionsOpenState);
     setValidationErrors({});
     setIsEditing(false);
-  }, [arc, hasChanges, originalFieldVisibility]);
+  }, [arc, hasChanges, originalFieldVisibility, originalAdvancedSectionOpen, originalEventChainSectionOpen, originalExtraSectionsOpenState]);
 
   const handleConfirmCancel = useCallback(() => {
     if (!arc) return;
     setEditForm({ ...arc });
     setFieldVisibility(originalFieldVisibility);
+    setAdvancedSectionOpen(originalAdvancedSectionOpen);
+    setEventChainSectionOpen(originalEventChainSectionOpen);
+    setExtraSectionsOpenState(originalExtraSectionsOpenState);
     setValidationErrors({});
     setIsEditing(false);
     setShowUnsavedChangesDialog(false);
-  }, [arc, originalFieldVisibility]);
+  }, [arc, originalFieldVisibility, originalAdvancedSectionOpen, originalEventChainSectionOpen, originalExtraSectionsOpenState]);
 
   const handleUnsavedChangesDialogChange = useCallback((open: boolean) => {
     setShowUnsavedChangesDialog(open);
@@ -399,11 +489,22 @@ export function PlotArcDetail() {
     }
 
     try {
-      const updatedData = { ...editForm, fieldVisibility };
+      const updatedData = {
+        ...editForm,
+        fieldVisibility,
+        uiState: {
+          advancedSectionOpen,
+          eventChainSectionOpen,
+          extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+        },
+      };
       await updatePlotArcInCache(arc.id, updatedData);
       setArc({ ...arc, ...updatedData } as IPlotArc);
       setOriginalData({ ...arc, ...updatedData } as IPlotArc);
       setOriginalFieldVisibility(fieldVisibility);
+      setOriginalAdvancedSectionOpen(advancedSectionOpen);
+      setOriginalEventChainSectionOpen(eventChainSectionOpen);
+      setOriginalExtraSectionsOpenState(extraSectionsOpenState);
       setValidationErrors({});
       setIsEditing(false);
     } catch (error) {
@@ -470,12 +571,34 @@ export function PlotArcDetail() {
 
   // Section toggle handlers
   const handleEventChainSectionToggle = useCallback(() => {
-    setEventChainSectionOpen((prev) => !prev);
-  }, []);
+    setEventChainSectionOpen((prev) => {
+      const newValue = !prev;
+
+      // Update cache immediately with complete UI state, use refs to avoid stale closures
+      setUIStateInStore("plotArcs", plotId, {
+        advancedSectionOpen: advancedSectionOpenRef.current,
+        eventChainSectionOpen: newValue,
+        extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+      });
+
+      return newValue;
+    });
+  }, [plotId, setUIStateInStore]);
 
   const handleAdvancedSectionToggle = useCallback(() => {
-    setAdvancedSectionOpen((prev) => !prev);
-  }, []);
+    setAdvancedSectionOpen((prev) => {
+      const newValue = !prev;
+
+      // Update cache immediately with complete UI state, use refs to avoid stale closures
+      setUIStateInStore("plotArcs", plotId, {
+        advancedSectionOpen: newValue,
+        eventChainSectionOpen: eventChainSectionOpenRef.current,
+        extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+      });
+
+      return newValue;
+    });
+  }, [plotId, setUIStateInStore]);
 
   // Field visibility toggle handler
   const handleFieldVisibilityToggle = useCallback((fieldName: string) => {
@@ -598,6 +721,8 @@ export function PlotArcDetail() {
       onAdvancedSectionToggle={handleAdvancedSectionToggle}
       fieldVisibility={fieldVisibility}
       onFieldVisibilityToggle={handleFieldVisibilityToggle}
+      extraSectionsOpenState={extraSectionsOpenState}
+      onExtraSectionsOpenStateChange={handleExtraSectionsOpenStateChange}
     />
   );
 }

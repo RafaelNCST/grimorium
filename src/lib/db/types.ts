@@ -79,8 +79,10 @@ export interface DBCharacter {
   nicknames?: string; // JSON array string
   past?: string;
 
+  // UI State
+  ui_state?: string; // JSON object string
+
   // Metadata
-  field_visibility?: string; // JSON object string
   created_at: number;
   updated_at: number;
 }
@@ -113,8 +115,11 @@ export interface DBItem {
   usage_consequences?: string;
   item_usage?: string;
 
-  // UI State
+  // UI State (legacy - to be removed)
   section_visibility?: string; // JSON object string
+
+  // UI State
+  ui_state?: string; // JSON object string
 
   created_at: number;
   updated_at: number;
@@ -176,9 +181,12 @@ export interface DBRace {
   story_motivation?: string;
   inspirations?: string;
 
+  // UI State (legacy - to be removed)
+  field_visibility?: string; // DEPRECATED - JSON object string
+  section_visibility?: string; // DEPRECATED - JSON object string
+
   // UI State
-  field_visibility?: string; // JSON object string
-  section_visibility?: string; // JSON object string
+  ui_state?: string; // JSON object string
 
   // Metadata
   created_at: number;
@@ -275,7 +283,13 @@ export interface DBPlotArc {
   important_regions?: string; // JSON array string
   arc_message?: string;
   world_impact?: string;
-  field_visibility?: string; // JSON object string
+
+  // UI State (legacy - to be removed)
+  field_visibility?: string; // DEPRECATED - JSON object string
+
+  // UI State
+  ui_state?: string; // JSON object string
+
   created_at: number;
   updated_at: number;
 }

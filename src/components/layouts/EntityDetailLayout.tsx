@@ -90,6 +90,10 @@ export interface EntityDetailLayoutProps {
   onAdvancedSectionToggle?: () => void;
   extraSections?: ExtraSection[];
 
+  // Extra sections state (NEW - per-entity control)
+  extraSectionsOpenState?: Record<string, boolean>;
+  onExtraSectionsOpenStateChange?: (state: Record<string, boolean>) => void;
+
   // Versions panel (optional)
   versionsPanel?: ReactNode;
 
@@ -149,6 +153,10 @@ export function EntityDetailLayout({
   onAdvancedSectionToggle,
   extraSections = [],
 
+  // Extra sections state (per-entity control)
+  extraSectionsOpenState: externalExtraSectionsOpenState,
+  onExtraSectionsOpenStateChange,
+
   // Versions panel
   versionsPanel,
 
@@ -160,11 +168,18 @@ export function EntityDetailLayout({
   className,
 }: EntityDetailLayoutProps) {
   const { t } = useTranslation("common");
-  // State to track which extra sections are open - persisted in localStorage
-  const [extraSectionsOpenState, setExtraSectionsOpenState] = React.useState<
+
+  // State to track which extra sections are open
+  // If external state is provided (per-entity), use it. Otherwise fall back to localStorage (legacy)
+  const [internalExtraSectionsOpenState, setInternalExtraSectionsOpenState] = React.useState<
     Record<string, boolean>
   >(() => {
-    // Try to load from localStorage first
+    // If external state is provided, use it as initial state
+    if (externalExtraSectionsOpenState) {
+      return externalExtraSectionsOpenState;
+    }
+
+    // Legacy fallback: Try to load from localStorage
     const stored = localStorage.getItem("entityDetailExtraSectionsState");
     if (stored) {
       try {
@@ -182,13 +197,18 @@ export function EntityDetailLayout({
     return initialState;
   });
 
-  // Save to localStorage whenever state changes
+  // Determine which state to use
+  const effectiveExtraSectionsOpenState = externalExtraSectionsOpenState ?? internalExtraSectionsOpenState;
+
+  // Legacy: Save to localStorage only if external state is NOT provided
   React.useEffect(() => {
-    localStorage.setItem(
-      "entityDetailExtraSectionsState",
-      JSON.stringify(extraSectionsOpenState)
-    );
-  }, [extraSectionsOpenState]);
+    if (!externalExtraSectionsOpenState) {
+      localStorage.setItem(
+        "entityDetailExtraSectionsState",
+        JSON.stringify(internalExtraSectionsOpenState)
+      );
+    }
+  }, [internalExtraSectionsOpenState, externalExtraSectionsOpenState]);
   // Loading state
   if (isLoading) {
     return (
@@ -365,7 +385,7 @@ export function EntityDetailLayout({
               }
 
               const isOpen =
-                extraSectionsOpenState[section.id] ??
+                effectiveExtraSectionsOpenState[section.id] ??
                 section.defaultOpen ??
                 false;
 
@@ -375,10 +395,18 @@ export function EntityDetailLayout({
                   title={section.title}
                   isOpen={isOpen}
                   onToggle={() => {
-                    setExtraSectionsOpenState((prev) => ({
-                      ...prev,
+                    const newState = {
+                      ...effectiveExtraSectionsOpenState,
                       [section.id]: !isOpen,
-                    }));
+                    };
+
+                    // If external handler provided, use it (per-entity state)
+                    if (onExtraSectionsOpenStateChange) {
+                      onExtraSectionsOpenStateChange(newState);
+                    } else {
+                      // Otherwise use internal state (legacy localStorage)
+                      setInternalExtraSectionsOpenState(newState);
+                    }
                   }}
                   isEditMode={isEditMode}
                   isVisible={section.isVisible}

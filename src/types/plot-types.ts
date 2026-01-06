@@ -10,6 +10,13 @@ export interface IPlotEvent {
   order: number;
 }
 
+export interface IPlotArcUIState {
+  advancedSectionOpen?: boolean;
+  eventChainSectionOpen?: boolean;
+  sectionVisibility?: Record<string, boolean>; // Empty for now, for future use
+  extraSectionsOpenState?: Record<string, boolean>;
+}
+
 export interface IPlotArc {
   id: string;
   name: string;
@@ -26,7 +33,10 @@ export interface IPlotArc {
   importantRegions: string[];
   arcMessage?: string;
   worldImpact?: string;
-  fieldVisibility?: Record<string, boolean>;
+  fieldVisibility?: Record<string, boolean>; // DEPRECATED - to be removed
+
+  // UI State (for persisting UI preferences)
+  uiState?: IPlotArcUIState;
 }
 
 export interface IPlotArcFormData {

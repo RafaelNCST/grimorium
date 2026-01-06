@@ -94,6 +94,8 @@ interface RaceDetailViewProps {
   setHasChapterMetrics: (value: boolean | null) => void;
   isLogsModalOpen: boolean;
   onLogsModalToggle: () => void;
+  extraSectionsOpenState: Record<string, boolean>;
+  onExtraSectionsOpenStateChange: (state: Record<string, boolean>) => void;
 }
 
 // Helper component for empty state
@@ -142,6 +144,8 @@ export function RaceDetailView({
   setHasChapterMetrics,
   isLogsModalOpen: _isLogsModalOpen,
   onLogsModalToggle,
+  extraSectionsOpenState,
+  onExtraSectionsOpenStateChange,
 }: RaceDetailViewProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { t } = useTranslation(["race-detail", "create-race"] as any);
@@ -1284,6 +1288,8 @@ export function RaceDetailView({
             advancedSectionOpen={advancedSectionOpen}
             onAdvancedSectionToggle={onAdvancedSectionToggle}
             // Extra sections
+            extraSectionsOpenState={extraSectionsOpenState}
+            onExtraSectionsOpenStateChange={onExtraSectionsOpenStateChange}
             extraSections={extraSections}
           />
         </div>

@@ -59,6 +59,7 @@ function raceToDBRace(bookId: string, race: IRace): DBRace {
     section_visibility: race.sectionVisibility
       ? JSON.stringify(race.sectionVisibility)
       : undefined,
+    ui_state: race.uiState ? JSON.stringify(race.uiState) : undefined,
     created_at: Date.now(),
     updated_at: Date.now(),
   };
@@ -106,6 +107,7 @@ function dbRaceToRace(dbRace: DBRace): IRace {
     sectionVisibility: dbRace.section_visibility
       ? safeParseUnknownObject(dbRace.section_visibility)
       : undefined,
+    uiState: dbRace.ui_state ? safeParseUnknownObject(dbRace.ui_state) : undefined,
     speciesId: "", // Legacy field, kept for backwards compatibility
   };
 }
@@ -147,12 +149,12 @@ export async function createRace(bookId: string, race: IRace): Promise<void> {
         other_communication, moral_tendency, social_organization, habitat,
         physical_capacity, special_characteristics, weaknesses,
         story_motivation, inspirations,
-        field_visibility, section_visibility,
+        field_visibility, section_visibility, ui_state,
         created_at, updated_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
         $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28,
-        $29, $30, $31, $32, $33, $34
+        $29, $30, $31, $32, $33, $34, $35
       )`,
       [
         dbRace.id,
@@ -187,6 +189,7 @@ export async function createRace(bookId: string, race: IRace): Promise<void> {
         dbRace.inspirations,
         dbRace.field_visibility,
         dbRace.section_visibility,
+        dbRace.ui_state,
         dbRace.created_at,
         dbRace.updated_at,
       ]
@@ -235,9 +238,9 @@ export async function updateRace(
         communication = $19, other_communication = $20, moral_tendency = $21, social_organization = $22,
         habitat = $23, physical_capacity = $24, special_characteristics = $25,
         weaknesses = $26, story_motivation = $27, inspirations = $28,
-        field_visibility = $29, section_visibility = $30,
-        updated_at = $31
-      WHERE id = $32`,
+        field_visibility = $29, section_visibility = $30, ui_state = $31,
+        updated_at = $32
+      WHERE id = $33`,
       [
         dbRace.group_id,
         dbRace.name,
@@ -269,6 +272,7 @@ export async function updateRace(
         dbRace.inspirations,
         dbRace.field_visibility,
         dbRace.section_visibility,
+        dbRace.ui_state,
         dbRace.updated_at,
         id,
       ]

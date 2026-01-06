@@ -178,6 +178,8 @@ interface CharacterDetailViewProps {
   sectionVisibility: ISectionVisibility;
   onSectionVisibilityToggle: (section: string) => void;
   onAdvancedSectionToggle: () => void;
+  extraSectionsOpenState: Record<string, boolean>;
+  onExtraSectionsOpenStateChange: (state: Record<string, boolean>) => void;
   getRelationshipTypeData: (type: string) => IRelationshipType;
   onNavigateToPowerInstance: (linkId: string) => void;
   onEditPowerLink: (link: IPowerCharacterLink) => void;
@@ -230,6 +232,8 @@ export function CharacterDetailView({
   sectionVisibility,
   onSectionVisibilityToggle,
   onAdvancedSectionToggle,
+  extraSectionsOpenState,
+  onExtraSectionsOpenStateChange,
   onNavigateToPowerInstance,
   onEditPowerLink,
   onDeletePowerLink,
@@ -1222,6 +1226,8 @@ export function CharacterDetailView({
             advancedSectionOpen={advancedSectionOpen}
             onAdvancedSectionToggle={onAdvancedSectionToggle}
             extraSections={extraSections}
+            extraSectionsOpenState={extraSectionsOpenState}
+            onExtraSectionsOpenStateChange={onExtraSectionsOpenStateChange}
           />
         </div>
       </div>

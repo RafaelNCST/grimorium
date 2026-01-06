@@ -77,6 +77,10 @@ interface FactionDetailViewProps {
   TypeIcon: React.ComponentType<{ className?: string }>;
   advancedSectionOpen: boolean;
   sectionVisibility: Record<string, boolean>;
+  extraSectionsOpenState: Record<string, boolean>;
+  onExtraSectionsOpenStateChange: (state: Record<string, boolean>) => void;
+  timelineOpenEras: string[];
+  onTimelineOpenErasChange: (openEras: string[]) => void;
   bookId: string;
   errors: Record<string, string>;
   validateField: (field: string, value: unknown) => void;
@@ -121,6 +125,10 @@ export function FactionDetailView({
   TypeIcon,
   advancedSectionOpen,
   sectionVisibility,
+  extraSectionsOpenState,
+  onExtraSectionsOpenStateChange,
+  timelineOpenEras,
+  onTimelineOpenErasChange,
   bookId,
   errors,
   validateField,
@@ -1276,6 +1284,8 @@ export function FactionDetailView({
             onEditDataChange("timeline", timeline)
           }
           isCreateEraDialogOpen={isCreateEraDialogOpen}
+          openEras={timelineOpenEras}
+          onOpenErasChange={onTimelineOpenErasChange}
           onCreateEraDialogOpenChange={setIsCreateEraDialogOpen}
           mockCharacters={mockCharacters}
           mockFactions={mockFactions}
@@ -1474,6 +1484,8 @@ export function FactionDetailView({
             onAdvancedSectionToggle={onAdvancedSectionToggle}
             // Extra sections
             extraSections={extraSections}
+            extraSectionsOpenState={extraSectionsOpenState}
+            onExtraSectionsOpenStateChange={onExtraSectionsOpenStateChange}
           />
         </div>
       </div>

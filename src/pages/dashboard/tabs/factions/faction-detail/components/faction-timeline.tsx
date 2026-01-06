@@ -63,6 +63,10 @@ interface PropsFactionTimeline {
   isCreateEraDialogOpen?: boolean;
   /** Callback when the create era dialog open state changes */
   onCreateEraDialogOpenChange?: (open: boolean) => void;
+  /** Controlled state for open eras (array of era IDs) */
+  openEras?: string[];
+  /** Callback when open eras change */
+  onOpenErasChange?: (openEras: string[]) => void;
   /** Entities for display */
   mockCharacters?: Array<{ id: string; name: string; image?: string }>;
   mockFactions?: Array<{ id: string; name: string; image?: string }>;
@@ -77,6 +81,8 @@ export function FactionTimeline({
   onTimelineChange,
   isCreateEraDialogOpen: controlledIsCreateEraDialogOpen,
   onCreateEraDialogOpenChange,
+  openEras: controlledOpenEras,
+  onOpenErasChange,
   mockCharacters = [],
   mockFactions = [],
   mockRaces = [],
@@ -108,7 +114,20 @@ export function FactionTimeline({
     null
   );
   const [editingEvent, setEditingEvent] = useState<boolean>(false);
-  const [openEras, setOpenEras] = useState<string[]>([]);
+
+  // Support both controlled and uncontrolled modes for open eras
+  const [internalOpenEras, setInternalOpenEras] = useState<string[]>([]);
+
+  // Use controlled state if provided, otherwise use internal state
+  const openEras = controlledOpenEras ?? internalOpenEras;
+  const setOpenEras = (eras: string[] | ((prev: string[]) => string[])) => {
+    const newEras = typeof eras === 'function' ? eras(openEras) : eras;
+    if (onOpenErasChange) {
+      onOpenErasChange(newEras);
+    } else {
+      setInternalOpenEras(newEras);
+    }
+  };
 
   const [newEra, setNewEra] = useState({
     name: "",

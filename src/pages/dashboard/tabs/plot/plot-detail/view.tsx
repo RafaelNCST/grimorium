@@ -151,6 +151,8 @@ interface PropsPlotArcDetailView {
   factions?: Array<{ id: string; name: string; emblem?: string }>;
   items?: Array<{ id: string; name: string; image?: string }>;
   regions?: Array<{ id: string; name: string; image?: string }>;
+  extraSectionsOpenState: Record<string, boolean>;
+  onExtraSectionsOpenStateChange: (state: Record<string, boolean>) => void;
 }
 
 interface PropsSortableEvent {
@@ -321,6 +323,8 @@ export function PlotArcDetailView({
   factions = [],
   items = [],
   regions = [],
+  extraSectionsOpenState,
+  onExtraSectionsOpenStateChange,
 }: PropsPlotArcDetailView) {
   const { t } = useTranslation(["plot", "create-plot-arc", "tooltips"]);
   const [showEventModal, setShowEventModal] = useState(false);
@@ -1042,20 +1046,18 @@ export function PlotArcDetailView({
             {(isEditing || fieldVisibility["chapterMetrics"] !== false) && (
               <CollapsibleSection
                 title={t("chapter-metrics:plot_section.title")}
-                isOpen={chapterMetricsSectionOpen}
+                isOpen={extraSectionsOpenState["chapterMetrics"] ?? false}
                 onToggle={() =>
-                  setChapterMetricsSectionOpen(!chapterMetricsSectionOpen)
+                  onExtraSectionsOpenStateChange({
+                    ...extraSectionsOpenState,
+                    chapterMetrics: !(extraSectionsOpenState["chapterMetrics"] ?? false),
+                  })
                 }
                 isEditMode={isEditing}
                 isVisible={fieldVisibility["chapterMetrics"] !== false}
-                onVisibilityToggle={() =>
-                  onFieldVisibilityToggle("chapterMetrics")
-                }
-                emptyState={
-                  !isEditing && hasChapterMetrics === false
-                    ? "empty-view"
-                    : null
-                }
+                onVisibilityToggle={() => onFieldVisibilityToggle("chapterMetrics")}
+                isCollapsible={true}
+                emptyState={!isEditing && hasChapterMetrics === false ? "empty-view" : null}
                 emptyIcon={BookOpen}
                 emptyTitle={t("chapter-metrics:plot_section.empty_state_title")}
                 emptyDescription={t("chapter-metrics:plot_section.no_chapters")}

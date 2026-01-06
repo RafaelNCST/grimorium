@@ -27,6 +27,7 @@ import {
   type RegionScale,
 } from "@/pages/dashboard/tabs/world/types/region-types";
 import { useRegionsStore } from "@/stores/regions-store";
+import { useEntityUIStateStore } from "@/stores/entity-ui-state-store";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { RegionDetailView } from "./view";
@@ -47,6 +48,10 @@ export function RegionDetail() {
   const updateRegionInCache = useRegionsStore(
     (state) => state.updateRegionInCache
   );
+
+  // Entity UI State store
+  const getUIState = useEntityUIStateStore((state) => state.getUIState);
+  const setUIStateInStore = useEntityUIStateStore((state) => state.setUIState);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -72,14 +77,8 @@ export function RegionDetail() {
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
   const [_isLoading, _setIsLoading] = useState(true);
   const [allRegions, setAllRegions] = useState<IRegion[]>([]);
-  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
-    const stored = localStorage.getItem("regionDetailAdvancedSectionOpen");
-    return stored ? JSON.parse(stored) : false;
-  });
-  const [timelineSectionOpen, setTimelineSectionOpen] = useState(() => {
-    const stored = localStorage.getItem("regionDetailTimelineSectionOpen");
-    return stored ? JSON.parse(stored) : false;
-  });
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
+  const [timelineSectionOpen, setTimelineSectionOpen] = useState(false);
 
   // Related data for multi-selects
   const [characters, setCharacters] = useState<
@@ -104,6 +103,14 @@ export function RegionDetail() {
     useState<ISectionVisibility>({});
   const [originalSectionVisibility, setOriginalSectionVisibility] =
     useState<ISectionVisibility>({});
+  const [originalAdvancedSectionOpen, setOriginalAdvancedSectionOpen] = useState(false);
+  const [originalTimelineSectionOpen, setOriginalTimelineSectionOpen] = useState(false);
+  const [extraSectionsOpenState, setExtraSectionsOpenState] = useState<
+    Record<string, boolean>
+  >({});
+  const [originalExtraSectionsOpenState, setOriginalExtraSectionsOpenState] = useState<
+    Record<string, boolean>
+  >({});
 
   // Chapter metrics state
   const [hasChapterMetrics, setHasChapterMetrics] = useState<boolean | null>(
@@ -113,8 +120,28 @@ export function RegionDetail() {
   // Entity logs state
   const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
 
-  // Refs to always have the latest visibility values
-  const sectionVisibilityRef = useRef<ISectionVisibility>({});
+  // Refs to always have current values (avoid stale closures)
+  const advancedSectionOpenRef = useRef(advancedSectionOpen);
+  const timelineSectionOpenRef = useRef(timelineSectionOpen);
+  const sectionVisibilityRef = useRef(sectionVisibility);
+  const extraSectionsOpenStateRef = useRef(extraSectionsOpenState);
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    advancedSectionOpenRef.current = advancedSectionOpen;
+  }, [advancedSectionOpen]);
+
+  useEffect(() => {
+    timelineSectionOpenRef.current = timelineSectionOpen;
+  }, [timelineSectionOpen]);
+
+  useEffect(() => {
+    sectionVisibilityRef.current = sectionVisibility;
+  }, [sectionVisibility]);
+
+  useEffect(() => {
+    extraSectionsOpenStateRef.current = extraSectionsOpenState;
+  }, [extraSectionsOpenState]);
 
   // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -326,6 +353,10 @@ export function RegionDetail() {
     const editInspirations = parseJsonArray(editData.inspirations);
     if (!arraysEqual(regionInspirations, editInspirations)) return true;
 
+    // Check if UI state has changed
+    if (advancedSectionOpen !== originalAdvancedSectionOpen) return true;
+    if (timelineSectionOpen !== originalTimelineSectionOpen) return true;
+
     return false;
   }, [
     region,
@@ -335,11 +366,28 @@ export function RegionDetail() {
     originalTimeline,
     sectionVisibility,
     originalSectionVisibility,
+    advancedSectionOpen,
+    originalAdvancedSectionOpen,
+    timelineSectionOpen,
+    originalTimelineSectionOpen,
   ]);
 
   // Load region from database
   useEffect(() => {
     const loadRegion = async () => {
+      // CRITICAL: Reset ALL UI states immediately when regionId changes
+      // (component is not unmounted when navigating between regions)
+      setSectionVisibility({});
+      setAdvancedSectionOpen(false);
+      setTimelineSectionOpen(false);
+      setOriginalSectionVisibility({});
+      setOriginalAdvancedSectionOpen(false);
+      setOriginalTimelineSectionOpen(false);
+      setExtraSectionsOpenState({});
+      setOriginalExtraSectionsOpenState({});
+      sectionVisibilityRef.current = {};
+      extraSectionsOpenStateRef.current = {};
+
       try {
         const regionFromDB = await getRegionById(regionId);
         if (regionFromDB) {
@@ -348,17 +396,6 @@ export function RegionDetail() {
           setEditData(regionFromDB);
           setImagePreview(regionFromDB.image || "");
 
-          // Load visibility preferences from the region data
-          const loadedSectionVisibility = safeJsonParse<ISectionVisibility>(
-            regionFromDB.sectionVisibility,
-            {}
-          );
-
-          setSectionVisibility(loadedSectionVisibility);
-          setOriginalSectionVisibility(loadedSectionVisibility);
-          // Update refs
-          sectionVisibilityRef.current = loadedSectionVisibility;
-
           // Load timeline from the region data
           const loadedTimeline = safeJsonParse<ITimelineEra[]>(
             regionFromDB.timeline,
@@ -366,6 +403,54 @@ export function RegionDetail() {
           );
           setTimeline(loadedTimeline);
           setOriginalTimeline(loadedTimeline);
+
+          // Priority 1: Check in-memory cache
+          let cachedUIState = getUIState("regions", regionId);
+
+          // Priority 2: Load from database if not in cache
+          if (!cachedUIState && regionFromDB.uiState) {
+            cachedUIState = regionFromDB.uiState;
+            // Save to cache for future use
+            setUIStateInStore("regions", regionId, cachedUIState);
+          }
+
+          // Priority 3: Use defaults if no cache and no database value
+          if (!cachedUIState) {
+            // Create NEW object references for each entity (prevent sharing)
+            cachedUIState = {
+              advancedSectionOpen: false,
+              timelineSectionOpen: false,
+              sectionVisibility: {}, // New object reference
+              extraSectionsOpenState: {}, // New object reference
+            };
+            // Save defaults to cache
+            setUIStateInStore("regions", regionId, cachedUIState);
+          }
+
+          // Apply UI state to local state (deep copy to avoid reference sharing)
+          const loadedAdvancedSectionOpen =
+            cachedUIState.advancedSectionOpen ?? false;
+          const loadedTimelineSectionOpen =
+            cachedUIState.timelineSectionOpen ?? false;
+          const loadedSectionVisibility =
+            cachedUIState.sectionVisibility || {};
+          const loadedExtraSectionsOpenState =
+            cachedUIState.extraSectionsOpenState || {};
+
+          // Create TWO separate deep copies to avoid sharing between current and original states
+          const sectionVisibilityCopy = { ...loadedSectionVisibility };
+          const sectionVisibilityOriginalCopy = { ...loadedSectionVisibility };
+          const extraSectionsOpenStateCopy = { ...loadedExtraSectionsOpenState };
+          const extraSectionsOpenStateOriginalCopy = { ...loadedExtraSectionsOpenState };
+
+          setAdvancedSectionOpen(loadedAdvancedSectionOpen);
+          setOriginalAdvancedSectionOpen(loadedAdvancedSectionOpen);
+          setTimelineSectionOpen(loadedTimelineSectionOpen);
+          setOriginalTimelineSectionOpen(loadedTimelineSectionOpen);
+          setSectionVisibility(sectionVisibilityCopy);
+          setOriginalSectionVisibility(sectionVisibilityOriginalCopy);
+          setExtraSectionsOpenState(extraSectionsOpenStateCopy);
+          setOriginalExtraSectionsOpenState(extraSectionsOpenStateOriginalCopy);
 
           // Load all regions from the same book
           if (dashboardId) {
@@ -487,7 +572,7 @@ export function RegionDetail() {
     };
 
     loadRegion();
-  }, [regionId, dashboardId]);
+  }, [regionId, dashboardId, getUIState, setUIStateInStore]);
 
   const handleSave = useCallback(async () => {
     if (!editData) {
@@ -548,9 +633,6 @@ export function RegionDetail() {
       setRegion(updatedRegion);
       setImagePreview(updatedRegion.image || "");
 
-      // Get current visibility state from refs
-      const currentSectionVisibility = sectionVisibilityRef.current;
-
       // Helper function to ensure array fields are JSON strings for database
       const ensureJsonString = (field: any): string | undefined => {
         if (!field) return undefined;
@@ -587,8 +669,14 @@ export function RegionDetail() {
         worldPerception: updatedRegion.worldPerception,
         regionMysteries: ensureJsonString(updatedRegion.regionMysteries),
         inspirations: ensureJsonString(updatedRegion.inspirations),
-        // Visibility preferences
-        sectionVisibility: JSON.stringify(currentSectionVisibility),
+        // sectionVisibility removed - now only saved in uiState
+        // UI State
+        uiState: {
+          advancedSectionOpen,
+          timelineSectionOpen,
+          sectionVisibility: sectionVisibilityRef.current,
+          extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+        },
         // Timeline data
         timeline: JSON.stringify(timeline),
       };
@@ -597,7 +685,10 @@ export function RegionDetail() {
       await updateRegionInCache(regionId, dataToSave);
 
       // Update original visibility to match saved state
-      setOriginalSectionVisibility(currentSectionVisibility);
+      setOriginalSectionVisibility(sectionVisibility);
+      setOriginalAdvancedSectionOpen(advancedSectionOpen);
+      setOriginalTimelineSectionOpen(timelineSectionOpen);
+      setOriginalExtraSectionsOpenState(extraSectionsOpenState);
 
       // Update original timeline after successful save
       setOriginalTimeline(timeline);
@@ -655,19 +746,25 @@ export function RegionDetail() {
     setImagePreview(region?.image || "");
     setTimeline(originalTimeline);
     setSectionVisibility(originalSectionVisibility);
+    setAdvancedSectionOpen(originalAdvancedSectionOpen);
+    setTimelineSectionOpen(originalTimelineSectionOpen);
+    setExtraSectionsOpenState(originalExtraSectionsOpenState);
     setErrors({});
     setIsEditing(false);
-  }, [region, originalTimeline, originalSectionVisibility, hasChanges]);
+  }, [region, originalTimeline, originalSectionVisibility, originalAdvancedSectionOpen, originalTimelineSectionOpen, originalExtraSectionsOpenState, hasChanges]);
 
   const handleConfirmCancel = useCallback(() => {
     setEditData(region);
     setImagePreview(region?.image || "");
     setTimeline(originalTimeline);
     setSectionVisibility(originalSectionVisibility);
+    setAdvancedSectionOpen(originalAdvancedSectionOpen);
+    setTimelineSectionOpen(originalTimelineSectionOpen);
+    setExtraSectionsOpenState(originalExtraSectionsOpenState);
     setErrors({});
     setIsEditing(false);
     setShowUnsavedChangesDialog(false);
-  }, [region, originalTimeline, originalSectionVisibility]);
+  }, [region, originalTimeline, originalSectionVisibility, originalAdvancedSectionOpen, originalTimelineSectionOpen, originalExtraSectionsOpenState]);
 
   const handleImageFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -730,8 +827,22 @@ export function RegionDetail() {
     setIsNavigationSidebarOpen(false);
     // Capture current states when entering edit mode
     setOriginalSectionVisibility(sectionVisibility);
+    setOriginalAdvancedSectionOpen(advancedSectionOpen);
+    setOriginalTimelineSectionOpen(timelineSectionOpen);
     setOriginalTimeline(timeline);
-  }, [sectionVisibility, timeline]);
+    setOriginalExtraSectionsOpenState(extraSectionsOpenState);
+  }, [sectionVisibility, advancedSectionOpen, timelineSectionOpen, timeline, extraSectionsOpenState]);
+
+  const handleExtraSectionsOpenStateChange = useCallback((newState: Record<string, boolean>) => {
+    const newUiState = {
+      advancedSectionOpen: advancedSectionOpenRef.current,
+      timelineSectionOpen: timelineSectionOpenRef.current,
+      sectionVisibility: { ...sectionVisibilityRef.current },
+      extraSectionsOpenState: { ...newState },
+    };
+    setExtraSectionsOpenState(newState);
+    setUIStateInStore("regions", regionId, newUiState);
+  }, [regionId, setUIStateInStore]);
 
   const handleDeleteModalOpen = useCallback(() => {
     setShowDeleteModal(true);
@@ -751,12 +862,36 @@ export function RegionDetail() {
   }, []);
 
   const handleAdvancedSectionToggle = useCallback(() => {
-    setAdvancedSectionOpen((prev) => !prev);
-  }, []);
+    setAdvancedSectionOpen((prev) => {
+      const newValue = !prev;
+
+      // Deep copy to avoid reference sharing, use refs to avoid stale closures
+      setUIStateInStore("regions", regionId, {
+        advancedSectionOpen: newValue,
+        timelineSectionOpen: timelineSectionOpenRef.current,
+        sectionVisibility: { ...sectionVisibilityRef.current },
+        extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+      });
+
+      return newValue;
+    });
+  }, [regionId, setUIStateInStore]);
 
   const handleTimelineSectionToggle = useCallback(() => {
-    setTimelineSectionOpen((prev) => !prev);
-  }, []);
+    setTimelineSectionOpen((prev) => {
+      const newValue = !prev;
+
+      // Deep copy to avoid reference sharing, use refs to avoid stale closures
+      setUIStateInStore("regions", regionId, {
+        advancedSectionOpen: advancedSectionOpenRef.current,
+        timelineSectionOpen: newValue,
+        sectionVisibility: { ...sectionVisibilityRef.current },
+        extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+      });
+
+      return newValue;
+    });
+  }, [regionId, setUIStateInStore]);
 
   const handleTimelineChange = useCallback((newTimeline: ITimelineEra[]) => {
     setTimeline(newTimeline);
@@ -766,9 +901,18 @@ export function RegionDetail() {
     setSectionVisibility((prev) => {
       const newVisibility = toggleSectionVisibility(sectionName, prev);
       sectionVisibilityRef.current = newVisibility;
+
+      // Deep copy to avoid reference sharing, use refs to avoid stale closures
+      setUIStateInStore("regions", regionId, {
+        advancedSectionOpen: advancedSectionOpenRef.current,
+        timelineSectionOpen: timelineSectionOpenRef.current,
+        sectionVisibility: { ...newVisibility },
+        extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+      });
+
       return newVisibility;
     });
-  }, []);
+  }, [regionId, setUIStateInStore]);
 
   // Don't render until we have the region data loaded
   if (!region) {
@@ -839,6 +983,8 @@ export function RegionDetail() {
         onTimelineSectionToggle={handleTimelineSectionToggle}
         isLogsModalOpen={isLogsModalOpen}
         onLogsModalToggle={() => setIsLogsModalOpen(!isLogsModalOpen)}
+        extraSectionsOpenState={extraSectionsOpenState}
+        onExtraSectionsOpenStateChange={handleExtraSectionsOpenStateChange}
       />
     </>
   );

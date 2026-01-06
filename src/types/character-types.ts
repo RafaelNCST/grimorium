@@ -22,6 +22,15 @@ export interface ICharacterRelationship {
   description?: string; // Optional description (max 200 characters)
 }
 
+export interface ICharacterUIState {
+  advancedSectionOpen?: boolean;
+  sectionVisibility?: {
+    relationships?: boolean;
+    "chapter-metrics"?: boolean;
+  };
+  extraSectionsOpenState?: Record<string, boolean>;
+}
+
 export interface ICharacter {
   id: string;
   name: string;
@@ -69,6 +78,9 @@ export interface ICharacter {
   // Legacy fields (for backward compatibility)
   appearance?: string;
   qualities?: string[];
+
+  // UI State (for persisting UI preferences)
+  uiState?: ICharacterUIState;
 
   // Metadata
   createdAt?: string;

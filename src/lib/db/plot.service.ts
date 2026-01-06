@@ -4,6 +4,7 @@ import { safeDBOperation } from "./safe-db-operation";
 import {
   safeParseStringArray,
   safeParseFieldVisibility,
+  safeParseUnknownObject,
 } from "./safe-json-parse";
 import { DBPlotArc, DBPlotEvent } from "./types";
 
@@ -42,6 +43,7 @@ function arcToDBPlotArc(bookId: string, arc: IPlotArc): DBPlotArc {
     field_visibility: arc.fieldVisibility
       ? JSON.stringify(arc.fieldVisibility)
       : undefined,
+    ui_state: arc.uiState ? JSON.stringify(arc.uiState) : undefined,
     created_at: Date.now(),
     updated_at: Date.now(),
   };
@@ -66,6 +68,7 @@ function dbPlotArcToArc(dbArc: DBPlotArc, events: IPlotEvent[]): IPlotArc {
     arcMessage: dbArc.arc_message,
     worldImpact: dbArc.world_impact,
     fieldVisibility: safeParseFieldVisibility(dbArc.field_visibility),
+    uiState: dbArc.ui_state ? safeParseUnknownObject(dbArc.ui_state) : undefined,
   };
 }
 
@@ -151,8 +154,8 @@ export async function createPlotArc(
       `INSERT INTO plot_arcs (
         id, book_id, name, size, focus, description, progress, status,
         order_index, important_characters, important_factions, important_items,
-        important_regions, arc_message, world_impact, field_visibility, created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`,
+        important_regions, arc_message, world_impact, field_visibility, ui_state, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
       [
         dbArc.id,
         dbArc.book_id,
@@ -170,6 +173,7 @@ export async function createPlotArc(
         dbArc.arc_message,
         dbArc.world_impact,
         dbArc.field_visibility,
+        dbArc.ui_state,
         dbArc.created_at,
         dbArc.updated_at,
       ]
@@ -276,8 +280,8 @@ export async function updatePlotArc(
         name = $1, size = $2, focus = $3, description = $4, progress = $5,
         status = $6, order_index = $7, important_characters = $8,
         important_factions = $9, important_items = $10, important_regions = $11,
-        arc_message = $12, world_impact = $13, field_visibility = $14, updated_at = $15
-      WHERE id = $16`,
+        arc_message = $12, world_impact = $13, field_visibility = $14, ui_state = $15, updated_at = $16
+      WHERE id = $17`,
       [
         dbArc.name,
         dbArc.size,
@@ -293,6 +297,7 @@ export async function updatePlotArc(
         dbArc.arc_message,
         dbArc.world_impact,
         dbArc.field_visibility,
+        dbArc.ui_state,
         dbArc.updated_at,
         arcId,
       ]

@@ -12,6 +12,7 @@ import {
   saveRaceRelationships,
 } from "@/lib/db/races.service";
 import { useRacesStore } from "@/stores/races-store";
+import { useEntityUIStateStore } from "@/stores/entity-ui-state-store";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { RaceDetailView } from "./view";
@@ -30,6 +31,10 @@ export function RaceDetail() {
   const { t } = useTranslation();
 
   const { updateRaceInCache, deleteRaceFromCache } = useRacesStore();
+
+  // Entity UI State store
+  const getUIState = useEntityUIStateStore((state) => state.getUIState);
+  const setUIStateInStore = useEntityUIStateStore((state) => state.setUIState);
 
   const emptyRace: IRace = {
     id: "",
@@ -53,10 +58,7 @@ export function RaceDetail() {
   const [sectionVisibility, setSectionVisibility] = useState<
     Record<string, boolean>
   >({});
-  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
-    const stored = localStorage.getItem("raceDetailAdvancedSectionOpen");
-    return stored ? JSON.parse(stored) : false;
-  });
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
   const [allRaces, setAllRaces] = useState<IRace[]>([]);
   const [relationships, setRelationships] = useState<IRaceRelationship[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -76,21 +78,48 @@ export function RaceDetail() {
   const [originalSectionVisibility, setOriginalSectionVisibility] = useState<
     Record<string, boolean>
   >({});
+  const [originalAdvancedSectionOpen, setOriginalAdvancedSectionOpen] = useState(false);
   const [originalRelationships, setOriginalRelationships] = useState<
     IRaceRelationship[]
   >([]);
+  const [extraSectionsOpenState, setExtraSectionsOpenState] = useState<
+    Record<string, boolean>
+  >({});
+  const [originalExtraSectionsOpenState, setOriginalExtraSectionsOpenState] = useState<
+    Record<string, boolean>
+  >({});
 
-  // Ref to keep sectionVisibility always up-to-date (fixes async setState issue)
-  const sectionVisibilityRef =
-    useRef<Record<string, boolean>>(sectionVisibility);
+  // Refs to always have current values (avoid stale closures)
+  const advancedSectionOpenRef = useRef(advancedSectionOpen);
+  const sectionVisibilityRef = useRef(sectionVisibility);
+  const extraSectionsOpenStateRef = useRef(extraSectionsOpenState);
 
-  // Keep ref in sync with state
+  // Keep refs in sync with state
+  useEffect(() => {
+    advancedSectionOpenRef.current = advancedSectionOpen;
+  }, [advancedSectionOpen]);
+
   useEffect(() => {
     sectionVisibilityRef.current = sectionVisibility;
   }, [sectionVisibility]);
 
   useEffect(() => {
+    extraSectionsOpenStateRef.current = extraSectionsOpenState;
+  }, [extraSectionsOpenState]);
+
+  useEffect(() => {
     const loadRace = async () => {
+      // CRITICAL: Reset ALL UI states immediately when raceId changes
+      // (component is not unmounted when navigating between races)
+      setSectionVisibility({});
+      setAdvancedSectionOpen(false);
+      setOriginalSectionVisibility({});
+      setOriginalAdvancedSectionOpen(false);
+      setExtraSectionsOpenState({});
+      setOriginalExtraSectionsOpenState({});
+      sectionVisibilityRef.current = {};
+      extraSectionsOpenStateRef.current = {};
+
       try {
         setIsLoading(true);
         const raceFromDB = await getRaceById(raceId);
@@ -101,10 +130,48 @@ export function RaceDetail() {
           setFieldVisibility(raceFromDB.fieldVisibility || {});
           setOriginalFieldVisibility(raceFromDB.fieldVisibility || {});
 
-          const loadedSectionVisibility = raceFromDB.sectionVisibility || {};
-          setSectionVisibility(loadedSectionVisibility);
-          setOriginalSectionVisibility(loadedSectionVisibility);
-          sectionVisibilityRef.current = loadedSectionVisibility;
+          // Priority 1: Check in-memory cache
+          let cachedUIState = getUIState("races", raceId);
+
+          // Priority 2: Load from database if not in cache
+          if (!cachedUIState && raceFromDB.uiState) {
+            cachedUIState = raceFromDB.uiState;
+            // Save to cache for future use
+            setUIStateInStore("races", raceId, cachedUIState);
+          }
+
+          // Priority 3: Use defaults if no cache and no database value
+          if (!cachedUIState) {
+            // Create NEW object references for each entity (prevent sharing)
+            cachedUIState = {
+              advancedSectionOpen: false,
+              sectionVisibility: {}, // New object reference
+              extraSectionsOpenState: {}, // New object reference
+            };
+            // Save defaults to cache
+            setUIStateInStore("races", raceId, cachedUIState);
+          }
+
+          // Apply UI state to local state (deep copy to avoid reference sharing)
+          const loadedAdvancedSectionOpen =
+            cachedUIState.advancedSectionOpen ?? false;
+          const loadedSectionVisibility =
+            cachedUIState.sectionVisibility || {};
+          const loadedExtraSectionsOpenState =
+            cachedUIState.extraSectionsOpenState || {};
+
+          // Create TWO separate deep copies to avoid sharing between current and original states
+          const sectionVisibilityCopy = { ...loadedSectionVisibility };
+          const sectionVisibilityOriginalCopy = { ...loadedSectionVisibility };
+          const extraSectionsOpenStateCopy = { ...loadedExtraSectionsOpenState };
+          const extraSectionsOpenStateOriginalCopy = { ...loadedExtraSectionsOpenState };
+
+          setAdvancedSectionOpen(loadedAdvancedSectionOpen);
+          setOriginalAdvancedSectionOpen(loadedAdvancedSectionOpen);
+          setSectionVisibility(sectionVisibilityCopy);
+          setOriginalSectionVisibility(sectionVisibilityOriginalCopy);
+          setExtraSectionsOpenState(extraSectionsOpenStateCopy);
+          setOriginalExtraSectionsOpenState(extraSectionsOpenStateOriginalCopy);
 
           // Load relationships
           const rels = await getRaceRelationships(raceId);
@@ -125,7 +192,7 @@ export function RaceDetail() {
     };
 
     loadRace();
-  }, [raceId, dashboardId]);
+  }, [raceId, dashboardId, getUIState, setUIStateInStore]);
 
   // Check if there are changes between race and editData
   const hasChanges = useMemo(() => {
@@ -248,6 +315,9 @@ export function RaceDetail() {
     if (JSON.stringify(relationships) !== JSON.stringify(originalRelationships))
       return true;
 
+    // Check if advanced section state has changed
+    if (advancedSectionOpen !== originalAdvancedSectionOpen) return true;
+
     return false;
   }, [
     race,
@@ -257,6 +327,8 @@ export function RaceDetail() {
     originalFieldVisibility,
     sectionVisibility,
     originalSectionVisibility,
+    advancedSectionOpen,
+    originalAdvancedSectionOpen,
     relationships,
     originalRelationships,
   ]);
@@ -269,13 +341,15 @@ export function RaceDetail() {
     }
 
     try {
-      // Use ref to get the most recent sectionVisibility (setState is async)
-      const currentSectionVisibility = sectionVisibilityRef.current;
-
       const updatedRace: IRace = {
         ...editData,
         fieldVisibility,
-        sectionVisibility: currentSectionVisibility,
+        // sectionVisibility removed - now only saved in uiState
+        uiState: {
+          advancedSectionOpen,
+          sectionVisibility: sectionVisibilityRef.current,
+          extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+        },
       };
 
       // Update race and save relationships
@@ -285,8 +359,10 @@ export function RaceDetail() {
       setRace(updatedRace);
       setImagePreview(updatedRace.image || "");
       setOriginalFieldVisibility(fieldVisibility);
-      setOriginalSectionVisibility(currentSectionVisibility);
+      setOriginalSectionVisibility(sectionVisibility);
+      setOriginalAdvancedSectionOpen(advancedSectionOpen);
       setOriginalRelationships(relationships);
+      setOriginalExtraSectionsOpenState(extraSectionsOpenState);
       setErrors({});
       setIsEditing(false);
     } catch (error) {
@@ -307,8 +383,20 @@ export function RaceDetail() {
     // Capture current visibility states when entering edit mode
     setOriginalFieldVisibility(fieldVisibility);
     setOriginalSectionVisibility(sectionVisibility);
+    setOriginalAdvancedSectionOpen(advancedSectionOpen);
     setOriginalRelationships(relationships);
-  }, [race, fieldVisibility, sectionVisibility, relationships]);
+    setOriginalExtraSectionsOpenState(extraSectionsOpenState);
+  }, [race, fieldVisibility, sectionVisibility, advancedSectionOpen, relationships, extraSectionsOpenState]);
+
+  const handleExtraSectionsOpenStateChange = useCallback((newState: Record<string, boolean>) => {
+    const newUiState = {
+      advancedSectionOpen: advancedSectionOpenRef.current,
+      sectionVisibility: { ...sectionVisibilityRef.current },
+      extraSectionsOpenState: { ...newState },
+    };
+    setExtraSectionsOpenState(newState);
+    setUIStateInStore("races", raceId, newUiState);
+  }, [raceId, setUIStateInStore]);
 
   const handleCancel = useCallback(() => {
     if (hasChanges) {
@@ -321,7 +409,9 @@ export function RaceDetail() {
     setImagePreview(race?.image || "");
     setFieldVisibility(originalFieldVisibility);
     setSectionVisibility(originalSectionVisibility);
+    setAdvancedSectionOpen(originalAdvancedSectionOpen);
     setRelationships(originalRelationships);
+    setExtraSectionsOpenState(originalExtraSectionsOpenState);
     setErrors({});
     setIsEditing(false);
   }, [
@@ -330,6 +420,7 @@ export function RaceDetail() {
     originalFieldVisibility,
     originalSectionVisibility,
     originalRelationships,
+    originalExtraSectionsOpenState,
   ]);
 
   const handleConfirmCancel = useCallback(() => {
@@ -337,7 +428,9 @@ export function RaceDetail() {
     setImagePreview(race?.image || "");
     setFieldVisibility(originalFieldVisibility);
     setSectionVisibility(originalSectionVisibility);
+    setAdvancedSectionOpen(originalAdvancedSectionOpen);
     setRelationships(originalRelationships);
+    setExtraSectionsOpenState(originalExtraSectionsOpenState);
     setErrors({});
     setIsEditing(false);
     setShowUnsavedChangesDialog(false);
@@ -345,7 +438,9 @@ export function RaceDetail() {
     race,
     originalFieldVisibility,
     originalSectionVisibility,
+    originalAdvancedSectionOpen,
     originalRelationships,
+    originalExtraSectionsOpenState,
   ]);
 
   const handleConfirmDelete = useCallback(async () => {
@@ -368,22 +463,37 @@ export function RaceDetail() {
   }, []);
 
   const handleSectionVisibilityToggle = useCallback((sectionName: string) => {
-    setSectionVisibility((prev) => ({
-      ...prev,
-      [sectionName]: prev[sectionName] === false ? true : false,
-    }));
-  }, []);
+    setSectionVisibility((prev) => {
+      const newVisibility = {
+        ...prev,
+        [sectionName]: prev[sectionName] === false ? true : false,
+      };
+
+      // Deep copy to avoid reference sharing, use refs to avoid stale closures
+      setUIStateInStore("races", raceId, {
+        advancedSectionOpen: advancedSectionOpenRef.current,
+        sectionVisibility: { ...newVisibility },
+        extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+      });
+
+      return newVisibility;
+    });
+  }, [raceId, setUIStateInStore]);
 
   const handleAdvancedSectionToggle = useCallback(() => {
     setAdvancedSectionOpen((prev) => {
       const newValue = !prev;
-      localStorage.setItem(
-        "raceDetailAdvancedSectionOpen",
-        JSON.stringify(newValue)
-      );
+
+      // Deep copy to avoid reference sharing, use refs to avoid stale closures
+      setUIStateInStore("races", raceId, {
+        advancedSectionOpen: newValue,
+        sectionVisibility: { ...sectionVisibilityRef.current },
+        extraSectionsOpenState: { ...extraSectionsOpenStateRef.current },
+      });
+
       return newValue;
     });
-  }, []);
+  }, [raceId, setUIStateInStore]);
 
   const toggleSection = useCallback((sectionName: string) => {
     setOpenSections((prev) => ({
@@ -535,6 +645,8 @@ export function RaceDetail() {
         setHasChapterMetrics={setHasChapterMetrics}
         isLogsModalOpen={isLogsModalOpen}
         onLogsModalToggle={() => setIsLogsModalOpen(!isLogsModalOpen)}
+        extraSectionsOpenState={extraSectionsOpenState}
+        onExtraSectionsOpenStateChange={handleExtraSectionsOpenStateChange}
       />
     </>
   );
