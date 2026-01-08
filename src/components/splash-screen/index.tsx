@@ -7,8 +7,6 @@
 
 import { useEffect, useState } from "react";
 
-import { BookOpen } from "lucide-react";
-
 import { getAllBooks } from "@/lib/db/books.service";
 import {
   needsGalleryThumbnailMigration,
@@ -20,33 +18,14 @@ import {
 } from "@/lib/db/migrate-remove-chapter-unique";
 import { useBookStore } from "@/stores/book-store";
 
-const LOADING_PHRASES = [
-  "Preparando magias...",
-  "Treinando cavaleiros...",
-  "Explorando masmorras...",
-  "Forjando espadas lendárias...",
-  "Invocando dragões...",
-  "Escrevendo profecias...",
-];
-
 interface SplashScreenProps {
   onLoadingComplete?: () => void;
 }
 
 export function SplashScreen({ onLoadingComplete }: SplashScreenProps) {
-  const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const { setBooks } = useBookStore();
-
-  // Cycle through loading phrases
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentPhraseIndex((prev) => (prev + 1) % LOADING_PHRASES.length);
-    }, 800);
-
-    return () => clearInterval(interval);
-  }, []);
 
   // Load all necessary data
   useEffect(() => {
@@ -119,39 +98,90 @@ export function SplashScreen({ onLoadingComplete }: SplashScreenProps) {
 
   return (
     <div className="fixed inset-0 bg-background z-50 flex items-center justify-center">
-      <div className="flex flex-col items-center gap-8">
-        {/* Logo/Icon with animations */}
-        <div className="relative">
-          {/* Outer glow ring */}
-          <div className="absolute inset-0 rounded-full bg-primary/20 blur-2xl animate-pulse" />
+      {/* Logo with animations */}
+      <div className="relative">
+        {/* Outer glow ring */}
+        <div className="absolute inset-0 rounded-full bg-primary/20 blur-3xl animate-pulse" />
 
-          {/* Rotating ring */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-32 h-32 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
-          </div>
+        {/* Logo container */}
+        <div className="relative w-48 h-48 flex items-center justify-center">
+          {/* Inner glow behind logo */}
+          <div className="absolute inset-0 bg-primary/20 blur-2xl animate-pulse" />
 
-          {/* Book icon */}
-          <div className="relative w-32 h-32 flex items-center justify-center">
-            <div className="relative">
-              {/* Inner glow behind icon */}
-              <div className="absolute inset-0 bg-primary/30 blur-md rounded-lg animate-pulse" />
-              <BookOpen
-                className="relative w-16 h-16 text-primary animate-pulse"
-                strokeWidth={2.5}
-              />
-            </div>
-          </div>
-        </div>
+          {/* SVG Logo with custom animations */}
+          <div className="relative w-40 h-40">
+            <style>
+              {`
+                @keyframes spin-diamond {
+                  from {
+                    transform: rotate(0deg);
+                  }
+                  to {
+                    transform: rotate(360deg);
+                  }
+                }
 
-        {/* Loading phrase with fade transition */}
-        <div className="text-center space-y-3">
-          <div className="h-12 flex items-center justify-center">
-            <h1
-              key={currentPhraseIndex}
-              className="text-4xl font-bold text-foreground tracking-wide animate-in fade-in duration-300"
+                @keyframes pulse-glow {
+                  0%, 100% {
+                    filter: drop-shadow(0 0 8px rgba(218, 138, 255, 0.4));
+                  }
+                  50% {
+                    filter: drop-shadow(0 0 20px rgba(218, 138, 255, 0.8));
+                  }
+                }
+
+                .grimoire-logo {
+                  animation: pulse-glow 2s ease-in-out infinite;
+                }
+
+                .grimoire-diamond {
+                  transform-origin: center;
+                  animation: spin-diamond 4s linear infinite;
+                }
+              `}
+            </style>
+            <svg
+              viewBox="0 0 1024 1024"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="grimoire-logo w-full h-full"
             >
-              {LOADING_PHRASES[currentPhraseIndex]}
-            </h1>
+              <rect
+                x="92"
+                y="12"
+                width="840.998"
+                height="1000"
+                rx="20"
+                fill="#101014"
+                stroke="#DA8AFF"
+                strokeWidth="24"
+              />
+              <g className="grimoire-diamond">
+                <rect
+                  width="364.045"
+                  height="364.045"
+                  rx="32"
+                  transform="matrix(0.721099 -0.692832 0.721099 0.692832 250.474 512)"
+                  fill="#DA8AFF"
+                />
+              </g>
+              <path
+                d="M103.961 902.956H181.822C199.495 902.956 213.822 917.283 213.822 934.956V1000.02H111.961C107.542 1000.02 103.961 996.436 103.961 992.018V902.956Z"
+                fill="#DA8AFF"
+              />
+              <path
+                d="M204.982 23.9814L204.982 97.5361C204.982 115.209 190.655 129.536 172.982 129.536L103.96 129.536L103.96 31.9814C103.96 27.5632 107.542 23.9814 111.96 23.9814L204.982 23.9814Z"
+                fill="#DA8AFF"
+              />
+              <path
+                d="M921.036 121.043L843.174 121.043C825.501 121.043 811.174 106.717 811.174 89.0435L811.174 23.9817L913.036 23.9817C917.454 23.9817 921.036 27.5634 921.036 31.9817L921.036 121.043Z"
+                fill="#DA8AFF"
+              />
+              <path
+                d="M820.015 1000.02L820.015 926.461C820.015 908.788 834.342 894.461 852.015 894.461L921.037 894.461L921.037 992.016C921.037 996.434 917.455 1000.02 913.037 1000.02L820.015 1000.02Z"
+                fill="#DA8AFF"
+              />
+            </svg>
           </div>
         </div>
       </div>
