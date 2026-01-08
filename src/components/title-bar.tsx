@@ -2,11 +2,13 @@ import { useEffect, useState, useMemo } from "react";
 
 import { useRouterState } from "@tanstack/react-router";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { Inbox, Minus, Settings, Square, X } from "lucide-react";
+import { BookOpen, Inbox, Minus, Settings, Square, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
 import { AdvancedSettingsModal } from "@/components/modals/advanced-settings";
+import { GuideContentModal } from "@/components/modals/guide-content-modal";
+import { GuideModal } from "@/components/modals/guide-modal";
 import { InboxNotificationModal } from "@/components/modals/inbox-notification-modal";
 import { Button } from "@/components/ui/button";
 import {
@@ -100,6 +102,8 @@ export const TitleBar = () => {
   const [isMaximized, setIsMaximized] = useState(false);
   const [isInboxOpen, setIsInboxOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isGuidesOpen, setIsGuidesOpen] = useState(false);
+  const [selectedGuideId, setSelectedGuideId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [controlsPosition, setControlsPosition] = useState({
     top: 0,
@@ -311,9 +315,34 @@ export const TitleBar = () => {
           </span>
         </div>
 
-        {/* Right section - Settings, Inbox and placeholder for window controls */}
+        {/* Right section - Guides, Settings, Inbox and placeholder for window controls */}
         <div data-tauri-drag-region className="flex items-center">
           <TooltipProvider>
+            <Tooltip open={isGuidesOpen ? false : undefined}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={isModalOpen}
+                  onClick={() => setIsGuidesOpen(!isGuidesOpen)}
+                  className={cn(
+                    "h-8 w-12 rounded-none hover:bg-gray-50 hover:text-secondary",
+                    "transition-colors duration-200",
+                    isGuidesOpen && "bg-gray-50 text-secondary",
+                    isModalOpen && "opacity-50 cursor-not-allowed"
+                  )}
+                  aria-label="Guides"
+                >
+                  <BookOpen
+                    className={cn("h-4 w-4 transition-colors duration-200")}
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>{tCommon("guides.tooltip")}</p>
+              </TooltipContent>
+            </Tooltip>
+
             <Tooltip open={isSettingsOpen ? false : undefined}>
               <TooltipTrigger asChild>
                 <Button
@@ -388,6 +417,22 @@ export const TitleBar = () => {
           <WindowControls />
         </div>,
         document.body
+      )}
+
+      {/* Guide Modal */}
+      <GuideModal
+        isOpen={isGuidesOpen}
+        onClose={() => setIsGuidesOpen(false)}
+        onGuideSelect={(guideId) => setSelectedGuideId(guideId)}
+      />
+
+      {/* Guide Content Modal - Fullscreen */}
+      {selectedGuideId && (
+        <GuideContentModal
+          isOpen={!!selectedGuideId}
+          onClose={() => setSelectedGuideId(null)}
+          guideId={selectedGuideId}
+        />
       )}
 
       {/* Inbox Notification Modal - Custom modal, não usa Popover */}

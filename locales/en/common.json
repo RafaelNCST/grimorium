@@ -140,5 +140,109 @@
   "button": {
     "hide": "Hide",
     "read_more": "Read more"
+  },
+  "guides": {
+    "tooltip": "Writing Guides",
+    "title": "Writing Guides",
+    "search_placeholder": "Search guides...",
+    "empty": "No guides found",
+    "categories": {
+      "all": "All",
+      "starting": "Getting Started",
+      "characters": "Characters",
+      "worldbuilding": "Worldbuilding",
+      "magic": "Magic Systems",
+      "plot": "Plot & Structure",
+      "conflicts": "Conflicts & Action"
+    },
+    "list": {
+      "how_to_start": {
+        "title": "How to Start Your Book",
+        "description": "Discover your writing style and take the first step in your creative journey"
+      },
+      "creative_block": {
+        "title": "Overcoming Creative Block",
+        "description": "Practical exercises to unlock your creativity and get back to writing"
+      },
+      "creating_characters": {
+        "title": "Creating Memorable Characters",
+        "description": "From initial idea to complete profile: build characters your readers will love"
+      },
+      "building_world": {
+        "title": "Building Your World",
+        "description": "Techniques to create convincing regions, cultures, and hierarchies"
+      }
+    },
+    "content": {
+      "how_to_start": {
+        "hero_subtitle": "Two paths, one journey",
+        "main_title": "How to Start Your Book",
+        "main_subtitle": "Discover your writing style and find the perfect path to bring your story to life",
+        "intro": "There's an old dilemma in the world of creative writing: are you a <1>gardener</1> or an <3>architect</3>? Understanding your style not only makes it easier to begin your journey, but also helps you embrace your strengths and work on your limitations.",
+        "gardener": {
+          "title": "The Gardener Writer",
+          "description": "Like a gardener who plants seeds and watches them grow, you write by discovering the story as it unfolds. Your characters and plots reveal themselves during the writing process.",
+          "strengths_title": "Strengths",
+          "strengths": {
+            "spontaneous": "Spontaneous and surprising creativity",
+            "organic": "Organic and authentic characters",
+            "discovery": "Discovery is part of the fun",
+            "flexibility": "Flexibility to explore ideas"
+          },
+          "challenges_title": "Challenges",
+          "challenges": {
+            "consistency": "Difficulty maintaining consistency",
+            "lost": "Risk of getting lost along the way",
+            "revisions": "Extensive revisions may be necessary",
+            "plot_holes": "Plot holes can easily arise"
+          },
+          "how_to_start_title": "How to Start as a Gardener",
+          "how_to_start": {
+            "write": "Write your chapters freely, without overthinking at the moment. Leave improvements for later",
+            "characters": "Create characters as they appear in your writing",
+            "annotations": "Use annotations and links to track emerging ideas",
+            "dashboard": "Visit the Dashboard when you feel the need to organize"
+          }
+        },
+        "architect": {
+          "title": "The Architect Writer",
+          "description": "Like an architect who draws blueprints before building, you plan every detail of your story. Your foundations are solid and every word has its defined purpose.",
+          "strengths_title": "Strengths",
+          "strengths": {
+            "control": "Complete control of the narrative",
+            "foreshadowing": "Planned foreshadowing and symbolism",
+            "plot_holes": "Few plot holes and inconsistencies",
+            "structure": "Cohesive narrative structure"
+          },
+          "challenges_title": "Challenges",
+          "challenges": {
+            "paralysis": "Overplanning can discourage writing",
+            "rigidity": "Rigidity kills spontaneous moments",
+            "time": "More time planning than writing",
+            "artificial": "Characters may seem artificial"
+          },
+          "how_to_start_title": "How to Start as an Architect",
+          "how_to_start": {
+            "premise": "Define the premise and goals of your story",
+            "characters": "Create complete characters with archetypes and backgrounds",
+            "world": "Build the world with hierarchies and locations",
+            "plot": "Map plot arcs with clear events and structure"
+          }
+        },
+        "balance": {
+          "title": "The Truth: You Can Be Both",
+          "description": "Most successful writers dance between both worlds. Some chapters sprout freely like wild gardens. Others follow meticulous blueprints. The secret isn't choosing a side, but discovering <1>when to use each approach</1>.",
+          "recommended_title": "Recommended Approach",
+          "step1_title": "Start as a Gardener:",
+          "step1_description": "Write your chapters freely, letting the story flow. Use <1>editor annotations</1> or <3>draft chapters</3> to save creative ideas — from small notes to entire chapters that may be useful in the future.",
+          "step2_title": "Pause to Organize:",
+          "step2_description": "After <1>10 to 20 chapters</1>, pause to review what you've written. This is the moment to put on your architect hat.",
+          "step3_title": "Organize in the Dashboard:",
+          "step3_description": "Structure characters, locations, and plot arcs. While organizing, let your <1>imagination flow</1> — create interesting future plots that can have foreshadowing from the beginning.",
+          "step4_title": "Return to Writing:",
+          "step4_description": "With a clearer structure, return to gardener mode and continue your creative journey, now with greater awareness of the whole."
+        }
+      }
+    }
   }
 }

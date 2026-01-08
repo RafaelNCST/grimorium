@@ -140,5 +140,109 @@
   "button": {
     "hide": "Esconder",
     "read_more": "Ler mais"
+  },
+  "guides": {
+    "tooltip": "Guias de Escrita",
+    "title": "Guias de Escrita",
+    "search_placeholder": "Buscar guias...",
+    "empty": "Nenhum guia encontrado",
+    "categories": {
+      "all": "Todos",
+      "starting": "Começando",
+      "characters": "Personagens",
+      "worldbuilding": "Worldbuilding",
+      "magic": "Sistemas de Magia",
+      "plot": "Plot & Estrutura",
+      "conflicts": "Conflitos & Ação"
+    },
+    "list": {
+      "how_to_start": {
+        "title": "Como Começar Seu Livro",
+        "description": "Descubra seu estilo de escrita e dê o primeiro passo na sua jornada criativa"
+      },
+      "creative_block": {
+        "title": "Superando o Bloqueio Criativo",
+        "description": "Exercícios práticos para destravar sua criatividade e voltar a escrever"
+      },
+      "creating_characters": {
+        "title": "Criando Personagens Memoráveis",
+        "description": "Da ideia inicial à ficha completa: construa personagens que seus leitores amarão"
+      },
+      "building_world": {
+        "title": "Construindo Seu Mundo",
+        "description": "Técnicas para criar regiões, culturas e hierarquias convincentes"
+      }
+    },
+    "content": {
+      "how_to_start": {
+        "hero_subtitle": "Dois caminhos, uma jornada",
+        "main_title": "Como Começar Seu Livro",
+        "main_subtitle": "Descubra seu estilo de escrita e encontre o caminho perfeito para dar vida à sua história",
+        "intro": "Existe um dilema antigo no mundo da escrita criativa: você é um <1>jardineiro</1> ou um <3>arquiteto</3>? Compreender seu estilo não apenas facilita o início da jornada, mas também te ajuda a abraçar seus pontos fortes e trabalhar suas limitações.",
+        "gardener": {
+          "title": "O Escritor Jardineiro",
+          "description": "Como um jardineiro que planta sementes e observa crescer, você escreve descobrindo a história conforme ela se desenvolve. Seus personagens e tramas revelam-se durante o processo de escrita.",
+          "strengths_title": "Pontos Fortes",
+          "strengths": {
+            "spontaneous": "Criatividade espontânea e surpreendente",
+            "organic": "Personagens orgânicos e autênticos",
+            "discovery": "Descoberta faz parte da diversão",
+            "flexibility": "Flexibilidade para explorar ideias"
+          },
+          "challenges_title": "Desafios",
+          "challenges": {
+            "consistency": "Dificuldade em manter consistência",
+            "lost": "Risco de se perder no meio do caminho",
+            "revisions": "Revisões extensas podem ser necessárias",
+            "plot_holes": "Furos de roteiro podem surgir facilmente"
+          },
+          "how_to_start_title": "Como Começar como Jardineiro",
+          "how_to_start": {
+            "write": "Escreva seus capítulos livremente, sem pensar muito no momento. Deixe para melhorar depois",
+            "characters": "Crie personagens conforme aparecem na sua escrita",
+            "annotations": "Use anotações e links para rastrear ideias que surgem",
+            "dashboard": "Visite o Dashboard quando sentir necessidade de organizar"
+          }
+        },
+        "architect": {
+          "title": "O Escritor Arquiteto",
+          "description": "Como um arquiteto que desenha blueprints antes de construir, você planeja cada detalhe da sua história. Seus alicerces são sólidos e cada palavra tem seu propósito definido.",
+          "strengths_title": "Pontos Fortes",
+          "strengths": {
+            "control": "Controle total da narrativa",
+            "foreshadowing": "Foreshadowing e simbolismo planejados",
+            "plot_holes": "Poucos furos de roteiro e inconsistências",
+            "structure": "Estrutura narrativa coesa"
+          },
+          "challenges_title": "Desafios",
+          "challenges": {
+            "paralysis": "Planejar demais pode desanimar de escrever",
+            "rigidity": "Rigidez mata momentos espontâneos",
+            "time": "Mais tempo planejando que escrevendo",
+            "artificial": "Personagens podem parecer artificiais"
+          },
+          "how_to_start_title": "Como Começar como Arquiteto",
+          "how_to_start": {
+            "premise": "Defina a premissa e objetivos da sua história",
+            "characters": "Crie personagens completos com arquétipos e backgrounds",
+            "world": "Construa o mundo com hierarquias e localizações",
+            "plot": "Mapeie arcos de plot com eventos e estrutura clara"
+          }
+        },
+        "balance": {
+          "title": "A Verdade: Você Pode Ser Ambos",
+          "description": "A maioria dos escritores de sucesso dança entre os dois mundos. Alguns capítulos brotam livres como jardins selvagens. Outros seguem blueprints meticulosos. O segredo não é escolher um lado, mas descobrir <1>quando usar cada abordagem</1>.",
+          "recommended_title": "Abordagem Recomendada",
+          "step1_title": "Comece como Jardineiro:",
+          "step1_description": "Escreva seus capítulos livremente, deixando a história fluir. Use as <1>anotações do editor</1> ou <3>capítulos de rascunho</3> para guardar ideias criativas — desde pequenas notas até capítulos inteiros que podem ser úteis futuramente.",
+          "step2_title": "Pause para Organizar:",
+          "step2_description": "Após <1>10 a 20 capítulos</1>, pare para revisar o que já escreveu. Este é o momento de vestir o chapéu de arquiteto.",
+          "step3_title": "Organize no Dashboard:",
+          "step3_description": "Estruture personagens, localizações e arcos de plot. Enquanto organiza, deixe sua <1>imaginação fluir</1> — crie plots futuros interessantes que possam ter foreshadowing desde o início.",
+          "step4_title": "Volte a Escrever:",
+          "step4_description": "Com uma estrutura mais clara, retorne ao modo jardineiro e continue sua jornada criativa, agora com mais consciência do todo."
+        }
+      }
+    }
   }
 }

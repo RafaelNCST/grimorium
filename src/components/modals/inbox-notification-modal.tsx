@@ -175,14 +175,14 @@ export function InboxNotificationModal({
     <>
       {/* Backdrop - Transparente para não escurecer */}
       <div
-        className="fixed inset-0 z-[115]"
+        className="fixed inset-0 z-[160]"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Modal Container - Posicionado no canto superior direito */}
       <div
-        className="fixed z-[120] bg-background border border-border rounded-lg shadow-2xl overflow-hidden"
+        className="fixed z-[165] bg-background border border-border rounded-lg shadow-2xl overflow-hidden"
         style={{
           top: "3rem",
           right: "1rem",
