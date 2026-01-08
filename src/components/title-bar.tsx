@@ -290,7 +290,12 @@ export const TitleBar = () => {
         style={{ pointerEvents: "auto" }}
       >
         {/* Left section - App logo/name */}
-        <div data-tauri-drag-region className="flex items-center px-4">
+        <div data-tauri-drag-region className="flex items-center gap-2 px-4">
+          <img
+            src="/assets/logos/logo.png"
+            alt="Grimorium"
+            className="h-4 w-4 pointer-events-none"
+          />
           <span className="text-sm font-semibold text-foreground/80 pointer-events-none">
             Grimorium
           </span>

@@ -113,7 +113,9 @@
       "Bash(Out-String -Stream)",
       "WebFetch(domain:www.radix-ui.com)",
       "Bash(Start-Sleep -Seconds 10)",
-      "Bash(rmdir:*)"
+      "Bash(rmdir:*)",
+      "Bash(ie4uinit.exe -show)",
+      "Bash(copy \"C:\\\\Users\\\\rafae\\\\Desktop\\\\dev\\\\grimorium\\\\src-tauri\\\\icons\\\\icon.ico\" \"C:\\\\Users\\\\rafae\\\\Desktop\\\\dev\\\\grimorium\\\\public\\\\favicon.ico\")"
     ],
     "deny": [
       "Bash(git push --force:*)",
