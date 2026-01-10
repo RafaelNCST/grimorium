@@ -171,6 +171,10 @@
       "building_world": {
         "title": "Construindo Seu Mundo",
         "description": "Técnicas para criar regiões, culturas e hierarquias convincentes"
+      },
+      "power_system": {
+        "title": "Criando Sistema de Poder",
+        "description": "Organize e explique o sistema de magia ou poderes da sua história de forma visual e didática"
       }
     },
     "content": {
@@ -241,6 +245,94 @@
           "step3_description": "Estruture personagens, localizações e arcos de plot. Enquanto organiza, deixe sua <1>imaginação fluir</1> — crie plots futuros interessantes que possam ter foreshadowing desde o início.",
           "step4_title": "Volte a Escrever:",
           "step4_description": "Com uma estrutura mais clara, retorne ao modo jardineiro e continue sua jornada criativa, agora com mais consciência do todo."
+        }
+      },
+      "power_system": {
+        "hero_subtitle": "Organize, visualize e explique",
+        "main_title": "Criando um Sistema de Poder",
+        "main_subtitle": "Use nossa ferramenta visual para criar um sistema de magia ou poderes claro e organizado para sua história",
+        "intro": "Todo mundo de fantasia precisa de regras. Seja um sistema de magia complexo, artes marciais místicas ou superpoderes, a chave está em <1>organizar e comunicar</1> essas regras de forma clara. Nossa ferramenta de Sistema de Poder foi criada para isso.",
+        "basics": {
+          "title": "Conceitos Básicos e Gerais",
+          "description": "Use páginas dedicadas para explicar os fundamentos do seu sistema. Ideal para regras gerais, leis universais e conceitos que todos precisam entender.",
+          "strengths_title": "O que incluir",
+          "strengths": {
+            "fundamentals": "Fundamentos e leis universais do sistema",
+            "energy": "Fonte de poder (mana, chi, energia, etc)",
+            "costs": "Custos e limitações gerais",
+            "rules": "Regras que todos devem seguir"
+          },
+          "example_title": "Exemplo Prático",
+          "example": "Crie uma página 'Fundamentos da Magia' explicando de onde vem o mana, como todos o acessam, e as três leis universais que regem seu uso."
+        },
+        "abilities": {
+          "title": "Habilidades Específicas",
+          "description": "Crie pastas organizadas para habilidades individuais. O diferencial: você pode <1>linkar cada habilidade a personagens específicos</1>, mostrando visualmente quem domina o quê.",
+          "strengths_title": "Organização Inteligente",
+          "strengths": {
+            "folders": "Pastas por categoria (Fogo, Cura, Ilusão, etc)",
+            "links": "Link direto personagem → habilidade",
+            "visual": "Visualização clara de quem tem cada poder",
+            "custom": "Rótulos customizados para variações"
+          },
+          "example_title": "Exemplo Prático",
+          "example": "Crie uma pasta 'Magias de Fogo'. Dentro dela, páginas para 'Bola de Fogo', 'Escudo de Chamas', 'Fênix'. Linke 'Bola de Fogo' ao personagem 'Arkan, o Piromante'."
+        },
+        "advanced": {
+          "title": "Conceitos Avançados",
+          "description": "Reserve páginas para mecânicas complexas, técnicas secretas, ou aspectos do sistema que poucos dominam. Perfeito para plot points e revelações futuras.",
+          "strengths_title": "Aprofunde o Sistema",
+          "strengths": {
+            "complex": "Mecânicas avançadas e combinações",
+            "rare": "Técnicas raras ou proibidas",
+            "plot": "Segredos para revelações futuras",
+            "evolution": "Sistema de progressão e evolução"
+          },
+          "example_title": "Exemplo Prático",
+          "example": "Crie 'Magia Ancestral' com blocos informativos sobre técnicas perdidas. Use blocos de atributos para mostrar níveis de dificuldade e perigo."
+        },
+        "organization": {
+          "title": "Como Organizar Seu Sistema",
+          "recommended_title": "Estrutura Recomendada",
+          "step1_title": "Crie a Base:",
+          "step1_description": "Comece com <1>1-2 páginas de conceitos gerais</1>. Use blocos de parágrafo para explicar, listas para regras, e blocos informativos para avisos importantes.",
+          "step2_title": "Organize por Categorias:",
+          "step2_description": "Crie <1>pastas para cada tipo/escola</1> de poder. Dentro delas, uma página por habilidade específica. Use blocos de imagem e ícones para tornar visual.",
+          "step3_title": "Linke aos Personagens:",
+          "step3_description": "Para cada habilidade, use o botão <1>'Gerenciar Links'</1> para conectar aos personagens que a dominam. Isso cria uma rede visual de quem pode o quê.",
+          "step4_title": "Adicione Complexidade:",
+          "step4_description": "Crie páginas avançadas conforme a história progride. Use <1>blocos navegadores</1> para criar links entre conceitos relacionados, formando uma wiki interativa."
+        },
+        "blocks": {
+          "title": "Blocos: Suas Ferramentas Visuais",
+          "description": "16 tipos de blocos transformam texto em conteúdo visual e organizado:",
+          "text_title": "Texto & Organização",
+          "text_blocks": {
+            "heading": "Cabeçalhos (5 níveis) para estruturar",
+            "paragraph": "Parágrafos para explicações detalhadas",
+            "lists": "Listas (ordenadas e não-ordenadas)",
+            "tags": "Tags para palavras-chave e atributos"
+          },
+          "interactive_title": "Dados & Links",
+          "interactive_blocks": {
+            "dropdown": "Dropdowns linkados a personagens/facções/itens",
+            "multi": "Seleção múltipla com tags",
+            "navigator": "Navegação entre páginas do sistema"
+          },
+          "visual_title": "Visual & Mídia",
+          "visual_blocks": {
+            "image": "Imagens grandes com editor de crop",
+            "icon": "Ícone circular com título e descrição",
+            "icon_group": "Grade de até 4 ícones por linha",
+            "attributes": "Barras de progresso (níveis, stats)"
+          },
+          "info_title": "Informação",
+          "info_blocks": {
+            "informative": "Blocos destacados (alerta, info, dica)",
+            "stars": "Avaliação com estrelas (dificuldade, poder)",
+            "divider": "Separadores visuais",
+            "spacer": "Espaçamento entre seções"
+          }
         }
       }
     }

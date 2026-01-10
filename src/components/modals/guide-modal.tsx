@@ -7,6 +7,7 @@ import {
   Sparkles,
   X,
   ChevronRight,
+  Wand2,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -49,6 +50,13 @@ export function GuideModal({ isOpen, onClose, onGuideSelect }: GuideModalProps) 
       icon: <BookOpen className="h-5 w-5" />,
     },
     {
+      id: "power_system",
+      title: t("guides.list.power_system.title"),
+      description: t("guides.list.power_system.description"),
+      category: "magic",
+      icon: <Wand2 className="h-5 w-5" />,
+    },
+    {
       id: "creative-block",
       title: t("guides.list.creative_block.title"),
       description: t("guides.list.creative_block.description"),
@@ -89,14 +97,14 @@ export function GuideModal({ isOpen, onClose, onGuideSelect }: GuideModalProps) 
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-[115]"
+            className="fixed inset-0 z-[155]"
             onClick={onClose}
             aria-hidden="true"
           />
 
           {/* Modal Container */}
           <div
-            className="fixed z-[120] bg-background border border-border rounded-lg shadow-2xl overflow-hidden flex flex-col"
+            className="fixed z-[160] bg-background border border-border rounded-lg shadow-2xl overflow-hidden flex flex-col"
             style={{
               top: "3rem",
               right: "1rem",

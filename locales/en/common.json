@@ -171,6 +171,10 @@
       "building_world": {
         "title": "Building Your World",
         "description": "Techniques to create convincing regions, cultures, and hierarchies"
+      },
+      "power_system": {
+        "title": "Creating a Power System",
+        "description": "Organize and explain your story's magic or power system in a visual and didactic way"
       }
     },
     "content": {
@@ -241,6 +245,94 @@
           "step3_description": "Structure characters, locations, and plot arcs. While organizing, let your <1>imagination flow</1> — create interesting future plots that can have foreshadowing from the beginning.",
           "step4_title": "Return to Writing:",
           "step4_description": "With a clearer structure, return to gardener mode and continue your creative journey, now with greater awareness of the whole."
+        }
+      },
+      "power_system": {
+        "hero_subtitle": "Organize, visualize and explain",
+        "main_title": "Creating a Power System",
+        "main_subtitle": "Use our visual tool to create a clear and organized magic or power system for your story",
+        "intro": "Every fantasy world needs rules. Whether it's a complex magic system, mystical martial arts, or superpowers, the key is to <1>organize and communicate</1> those rules clearly. Our Power System tool was created for this.",
+        "basics": {
+          "title": "Basic and General Concepts",
+          "description": "Use dedicated pages to explain the fundamentals of your system. Ideal for general rules, universal laws, and concepts everyone needs to understand.",
+          "strengths_title": "What to Include",
+          "strengths": {
+            "fundamentals": "Fundamentals and universal laws of the system",
+            "energy": "Power source (mana, chi, energy, etc)",
+            "costs": "General costs and limitations",
+            "rules": "Rules everyone must follow"
+          },
+          "example_title": "Practical Example",
+          "example": "Create a 'Magic Fundamentals' page explaining where mana comes from, how everyone accesses it, and the three universal laws governing its use."
+        },
+        "abilities": {
+          "title": "Specific Abilities",
+          "description": "Create organized folders for individual abilities. The differentiator: you can <1>link each ability to specific characters</1>, visually showing who masters what.",
+          "strengths_title": "Smart Organization",
+          "strengths": {
+            "folders": "Folders by category (Fire, Healing, Illusion, etc)",
+            "links": "Direct character → ability link",
+            "visual": "Clear visualization of who has each power",
+            "custom": "Custom labels for variations"
+          },
+          "example_title": "Practical Example",
+          "example": "Create a 'Fire Spells' folder. Inside it, pages for 'Fireball', 'Flame Shield', 'Phoenix'. Link 'Fireball' to the character 'Arkan, the Pyromancer'."
+        },
+        "advanced": {
+          "title": "Advanced Concepts",
+          "description": "Reserve pages for complex mechanics, secret techniques, or aspects of the system that few master. Perfect for plot points and future revelations.",
+          "strengths_title": "Deepen the System",
+          "strengths": {
+            "complex": "Advanced mechanics and combinations",
+            "rare": "Rare or forbidden techniques",
+            "plot": "Secrets for future revelations",
+            "evolution": "Progression and evolution system"
+          },
+          "example_title": "Practical Example",
+          "example": "Create 'Ancestral Magic' with informative blocks about lost techniques. Use attribute blocks to show difficulty and danger levels."
+        },
+        "organization": {
+          "title": "How to Organize Your System",
+          "recommended_title": "Recommended Structure",
+          "step1_title": "Create the Foundation:",
+          "step1_description": "Start with <1>1-2 pages of general concepts</1>. Use paragraph blocks to explain, lists for rules, and informative blocks for important warnings.",
+          "step2_title": "Organize by Categories:",
+          "step2_description": "Create <1>folders for each type/school</1> of power. Inside them, one page per specific ability. Use image and icon blocks to make it visual.",
+          "step3_title": "Link to Characters:",
+          "step3_description": "For each ability, use the <1>'Manage Links'</1> button to connect to characters who master it. This creates a visual network of who can do what.",
+          "step4_title": "Add Complexity:",
+          "step4_description": "Create advanced pages as the story progresses. Use <1>navigator blocks</1> to create links between related concepts, forming an interactive wiki."
+        },
+        "blocks": {
+          "title": "Blocks: Your Visual Tools",
+          "description": "16 types of blocks transform text into visual and organized content:",
+          "text_title": "Text & Organization",
+          "text_blocks": {
+            "heading": "Headings (5 levels) for structure",
+            "paragraph": "Paragraphs for detailed explanations",
+            "lists": "Lists (ordered and unordered)",
+            "tags": "Tags for keywords and attributes"
+          },
+          "interactive_title": "Data & Links",
+          "interactive_blocks": {
+            "dropdown": "Dropdowns linked to characters/factions/items",
+            "multi": "Multiple selection with tags",
+            "navigator": "Navigation between system pages"
+          },
+          "visual_title": "Visual & Media",
+          "visual_blocks": {
+            "image": "Large images with crop editor",
+            "icon": "Circular icon with title and description",
+            "icon_group": "Grid of up to 4 icons per row",
+            "attributes": "Progress bars (levels, stats)"
+          },
+          "info_title": "Information",
+          "info_blocks": {
+            "informative": "Highlighted blocks (alert, info, tip)",
+            "stars": "Star rating (difficulty, power)",
+            "divider": "Visual separators",
+            "spacer": "Spacing between sections"
+          }
         }
       }
     }

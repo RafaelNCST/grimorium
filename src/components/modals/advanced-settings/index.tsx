@@ -22,8 +22,6 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogOverlay,
-  DialogPortal,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -97,20 +95,19 @@ export function AdvancedSettingsModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogPortal>
-        <DialogOverlay className="z-[160]" />
-        <DialogContent
-          className="p-0 gap-0 overflow-hidden !w-[1200px] !max-w-[1200px] !min-w-[1200px] z-[170]"
-          showCloseButton={false}
-          style={{
-            width: "1200px",
-            maxWidth: "1200px",
-            minWidth: "1200px",
-            height: "800px",
-            maxHeight: "800px",
-            minHeight: "800px",
-          }}
-        >
+      <DialogContent
+        className="p-0 gap-0 overflow-hidden !w-[1200px] !max-w-[1200px] !min-w-[1200px] z-[175]"
+        overlayClassName="z-[170]"
+        showCloseButton={false}
+        style={{
+          width: "1200px",
+          maxWidth: "1200px",
+          minWidth: "1200px",
+          height: "800px",
+          maxHeight: "800px",
+          minHeight: "800px",
+        }}
+      >
         <div className="flex h-full w-full overflow-hidden">
           {/* Sidebar */}
           <div className="w-[280px] flex-shrink-0 bg-muted/30 border-r flex flex-col overflow-hidden">
@@ -275,7 +272,6 @@ export function AdvancedSettingsModal({
           </div>
         </div>
       </DialogContent>
-      </DialogPortal>
     </Dialog>
   );
 }
