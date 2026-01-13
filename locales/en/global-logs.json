@@ -1,0 +1,63 @@
+{
+  "page": {
+    "title": "Global Logs",
+    "description": "Central library of all story logs",
+    "loading": "Loading...",
+    "empty_state": "No global logs yet",
+    "empty_state_description": "Create logs and link them to characters, factions, races, items, and regions.",
+    "empty_state_filtered": "No logs with the selected types",
+    "create_button": "Create New Log",
+    "create_first": "Create First Log"
+  },
+  "card": {
+    "chapter": "Chapter",
+    "prehistory": "Prehistory",
+    "edit": "Edit",
+    "delete": "Delete",
+    "manage_links": "Manage Links"
+  },
+  "filters": {
+    "search_placeholder": "Search logs...",
+    "sort_label": "Sort",
+    "sort_manual": "Manual Order",
+    "sort_recent": "Most Recent",
+    "sort_importance": "By Type",
+    "filter_importance": "Filter by Type",
+    "all_importance": "All",
+    "hook": "Hooks",
+    "lore": "Lore",
+    "foreshadowing": "Foreshadowing",
+    "filter_moment": "Filter by Moment",
+    "all_moments": "All",
+    "chapters": "Chapters",
+    "prehistory": "Prehistory"
+  },
+  "manage_links_modal": {
+    "title": "Manage Links",
+    "description": "Link this log to characters, regions, factions, races, or items",
+    "tabs": {
+      "characters": "Characters",
+      "regions": "Regions",
+      "factions": "Factions",
+      "races": "Races",
+      "items": "Items"
+    },
+    "search_placeholder": "Search...",
+    "no_entities": "No entities found",
+    "no_results": "No results found",
+    "loading": "Loading...",
+    "selected_count": "{{count}} selected",
+    "of": "of",
+    "in_tab": "in this category",
+    "done": "Done",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "delete": {
+    "title": "Delete Log",
+    "message": "Are you sure you want to delete this log? This action cannot be undone.",
+    "message_with_links": "This log is linked to {{count}} entity(ies). Deleting will also remove the links.",
+    "cancel": "Cancel",
+    "confirm": "Delete"
+  }
+}

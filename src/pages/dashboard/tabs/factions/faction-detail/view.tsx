@@ -11,6 +11,7 @@ import {
   AlertCircle,
   BookOpen,
   ScrollText,
+  FileText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -1437,6 +1438,18 @@ export function FactionDetailView({
                 icon: ScrollText,
                 onClick: onLogsModalToggle,
                 tooltip: t("faction-detail:header.logs"),
+              },
+              {
+                label: t("faction-detail:header.global_logs"),
+                icon: FileText,
+                onClick: () =>
+                  navigate({
+                    to: "/dashboard/$dashboardId/global-logs",
+                    params: {
+                      dashboardId: bookId,
+                    },
+                  }),
+                tooltip: t("faction-detail:header.global_logs_tooltip"),
               },
               {
                 label: t("faction-detail:header.gallery"),

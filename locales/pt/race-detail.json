@@ -13,7 +13,9 @@
     "add_note": "Adicionar Nota",
     "notes": "Anotações",
     "gallery": "Galeria",
-    "logs": "Registros"
+    "logs": "Registros",
+    "global_logs": "Registros Globais",
+    "global_logs_tooltip": "Ver todos os registros da obra"
   },
   "sections": {
     "basic_info": "Informações Básicas",

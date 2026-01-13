@@ -4,14 +4,19 @@
     "description": "History of changes throughout the work",
     "empty_state": "No logs yet.",
     "empty_state_description": "Start by creating a new log.",
+    "empty_state_filtered": "No logs with the selected types",
     "loading": "Loading...",
-    "create_button": "Create New Log"
+    "create_button": "Create New Log",
+    "edit_disabled_multiple_links": "This log is linked to multiple entities. To edit it, access the Global Logs view."
   },
   "create_edit_modal": {
     "title_create": "Create New Log",
     "title_edit": "Edit Log",
     "description_create": "Add a new change log to the timeline",
     "description_edit": "Edit the log information",
+    "linked_entities": "Linked Entities",
+    "manage_links": "Manage Links",
+    "links_count": "{{count}} entity(ies) linked",
     "cancel": "Cancel",
     "save": "Save",
     "create": "Create"
@@ -19,10 +24,10 @@
   "fields": {
     "chapter": "Chapter",
     "chapter_label": "In which chapter?",
-    "importance": "Event importance",
-    "importance_minor": "Minor Event",
-    "importance_major": "Major Event",
-    "importance_critical": "Critical Event",
+    "importance": "Log type",
+    "importance_hook": "Hook",
+    "importance_lore": "Lore",
+    "importance_foreshadowing": "Foreshadowing",
     "description": "What happened?",
     "description_placeholder": "Lost an arm in battle against the orcs, discovered to be the king's son, swore revenge against his master's killer..."
   }

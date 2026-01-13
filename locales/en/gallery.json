@@ -89,5 +89,23 @@
     "upload_image": "Upload Image",
     "empty_state_title": "No linked images yet",
     "empty_state_description": "Upload your first image for {{entityName}} and it will appear here!"
+  },
+  "create_modal": {
+    "manage_links": "Manage Entity Links",
+    "search_entities": "Search entities...",
+    "loading": "Loading...",
+    "no_results": "No results found",
+    "no_entities_available": "No entities available",
+    "selected_count": "{{count}} selected",
+    "of": "of",
+    "in_tab": "in this category",
+    "done": "Done"
+  },
+  "tabs": {
+    "characters": "Characters",
+    "regions": "Regions",
+    "factions": "Factions",
+    "races": "Races",
+    "items": "Items"
   }
 }

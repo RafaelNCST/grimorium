@@ -5,6 +5,7 @@ import {
   AlertCircle,
   BookOpen,
   Calendar,
+  FileText,
   Heart,
   Image,
   ScrollText,
@@ -1187,6 +1188,18 @@ export function CharacterDetailView({
                 icon: ScrollText,
                 onClick: onLogsModalToggle,
                 tooltip: t("character-detail:header.logs"),
+              },
+              {
+                label: t("character-detail:header.global_logs"),
+                icon: FileText,
+                onClick: () =>
+                  navigate({
+                    to: "/dashboard/$dashboardId/global-logs",
+                    params: {
+                      dashboardId: bookId,
+                    },
+                  }),
+                tooltip: t("character-detail:header.global_logs_tooltip"),
               },
               {
                 label: t("character-detail:header.gallery"),

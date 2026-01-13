@@ -31,3 +31,6 @@ dist-ssr
 package-lock.json
 yarn.lock
 bun.lockb
+
+# Temporary files
+tmpclaude-*-cwd

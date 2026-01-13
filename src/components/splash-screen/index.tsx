@@ -16,6 +16,10 @@ import {
   needsChapterUniqueConstraintRemoval,
   removeChapterUniqueConstraint,
 } from "@/lib/db/migrate-remove-chapter-unique";
+import {
+  needsEntityLogMigration,
+  migrateEntityLogsToGlobal,
+} from "@/lib/db/migrate-entity-logs-to-global";
 import { useBookStore } from "@/stores/book-store";
 
 interface SplashScreenProps {
@@ -60,6 +64,24 @@ export function SplashScreen({ onLoadingComplete }: SplashScreenProps) {
             );
           });
           console.log("[SplashScreen] Migration complete:", result);
+        }
+
+        // Run entity logs to global migration if needed
+        const needsEntityLogsMigration = await needsEntityLogMigration();
+
+        if (needsEntityLogsMigration) {
+          console.log(
+            "[SplashScreen] Starting entity logs to global system migration..."
+          );
+          const result = await migrateEntityLogsToGlobal((current, total) => {
+            console.log(
+              `[SplashScreen] Entity logs migration progress: ${current}/${total}`
+            );
+          });
+          console.log(
+            "[SplashScreen] Entity logs migration complete:",
+            result
+          );
         }
 
         setIsDataLoaded(true);

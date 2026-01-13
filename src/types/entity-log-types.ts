@@ -1,11 +1,16 @@
 // Entity Log Types
 // Tipos para o sistema de registros de entidades
+//
+// @deprecated Este arquivo contém os tipos do sistema antigo de entity logs (local).
+// O sistema foi migrado para global entity logs com linkagem many-to-many.
+// Use @/types/global-entity-log-types.ts para novos desenvolvimentos.
+// Este arquivo é mantido temporariamente para compatibilidade durante a migração.
 
 export type EntityType = "character" | "item" | "faction" | "race" | "region";
 
 export type MomentType = "chapter" | "prehistory";
 
-export type ImportanceLevel = "minor" | "major" | "critical";
+export type ImportanceLevel = "hook" | "lore" | "foreshadowing";
 
 export interface IEntityLog {
   id: string;

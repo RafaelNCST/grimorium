@@ -12,6 +12,8 @@
     "delete": "Excluir",
     "notes": "Anotações",
     "logs": "Registros",
+    "global_logs": "Registros Globais",
+    "global_logs_tooltip": "Ver todos os registros da obra",
     "gallery": "Galeria"
   },
   "buttons": {

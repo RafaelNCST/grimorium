@@ -8,6 +8,7 @@ import {
   Package,
   Image,
   ScrollText,
+  FileText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -784,6 +785,18 @@ export const ItemDetailView = React.memo(
                   icon: ScrollText,
                   onClick: onLogsModalToggle,
                   tooltip: t("item-detail:header.logs"),
+                },
+                {
+                  label: t("item-detail:header.global_logs"),
+                  icon: FileText,
+                  onClick: () =>
+                    navigate({
+                      to: "/dashboard/$dashboardId/global-logs",
+                      params: {
+                        dashboardId: item.bookId,
+                      },
+                    }),
+                  tooltip: t("item-detail:header.global_logs_tooltip"),
                 },
                 {
                   label: t("item-detail:header.gallery"),

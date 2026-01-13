@@ -57,6 +57,7 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
 
   const [draftBook, setDraftBook] = useState<BookType | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showGlobalLogsModal, setShowGlobalLogsModal] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
   const [tabs, setTabs] = useState<TabConfig[]>(
     storeTabs.length > 0 ? storeTabs : DEFAULT_TABS_CONSTANT
@@ -431,6 +432,10 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
     });
   }, [navigate, bookId]);
 
+  const handleShowGlobalLogsModal = useCallback(() => {
+    setShowGlobalLogsModal(true);
+  }, []);
+
   const handleNavigateToGallery = useCallback(() => {
     navigate({
       to: "/dashboard/$dashboardId/gallery",
@@ -475,6 +480,7 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
       currentArc={currentArc}
       sensors={sensors}
       showDeleteDialog={showDeleteDialog}
+      showGlobalLogsModal={showGlobalLogsModal}
       deleteInput={deleteInput}
       previewTabs={previewTabs}
       draggedTabId={draggedTabId}
@@ -495,6 +501,8 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
       onDelete={handleDelete}
       onDeleteBook={handleDeleteBook}
       onNavigateToChapters={handleNavigateToChapters}
+      onShowGlobalLogsModal={handleShowGlobalLogsModal}
+      onGlobalLogsModalChange={setShowGlobalLogsModal}
       onNavigateToGallery={handleNavigateToGallery}
       onShowDeleteDialog={handleShowDeleteDialog}
       onDeleteInputChange={handleDeleteInputChange}

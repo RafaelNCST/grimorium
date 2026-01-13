@@ -1,3 +1,10 @@
+/**
+ * Global Entity Logs Modal
+ *
+ * Modal para visualizar e gerenciar todos os registros globais de uma obra.
+ * Similar ao EntityLogsModal mas sem filtro de entidade.
+ */
+
 import { useState, useEffect } from "react";
 
 import {
@@ -16,7 +23,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Anchor, BookOpen, Eye, ScrollText, Pencil, Trash2 } from "lucide-react";
+import { Anchor, BookOpen, Eye, ScrollText, Pencil, Trash2, Link } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -27,27 +34,20 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useGlobalEntityLogsStore } from "@/stores/global-entity-logs-store";
 import type {
-  IEntityLog,
-  EntityType,
+  IGlobalEntityLog,
+  IEntityLogLink,
   ImportanceLevel,
-} from "@/types/entity-log-types";
-import type { IGlobalEntityLog } from "@/types/global-entity-log-types";
+} from "@/types/global-entity-log-types";
 
 import { CreateEditLogModal } from "./create-edit-log-modal";
+import { ManageEntityLogLinksModal } from "./manage-entity-log-links-modal";
 
-interface EntityLogsModalProps {
+interface GlobalEntityLogsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  entityId: string;
-  entityType: EntityType;
   bookId: string;
 }
 
@@ -74,21 +74,19 @@ const IMPORTANCE_CONFIG: Record<
 };
 
 interface SortableLogItemProps {
-  log: IEntityLog;
-  onEdit: (log: IEntityLog) => void;
+  log: IGlobalEntityLog;
+  onEdit: (log: IGlobalEntityLog) => void;
   onDelete: (id: string) => void;
+  onManageLinks: (log: IGlobalEntityLog) => void;
   activeId: string | null;
-  isEditDisabled?: boolean;
-  editDisabledReason?: string;
 }
 
 function SortableLogItem({
   log,
   onEdit,
   onDelete,
+  onManageLinks,
   activeId,
-  isEditDisabled = false,
-  editDisabledReason,
 }: SortableLogItemProps) {
   const { t } = useTranslation("entity-logs");
   const { attributes, listeners, setNodeRef, transform, isDragging } =
@@ -135,6 +133,12 @@ function SortableLogItem({
           <span className="text-sm font-medium text-muted-foreground">
             {momentDisplay}
           </span>
+          {log.links.length > 0 && (
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <Link className="h-3 w-3" />
+              {log.links.length}
+            </span>
+          )}
         </div>
 
         {/* Description */}
@@ -145,39 +149,36 @@ function SortableLogItem({
 
       {/* Actions */}
       <div className="flex items-center gap-1">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (!isEditDisabled) {
-                    onEdit(log);
-                  }
-                }}
-                disabled={isEditDisabled}
-                className="h-8 w-8"
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-            </span>
-          </TooltipTrigger>
-          {isEditDisabled && editDisabledReason && (
-            <TooltipContent>
-              <p className="text-sm">{editDisabledReason}</p>
-            </TooltipContent>
-          )}
-        </Tooltip>
         <Button
           variant="ghost"
           size="icon"
           onClick={(e) => {
             e.stopPropagation();
+            onManageLinks(log);
+          }}
+          className="h-8 w-8"
+        >
+          <Link className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(log);
+          }}
+          className="h-8 w-8"
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost-destructive"
+          size="icon"
+          onClick={(e) => {
+            e.stopPropagation();
             onDelete(log.id);
           }}
-          className="h-8 w-8 text-destructive hover:bg-red-500/20 hover:text-red-600"
+          className="h-8 w-8"
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -186,31 +187,32 @@ function SortableLogItem({
   );
 }
 
-export function EntityLogsModal({
+export function GlobalEntityLogsModal({
   open,
   onOpenChange,
-  entityId,
-  entityType,
   bookId,
-}: EntityLogsModalProps) {
-  const { t } = useTranslation("entity-logs");
+}: GlobalEntityLogsModalProps) {
+  const { t } = useTranslation("global-logs");
   const {
-    getLogsByEntityId,
+    logs,
+    isLoading,
+    fetchGlobalEntityLogs,
     addGlobalEntityLog,
     updateGlobalEntityLogInCache,
     deleteGlobalEntityLogFromCache,
-    removeEntityLogLinkFromCache,
-    countLinksForLog,
+    reorderGlobalEntityLogsInCache,
+    updateEntityLogLinksInCache,
   } = useGlobalEntityLogsStore();
 
-  const [logs, setLogs] = useState<IGlobalEntityLog[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [isCreateEditModalOpen, setIsCreateEditModalOpen] = useState(false);
   const [editingLog, setEditingLog] = useState<IGlobalEntityLog | null>(null);
+  const [managingLinksLog, setManagingLinksLog] = useState<IGlobalEntityLog | null>(null);
+  const [tempLinks, setTempLinks] = useState<IEntityLogLink[]>([]);
+  const [createLinks, setCreateLinks] = useState<IEntityLogLink[]>([]); // Links for new log during creation
+  const [tempLogId, setTempLogId] = useState<string>(""); // Temporary log ID for creation
   const [activeId, setActiveId] = useState<string | null>(null);
   const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(null);
   const [needsScroll, setNeedsScroll] = useState(false);
-  const [linkCounts, setLinkCounts] = useState<Record<string, number>>({});
   const [selectedTypes, setSelectedTypes] = useState<ImportanceLevel[]>([
     "hook",
     "lore",
@@ -219,10 +221,10 @@ export function EntityLogsModal({
 
   // Load logs when modal opens
   useEffect(() => {
-    if (open) {
-      loadLogs();
+    if (open && bookId) {
+      fetchGlobalEntityLogs(false, bookId);
     }
-  }, [open, entityId, entityType]);
+  }, [open, bookId, fetchGlobalEntityLogs]);
 
   // Check if scroll is needed
   useEffect(() => {
@@ -238,25 +240,6 @@ export function EntityLogsModal({
       return () => clearTimeout(timer);
     }
   }, [scrollContainer, logs]);
-
-  const loadLogs = async () => {
-    setIsLoading(true);
-    try {
-      const fetchedLogs = await getLogsByEntityId(entityId, entityType);
-      setLogs(fetchedLogs);
-
-      // Load link counts for each log
-      const counts: Record<string, number> = {};
-      for (const log of fetchedLogs) {
-        counts[log.id] = await countLinksForLog(log.id);
-      }
-      setLinkCounts(counts);
-    } catch (error) {
-      console.error("Error loading logs:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   // Filter logs by selected types
   const filteredLogs = logs.filter((log) =>
@@ -289,7 +272,7 @@ export function EntityLogsModal({
     setActiveId(event.active.id as string);
   };
 
-  const handleDragEnd = async (event: DragEndEvent) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     setActiveId(null);
@@ -299,18 +282,7 @@ export function EntityLogsModal({
       const newIndex = logs.findIndex((log) => log.id === over.id);
 
       const reorderedLogs = arrayMove(logs, oldIndex, newIndex);
-      setLogs(reorderedLogs);
-
-      // Persist entity-specific reordering (independent from global order)
-      try {
-        await reorderEntityLogLinksInCache(
-          entityId,
-          entityType,
-          reorderedLogs.map((log) => log.id)
-        );
-      } catch (error) {
-        console.error("Error reordering entity log links:", error);
-      }
+      reorderGlobalEntityLogsInCache(reorderedLogs);
     }
   };
 
@@ -320,6 +292,10 @@ export function EntityLogsModal({
 
   const handleCreateNew = () => {
     setEditingLog(null);
+    setCreateLinks([]); // Reset links for new log
+    // Generate temporary ID for new log (used for links)
+    const newTempId = `log-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    setTempLogId(newTempId);
     setIsCreateEditModalOpen(true);
   };
 
@@ -328,70 +304,61 @@ export function EntityLogsModal({
     setIsCreateEditModalOpen(true);
   };
 
-  const handleSaveLog = async (logData: Partial<IEntityLog>) => {
+  const handleSaveLog = async (logData: Partial<IGlobalEntityLog>) => {
     try {
       if (editingLog) {
-        // Update existing log
+        // Update existing log (links are managed separately via the Links button)
         await updateGlobalEntityLogInCache(editingLog.id, logData);
       } else {
-        // Create new log with link to this entity
+        // Create new log with links from creation modal (use tempLogId generated earlier)
         const newLog: IGlobalEntityLog = {
-          id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          id: tempLogId,
           bookId,
           ...logData,
           orderIndex: logs.length,
-          links: [
-            {
-              id: crypto.randomUUID(),
-              logId: "",
-              entityId,
-              entityType,
-              bookId,
-              orderIndex: logs.length, // Entity-specific order
-              createdAt: new Date().toISOString(),
-            },
-          ],
+          links: createLinks,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         } as IGlobalEntityLog;
 
-        // Set logId in link
-        newLog.links[0].logId = newLog.id;
-
         await addGlobalEntityLog(newLog);
+        setCreateLinks([]); // Reset after creating
+        setTempLogId(""); // Reset temp ID
       }
 
-      // Reload logs
-      await loadLogs();
       setIsCreateEditModalOpen(false);
       setEditingLog(null);
     } catch (error) {
-      console.error("Error saving log:", error);
+      console.error("[GlobalEntityLogsModal] Error saving log:", error);
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
-      // Find the link for this entity
-      const log = logs.find((l) => l.id === id);
-      if (!log) return;
-
-      const linkToRemove = log.links.find(
-        (link) => link.entityId === entityId && link.entityType === entityType
-      );
-
-      if (!linkToRemove) {
-        console.error("Link not found for entity");
-        return;
-      }
-
-      // Remove only the link (unlink), not the entire log
-      await removeEntityLogLinkFromCache(id, linkToRemove.id);
-
-      // Reload logs to reflect changes
-      await loadLogs();
+      await deleteGlobalEntityLogFromCache(id);
     } catch (error) {
-      console.error("Error removing link:", error);
+      console.error("[GlobalEntityLogsModal] Error deleting log:", error);
+    }
+  };
+
+  const handleManageLinks = (log: IGlobalEntityLog) => {
+    setManagingLinksLog(log);
+    setTempLinks(log.links);
+  };
+
+  const handleLinksChange = (links: IEntityLogLink[]) => {
+    setTempLinks(links);
+  };
+
+  const handleSaveLinks = async () => {
+    if (!managingLinksLog) return;
+
+    try {
+      await updateEntityLogLinksInCache(managingLinksLog.id, tempLinks);
+      setManagingLinksLog(null);
+      setTempLinks([]);
+    } catch (error) {
+      console.error("[GlobalEntityLogsModal] Error updating links:", error);
     }
   };
 
@@ -402,9 +369,9 @@ export function EntityLogsModal({
           <DialogHeader className="mb-4">
             <DialogTitle className="flex items-center gap-2">
               <ScrollText className="h-5 w-5" />
-              {t("modal.title")}
+              {t("page.title")}
             </DialogTitle>
-            <DialogDescription>{t("modal.description")}</DialogDescription>
+            <DialogDescription>{t("page.description")}</DialogDescription>
           </DialogHeader>
 
           {/* Type Filters */}
@@ -441,17 +408,17 @@ export function EntityLogsModal({
           >
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
-                <p className="text-muted-foreground">{t("modal.loading")}</p>
+                <p className="text-muted-foreground">{t("page.loading")}</p>
               </div>
             ) : filteredLogs.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full gap-4">
                 <ScrollText className="h-12 w-12 text-muted-foreground opacity-50" />
                 <p className="text-muted-foreground text-center">
                   {logs.length === 0
-                    ? t("modal.empty_state")
-                    : t("modal.empty_state_filtered")}
+                    ? t("page.empty_state")
+                    : t("page.empty_state_filtered")}
                   <br />
-                  {logs.length === 0 && t("modal.empty_state_description")}
+                  {logs.length === 0 && t("page.empty_state_description")}
                 </p>
               </div>
             ) : (
@@ -468,25 +435,16 @@ export function EntityLogsModal({
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="space-y-1 pb-4">
-                    {filteredLogs.map((log) => {
-                      const linkCount = linkCounts[log.id] || 0;
-                      const isEditDisabled = linkCount > 1;
-                      const editDisabledReason = isEditDisabled
-                        ? t("modal.edit_disabled_multiple_links")
-                        : undefined;
-
-                      return (
-                        <SortableLogItem
-                          key={log.id}
-                          log={log}
-                          onEdit={handleEdit}
-                          onDelete={handleDelete}
-                          activeId={activeId}
-                          isEditDisabled={isEditDisabled}
-                          editDisabledReason={editDisabledReason}
-                        />
-                      );
-                    })}
+                    {filteredLogs.map((log) => (
+                      <SortableLogItem
+                        key={log.id}
+                        log={log}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                        onManageLinks={handleManageLinks}
+                        activeId={activeId}
+                      />
+                    ))}
                   </div>
                 </SortableContext>
               </DndContext>
@@ -500,7 +458,7 @@ export function EntityLogsModal({
               onClick={handleCreateNew}
               className="w-full"
             >
-              {t("modal.create_button")}
+              {t("page.create_button")}
             </Button>
           </div>
         </DialogContent>
@@ -512,7 +470,29 @@ export function EntityLogsModal({
         onOpenChange={setIsCreateEditModalOpen}
         onSave={handleSaveLog}
         editingLog={editingLog}
+        showLinkManagement={!editingLog}
+        links={createLinks}
+        onLinksChange={setCreateLinks}
+        bookId={bookId}
+        logId={editingLog ? editingLog.id : tempLogId}
       />
+
+      {/* Manage Links Modal */}
+      {managingLinksLog && (
+        <ManageEntityLogLinksModal
+          open={!!managingLinksLog}
+          onOpenChange={async (open) => {
+            if (!open) {
+              // Save links before closing
+              await handleSaveLinks();
+            }
+          }}
+          links={tempLinks}
+          onLinksChange={handleLinksChange}
+          bookId={bookId}
+          logId={managingLinksLog.id}
+        />
+      )}
     </>
   );
 }

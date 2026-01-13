@@ -409,6 +409,29 @@ export interface DBGalleryLink {
   created_at: number;
 }
 
+// Global Entity Logs (Sistema Global de Registros)
+export interface DBGlobalEntityLog {
+  id: string;
+  book_id: string;
+  moment_type: string; // 'chapter' or 'prehistory'
+  chapter_number: string | null;
+  prehistory_period: string | null;
+  importance: string; // 'minor', 'major', 'critical'
+  description: string;
+  order_index: number;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface DBEntityLogLink {
+  id: string;
+  log_id: string;
+  entity_id: string;
+  entity_type: string; // 'character', 'region', 'faction', 'race', 'item'
+  book_id: string;
+  created_at: number;
+}
+
 // Helper types for queries
 export interface CharacterWithRelationships extends DBCharacter {
   relationships?: DBRelationship[];

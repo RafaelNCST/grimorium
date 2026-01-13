@@ -9,6 +9,7 @@ import {
   Map as MapIcon,
   BookOpen,
   ScrollText,
+  FileText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -1134,6 +1135,18 @@ export function RegionDetailView({
                 icon: ScrollText,
                 onClick: onLogsModalToggle,
                 tooltip: t("region-detail:header.logs"),
+              },
+              {
+                label: t("region-detail:header.global_logs"),
+                icon: FileText,
+                onClick: () =>
+                  navigate({
+                    to: "/dashboard/$dashboardId/global-logs",
+                    params: {
+                      dashboardId: bookId,
+                    },
+                  }),
+                tooltip: t("region-detail:header.global_logs_tooltip"),
               },
               {
                 label: t("region-detail:header.gallery"),

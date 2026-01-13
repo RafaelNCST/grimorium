@@ -1,3 +1,10 @@
+/**
+ * Manage Entity Log Links Modal
+ *
+ * Modal para gerenciar links entre logs globais e entidades.
+ * Baseado em manage-entity-links-modal.tsx para consistência.
+ */
+
 import { useState, useEffect, useMemo, useRef } from "react";
 
 import {
@@ -15,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -29,23 +37,15 @@ import { getRacesByBookId } from "@/lib/db/races.service";
 import { getRegionsByBookId } from "@/lib/db/regions.service";
 import { cn } from "@/lib/utils";
 import { useBookStore } from "@/stores/book-store";
-import type { EntityType } from "@/types/gallery-types";
+import type { EntityType, IEntityLogLink } from "@/types/global-entity-log-types";
 
-interface EntityLink {
-  id: string;
-  entityId: string;
-  entityType: EntityType;
-  bookId: string;
-  entityName?: string;
-  createdAt?: string;
-}
-
-interface ManageEntityLinksModalProps {
+interface ManageEntityLogLinksModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  links: EntityLink[];
-  onLinksChange: (links: EntityLink[]) => void;
+  links: IEntityLogLink[];
+  onLinksChange: (links: IEntityLogLink[]) => void;
   bookId?: string; // Optional: filter entities by book
+  logId: string; // ID of the log being linked
 }
 
 interface EntityOption {
@@ -61,21 +61,22 @@ const ENTITY_TABS: {
   icon: typeof Users;
   labelKey: string;
 }[] = [
-  { type: "character", icon: Users, labelKey: "tabs.characters" },
-  { type: "region", icon: Globe, labelKey: "tabs.regions" },
-  { type: "faction", icon: Building2, labelKey: "tabs.factions" },
-  { type: "race", icon: Dna, labelKey: "tabs.races" },
-  { type: "item", icon: Package, labelKey: "tabs.items" },
+  { type: "character", icon: Users, labelKey: "manage_links_modal.tabs.characters" },
+  { type: "region", icon: Globe, labelKey: "manage_links_modal.tabs.regions" },
+  { type: "faction", icon: Building2, labelKey: "manage_links_modal.tabs.factions" },
+  { type: "race", icon: Dna, labelKey: "manage_links_modal.tabs.races" },
+  { type: "item", icon: Package, labelKey: "manage_links_modal.tabs.items" },
 ];
 
-export function ManageEntityLinksModal({
+export function ManageEntityLogLinksModal({
   open,
   onOpenChange,
   links,
   onLinksChange,
   bookId,
-}: ManageEntityLinksModalProps) {
-  const { t } = useTranslation("gallery");
+  logId,
+}: ManageEntityLogLinksModalProps) {
+  const { t } = useTranslation("global-logs");
   const { books } = useBookStore();
 
   const [activeTab, setActiveTab] = useState<EntityType>("character");
@@ -205,7 +206,6 @@ export function ManageEntityLinksModal({
       faction: 0,
       race: 0,
       item: 0,
-      arc: 0,
     };
 
     entities.forEach((e) => {
@@ -223,7 +223,6 @@ export function ManageEntityLinksModal({
       faction: 0,
       race: 0,
       item: 0,
-      arc: 0,
     };
 
     links.forEach((l) => {
@@ -260,11 +259,13 @@ export function ManageEntityLinksModal({
       onLinksChange(links.filter((l) => l.entityId !== entity.id));
     } else {
       // Add
-      const newLink: EntityLink = {
+      const newLink: IEntityLogLink = {
         id: crypto.randomUUID(),
+        logId: logId,
         entityId: entity.id,
         entityType: entity.entityType,
         bookId: entity.bookId,
+        orderIndex: 0, // Will be updated to correct position when persisted
         entityName: entity.name,
         createdAt: new Date().toISOString(),
       };
@@ -276,7 +277,10 @@ export function ManageEntityLinksModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
-          <DialogTitle>{t("create_modal.manage_links")}</DialogTitle>
+          <DialogTitle>{t("manage_links_modal.title")}</DialogTitle>
+          <DialogDescription>
+            {t("manage_links_modal.description")}
+          </DialogDescription>
         </DialogHeader>
 
         <Tabs
@@ -312,7 +316,7 @@ export function ManageEntityLinksModal({
           <div className="relative mt-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder={t("create_modal.search_entities")}
+              placeholder={t("manage_links_modal.search_placeholder")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9"
@@ -330,8 +334,8 @@ export function ManageEntityLinksModal({
                   ) : filteredEntities.length === 0 ? (
                     <div className="p-4 text-center text-muted-foreground">
                       {searchTerm
-                        ? t("create_modal.no_results")
-                        : t("create_modal.no_entities_available")}
+                        ? t("manage_links_modal.no_results")
+                        : t("manage_links_modal.no_entities")}
                     </div>
                   ) : (
                     <div className={cn(hasScrollbar && "pr-2")}>
@@ -391,17 +395,17 @@ export function ManageEntityLinksModal({
         <div className="flex items-center justify-between pt-2 border-t">
           <div className="flex flex-col gap-1">
             <span className="text-sm text-muted-foreground">
-              {t("create_modal.selected_count", {
+              {t("manage_links_modal.selected_count", {
                 count: links.length,
               })}
             </span>
             <span className="text-xs text-muted-foreground">
-              {selectedCounts[activeTab]} {t("create_modal.of")}{" "}
-              {entityCounts[activeTab]} {t("create_modal.in_tab")}
+              {selectedCounts[activeTab]} {t("manage_links_modal.of")}{" "}
+              {entityCounts[activeTab]} {t("manage_links_modal.in_tab")}
             </span>
           </div>
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
-            {t("create_modal.done")}
+            {t("manage_links_modal.done")}
           </Button>
         </div>
       </DialogContent>

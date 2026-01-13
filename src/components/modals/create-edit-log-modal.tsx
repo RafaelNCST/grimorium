@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 
 import {
-  Circle,
-  Star,
-  Zap,
+  Anchor,
+  BookOpen,
+  Eye,
   FileText,
   ChevronDown,
   ChevronUp,
   Plus,
+  Link,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -25,12 +26,21 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import type { IEntityLog, ImportanceLevel } from "@/types/entity-log-types";
+import type { IEntityLogLink } from "@/types/global-entity-log-types";
+
+import { ManageEntityLogLinksModal } from "./manage-entity-log-links-modal";
 
 interface CreateEditLogModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (log: Partial<IEntityLog>) => void;
+  onSave: (log: Partial<IEntityLog>, links?: IEntityLogLink[]) => void;
   editingLog?: IEntityLog | null;
+  // Link management (apenas para view global)
+  showLinkManagement?: boolean;
+  links?: IEntityLogLink[];
+  onLinksChange?: (links: IEntityLogLink[]) => void;
+  bookId?: string;
+  logId?: string; // ID do log (para links) - gerado temporariamente se criando
 }
 
 export function CreateEditLogModal({
@@ -38,38 +48,44 @@ export function CreateEditLogModal({
   onOpenChange,
   onSave,
   editingLog,
+  showLinkManagement = false,
+  links = [],
+  onLinksChange,
+  bookId,
+  logId,
 }: CreateEditLogModalProps) {
   const { t } = useTranslation("entity-logs");
   const isEditing = Boolean(editingLog);
+  const [isManageLinksOpen, setIsManageLinksOpen] = useState(false);
 
   // Importance options with icons and colors
   const IMPORTANCE_OPTIONS: Array<{
     value: ImportanceLevel;
     label: string;
-    icon: typeof Circle;
+    icon: typeof Anchor;
     color: string;
     bgColor: string;
   }> = [
     {
-      value: "minor",
-      label: t("fields.importance_minor"),
-      icon: Circle,
-      color: "text-gray-500",
-      bgColor: "bg-gray-500/10 border-gray-500/30",
+      value: "hook",
+      label: t("fields.importance_hook"),
+      icon: Anchor,
+      color: "text-purple-500",
+      bgColor: "bg-purple-500/10 border-purple-500/30",
     },
     {
-      value: "major",
-      label: t("fields.importance_major"),
-      icon: Star,
-      color: "text-yellow-500",
-      bgColor: "bg-yellow-500/10 border-yellow-500/30",
+      value: "lore",
+      label: t("fields.importance_lore"),
+      icon: BookOpen,
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/10 border-blue-500/30",
     },
     {
-      value: "critical",
-      label: t("fields.importance_critical"),
-      icon: Zap,
-      color: "text-red-500",
-      bgColor: "bg-red-500/10 border-red-500/30",
+      value: "foreshadowing",
+      label: t("fields.importance_foreshadowing"),
+      icon: Eye,
+      color: "text-amber-500",
+      bgColor: "bg-amber-500/10 border-amber-500/30",
     },
   ];
 
@@ -111,7 +127,7 @@ export function CreateEditLogModal({
       description,
     };
 
-    onSave(logData);
+    onSave(logData, showLinkManagement ? links : undefined);
     handleClose();
   };
 
@@ -254,6 +270,32 @@ export function CreateEditLogModal({
               </p>
             </div>
           </div>
+
+          {/* Link Management (apenas na view global) */}
+          {showLinkManagement && (
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-primary">
+                  {t("create_edit_modal.linked_entities")}
+                </Label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsManageLinksOpen(true)}
+                  className="h-8"
+                >
+                  <Link className="h-4 w-4 mr-2" />
+                  {t("create_edit_modal.manage_links")}
+                </Button>
+              </div>
+              {links.length > 0 && (
+                <div className="text-sm text-muted-foreground">
+                  {t("create_edit_modal.links_count", { count: links.length })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <DialogFooter className="pt-4 border-t">
@@ -272,6 +314,18 @@ export function CreateEditLogModal({
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {/* Manage Links Modal */}
+      {showLinkManagement && onLinksChange && logId && (
+        <ManageEntityLogLinksModal
+          open={isManageLinksOpen}
+          onOpenChange={setIsManageLinksOpen}
+          links={links}
+          onLinksChange={onLinksChange}
+          bookId={bookId}
+          logId={logId}
+        />
+      )}
     </Dialog>
   );
 }

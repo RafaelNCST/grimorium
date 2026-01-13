@@ -8,6 +8,7 @@ import {
   AlertCircle,
   BookOpen,
   ScrollText,
+  FileText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -1247,6 +1248,18 @@ export function RaceDetailView({
                 icon: ScrollText,
                 onClick: onLogsModalToggle,
                 tooltip: t("race-detail:buttons.logs"),
+              },
+              {
+                label: t("race-detail:buttons.global_logs"),
+                icon: FileText,
+                onClick: () =>
+                  navigate({
+                    to: "/dashboard/$dashboardId/global-logs",
+                    params: {
+                      dashboardId: bookId,
+                    },
+                  }),
+                tooltip: t("race-detail:buttons.global_logs_tooltip"),
               },
               {
                 label: t("race-detail:buttons.gallery"),

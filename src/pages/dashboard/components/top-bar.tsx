@@ -6,6 +6,7 @@ import {
   Palette,
   EyeOff,
   Eye,
+  ScrollText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -23,6 +24,7 @@ interface PropsTopBar {
   onBack: () => void;
   onShowDeleteDialog: (show: boolean) => void;
   onNavigateToChapters: () => void;
+  onShowGlobalLogsModal: () => void;
   onNavigateToGallery: () => void;
   onCustomizingToggle: () => void;
   onHeaderHiddenChange: (hidden: boolean) => void;
@@ -34,6 +36,7 @@ export function TopBar({
   onBack,
   onShowDeleteDialog,
   onNavigateToChapters,
+  onShowGlobalLogsModal,
   onNavigateToGallery,
   onCustomizingToggle,
   onHeaderHiddenChange,
@@ -99,6 +102,24 @@ export function TopBar({
           <TooltipContent>
             <p className="text-sm font-medium">
               {t("common:tooltips.delete_book")}
+            </p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onShowGlobalLogsModal}
+              className="hover:bg-accent hover:text-accent-foreground"
+            >
+              <ScrollText className="w-5 h-5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="text-sm font-medium">
+              {t("common:tooltips.global_logs")}
             </p>
           </TooltipContent>
         </Tooltip>

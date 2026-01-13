@@ -994,7 +994,7 @@ async function runMigrations(database: Database): Promise<void> {
       // Column already exists - safe to ignore
     }
 
-    // Create entity_logs table for entity change tracking
+    // Create entity_logs table for entity change tracking (LEGACY - will be migrated to global system)
     try {
       await database.execute(`
         CREATE TABLE IF NOT EXISTS entity_logs (
@@ -1025,6 +1025,97 @@ async function runMigrations(database: Database): Promise<void> {
       );
     } catch (_error) {
       // Table already exists - safe to ignore
+    }
+
+    // Create global_entity_logs table (new system)
+    try {
+      await database.execute(`
+        CREATE TABLE IF NOT EXISTS global_entity_logs (
+          id TEXT PRIMARY KEY,
+          book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+          moment_type TEXT NOT NULL,
+          chapter_number TEXT,
+          prehistory_period TEXT,
+          importance TEXT NOT NULL,
+          description TEXT NOT NULL,
+          order_index INTEGER NOT NULL DEFAULT 0,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL
+        )
+      `);
+
+      // Create indexes for global_entity_logs
+      await database.execute(
+        "CREATE INDEX IF NOT EXISTS idx_global_entity_logs_book_id ON global_entity_logs(book_id)"
+      );
+      await database.execute(
+        "CREATE INDEX IF NOT EXISTS idx_global_entity_logs_order ON global_entity_logs(book_id, order_index)"
+      );
+    } catch (_error) {
+      // Table already exists - safe to ignore
+    }
+
+    // Create entity_log_links table (many-to-many relationship)
+    try {
+      await database.execute(`
+        CREATE TABLE IF NOT EXISTS entity_log_links (
+          id TEXT PRIMARY KEY,
+          log_id TEXT NOT NULL REFERENCES global_entity_logs(id) ON DELETE CASCADE,
+          entity_id TEXT NOT NULL,
+          entity_type TEXT NOT NULL,
+          book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+          created_at INTEGER NOT NULL,
+          UNIQUE(log_id, entity_id, entity_type)
+        )
+      `);
+
+      // Create indexes for entity_log_links
+      await database.execute(
+        "CREATE INDEX IF NOT EXISTS idx_entity_log_links_log_id ON entity_log_links(log_id)"
+      );
+      await database.execute(
+        "CREATE INDEX IF NOT EXISTS idx_entity_log_links_entity ON entity_log_links(entity_id, entity_type)"
+      );
+      await database.execute(
+        "CREATE INDEX IF NOT EXISTS idx_entity_log_links_book_id ON entity_log_links(book_id)"
+      );
+    } catch (_error) {
+      // Table already exists - safe to ignore
+    }
+
+    // Add order_index column to entity_log_links for entity-specific ordering
+    try {
+      await database.execute(
+        "ALTER TABLE entity_log_links ADD COLUMN order_index INTEGER NOT NULL DEFAULT 0"
+      );
+    } catch (_error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Create index for entity-specific ordering
+    try {
+      await database.execute(
+        "CREATE INDEX IF NOT EXISTS idx_entity_log_links_entity_order ON entity_log_links(entity_id, entity_type, order_index)"
+      );
+    } catch (_error) {
+      // Index already exists - safe to ignore
+    }
+
+    // Migrate importance levels from old values (minor/major/critical) to new (hook/lore/foreshadowing)
+    try {
+      await database.execute(
+        "UPDATE global_entity_logs SET importance = 'hook' WHERE importance = 'minor'"
+      );
+      await database.execute(
+        "UPDATE global_entity_logs SET importance = 'lore' WHERE importance = 'major'"
+      );
+      await database.execute(
+        "UPDATE global_entity_logs SET importance = 'foreshadowing' WHERE importance = 'critical'"
+      );
+      console.log("[Migration] Updated importance levels in global_entity_logs");
+    } catch (_error) {
+      // Migration already applied or table doesn't exist - safe to ignore
+      console.log("[Migration] Importance levels migration skipped (likely already applied)");
     }
 
     // Migrate gallery_items to make thumbnail_base64 nullable (it's deprecated)

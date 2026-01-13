@@ -314,3 +314,49 @@ CREATE TABLE IF NOT EXISTS entity_logs (
 CREATE INDEX IF NOT EXISTS idx_entity_logs_entity ON entity_logs(entity_id, entity_type);
 CREATE INDEX IF NOT EXISTS idx_entity_logs_book_id ON entity_logs(book_id);
 CREATE INDEX IF NOT EXISTS idx_entity_logs_order ON entity_logs(entity_id, entity_type, order_index);
+
+-- ============================================
+-- SISTEMA GLOBAL DE REGISTROS (GLOBAL ENTITY LOGS)
+-- ============================================
+
+-- REGISTROS GLOBAIS (armazenamento centralizado)
+CREATE TABLE IF NOT EXISTS global_entity_logs (
+  id TEXT PRIMARY KEY,
+  book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+
+  -- Momento do registro
+  moment_type TEXT NOT NULL, -- 'chapter' or 'prehistory'
+  chapter_number TEXT,
+  prehistory_period TEXT,
+
+  -- Importância do evento
+  importance TEXT NOT NULL, -- 'minor', 'major', 'critical'
+
+  -- Descrição da mudança
+  description TEXT NOT NULL,
+
+  -- Ordenação (drag and drop na view global)
+  order_index INTEGER NOT NULL DEFAULT 0,
+
+  -- Timestamps
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+-- LINKS DE REGISTROS COM ENTIDADES (relacionamento many-to-many)
+CREATE TABLE IF NOT EXISTS entity_log_links (
+  id TEXT PRIMARY KEY,
+  log_id TEXT NOT NULL REFERENCES global_entity_logs(id) ON DELETE CASCADE,
+  entity_id TEXT NOT NULL,
+  entity_type TEXT NOT NULL, -- 'character', 'region', 'faction', 'race', 'item'
+  book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+  created_at INTEGER NOT NULL,
+  UNIQUE(log_id, entity_id, entity_type)
+);
+
+-- ÍNDICES PARA PERFORMANCE DOS REGISTROS GLOBAIS
+CREATE INDEX IF NOT EXISTS idx_global_entity_logs_book_id ON global_entity_logs(book_id);
+CREATE INDEX IF NOT EXISTS idx_global_entity_logs_order ON global_entity_logs(book_id, order_index);
+CREATE INDEX IF NOT EXISTS idx_entity_log_links_log_id ON entity_log_links(log_id);
+CREATE INDEX IF NOT EXISTS idx_entity_log_links_entity ON entity_log_links(entity_id, entity_type);
+CREATE INDEX IF NOT EXISTS idx_entity_log_links_book_id ON entity_log_links(book_id);

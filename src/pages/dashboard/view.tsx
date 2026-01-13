@@ -24,6 +24,8 @@ import { Tabs } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Book as BookType } from "@/stores/book-store";
 
+import { GlobalEntityLogsModal } from "@/components/modals/global-entity-logs-modal";
+
 import { Header } from "./components/header";
 import { TabsBar } from "./components/tabs-bar";
 import { TopBar } from "./components/top-bar";
@@ -68,6 +70,7 @@ interface PropsDashboardView {
   currentArc?: PlotArc;
   sensors: SensorDescriptor<SensorOptions>[];
   showDeleteDialog: boolean;
+  showGlobalLogsModal: boolean;
   deleteInput: string;
   previewTabs?: TabConfig[];
   draggedTabId?: string | null;
@@ -88,6 +91,8 @@ interface PropsDashboardView {
   onDelete: () => void;
   onDeleteBook: () => void;
   onNavigateToChapters: () => void;
+  onShowGlobalLogsModal: () => void;
+  onGlobalLogsModalChange: (show: boolean) => void;
   onNavigateToGallery: () => void;
   onShowDeleteDialog: (show: boolean) => void;
   onDeleteInputChange: (value: string) => void;
@@ -116,6 +121,7 @@ export function DashboardView({
   visibleTabs,
   sensors,
   showDeleteDialog,
+  showGlobalLogsModal,
   deleteInput,
   previewTabs,
   draggedTabId,
@@ -132,6 +138,8 @@ export function DashboardView({
   onCancel,
   onDelete,
   onNavigateToChapters,
+  onShowGlobalLogsModal,
+  onGlobalLogsModalChange,
   onNavigateToGallery,
   onShowDeleteDialog,
   onDeleteInputChange,
@@ -156,6 +164,7 @@ export function DashboardView({
                 onBack={onBack}
                 onShowDeleteDialog={onShowDeleteDialog}
                 onNavigateToChapters={onNavigateToChapters}
+                onShowGlobalLogsModal={onShowGlobalLogsModal}
                 onNavigateToGallery={onNavigateToGallery}
                 onCustomizingToggle={onCustomizingToggle}
                 onHeaderHiddenChange={onHeaderHiddenChange}
@@ -297,6 +306,13 @@ export function DashboardView({
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Global Entity Logs Modal */}
+        <GlobalEntityLogsModal
+          open={showGlobalLogsModal}
+          onOpenChange={onGlobalLogsModalChange}
+          bookId={bookId}
+        />
       </div>
     </TooltipProvider>
   );

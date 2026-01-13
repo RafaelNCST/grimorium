@@ -28,6 +28,7 @@ import enFactions from "../../locales/en/factions.json";
 import enForms from "../../locales/en/forms.json";
 import enGallery from "../../locales/en/gallery.json";
 import enGlobalGoals from "../../locales/en/global-goals.json";
+import enGlobalLogs from "../../locales/en/global-logs.json";
 import enHome from "../../locales/en/home.json";
 import enInbox from "../../locales/en/inbox.json";
 import enItemDetail from "../../locales/en/item-detail.json";
@@ -72,6 +73,7 @@ import ptFactions from "../../locales/pt/factions.json";
 import ptForms from "../../locales/pt/forms.json";
 import ptGallery from "../../locales/pt/gallery.json";
 import ptGlobalGoals from "../../locales/pt/global-goals.json";
+import ptGlobalLogs from "../../locales/pt/global-logs.json";
 import ptHome from "../../locales/pt/home.json";
 import ptInbox from "../../locales/pt/inbox.json";
 import ptItemDetail from "../../locales/pt/item-detail.json";
@@ -121,6 +123,7 @@ const resources = {
     forms: enForms,
     gallery: enGallery,
     "global-goals": enGlobalGoals,
+    "global-logs": enGlobalLogs,
     "item-detail": enItemDetail,
     items: enItems,
     loading: enLoading,
@@ -167,6 +170,7 @@ const resources = {
     forms: ptForms,
     gallery: ptGallery,
     "global-goals": ptGlobalGoals,
+    "global-logs": ptGlobalLogs,
     "item-detail": ptItemDetail,
     items: ptItems,
     loading: ptLoading,

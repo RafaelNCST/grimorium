@@ -89,5 +89,23 @@
     "upload_image": "Enviar Imagem",
     "empty_state_title": "Nenhuma imagem vinculada ainda",
     "empty_state_description": "Envie sua primeira imagem para {{entityName}} e ela aparecerá aqui!"
+  },
+  "create_modal": {
+    "manage_links": "Gerenciar Vínculos de Entidades",
+    "search_entities": "Buscar entidades...",
+    "loading": "Carregando...",
+    "no_results": "Nenhum resultado encontrado",
+    "no_entities_available": "Nenhuma entidade disponível",
+    "selected_count": "{{count}} selecionado(s)",
+    "of": "de",
+    "in_tab": "nesta categoria",
+    "done": "Concluir"
+  },
+  "tabs": {
+    "characters": "Personagens",
+    "regions": "Regiões",
+    "factions": "Facções",
+    "races": "Raças",
+    "items": "Itens"
   }
 }

@@ -1,0 +1,63 @@
+{
+  "page": {
+    "title": "Registros Globais",
+    "description": "Biblioteca central de todos os registros da obra",
+    "loading": "Carregando...",
+    "empty_state": "Nenhum registro global ainda",
+    "empty_state_description": "Crie registros e vincule-os a personagens, facções, raças, itens e regiões.",
+    "empty_state_filtered": "Nenhum registro com os tipos selecionados",
+    "create_button": "Criar Novo Registro",
+    "create_first": "Criar Primeiro Registro"
+  },
+  "card": {
+    "chapter": "Capítulo",
+    "prehistory": "Pré-história",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "manage_links": "Gerenciar Vínculos"
+  },
+  "filters": {
+    "search_placeholder": "Buscar registros...",
+    "sort_label": "Ordenar",
+    "sort_manual": "Ordem Manual",
+    "sort_recent": "Mais Recentes",
+    "sort_importance": "Por Tipo",
+    "filter_importance": "Filtrar por Tipo",
+    "all_importance": "Todos",
+    "hook": "Ganchos",
+    "lore": "Lore",
+    "foreshadowing": "Foreshadowing",
+    "filter_moment": "Filtrar por Momento",
+    "all_moments": "Todos",
+    "chapters": "Capítulos",
+    "prehistory": "Pré-história"
+  },
+  "manage_links_modal": {
+    "title": "Gerenciar Vínculos",
+    "description": "Vincule este registro a personagens, regiões, facções, raças ou itens",
+    "tabs": {
+      "characters": "Personagens",
+      "regions": "Regiões",
+      "factions": "Facções",
+      "races": "Raças",
+      "items": "Itens"
+    },
+    "search_placeholder": "Buscar...",
+    "no_entities": "Nenhuma entidade encontrada",
+    "no_results": "Nenhum resultado encontrado",
+    "loading": "Carregando...",
+    "selected_count": "{{count}} selecionado(s)",
+    "of": "de",
+    "in_tab": "nesta categoria",
+    "done": "Concluir",
+    "cancel": "Cancelar",
+    "save": "Salvar"
+  },
+  "delete": {
+    "title": "Excluir Registro",
+    "message": "Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.",
+    "message_with_links": "Este registro está vinculado a {{count}} entidade(s). Ao excluir, os vínculos também serão removidos.",
+    "cancel": "Cancelar",
+    "confirm": "Excluir"
+  }
+}

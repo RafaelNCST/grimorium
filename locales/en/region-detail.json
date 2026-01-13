@@ -9,6 +9,8 @@
     "quick_navigation": "Quick Navigation",
     "notes": "Notes",
     "logs": "Logs",
+    "global_logs": "Global Logs",
+    "global_logs_tooltip": "View all story logs",
     "gallery": "Gallery",
     "view_map": "View Map"
   },
