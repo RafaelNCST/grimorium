@@ -176,6 +176,10 @@
       "power_system": {
         "title": "Criando Sistema de Poder",
         "description": "Organize e explique o sistema de magia ou poderes da sua história de forma visual e didática"
+      },
+      "fast_writing": {
+        "title": "Escrita Rápida e Eficiente",
+        "description": "Aprenda a arquitetar o mínimo necessário e começar a escrever rapidamente usando arcos e referências"
       }
     },
     "content": {
@@ -334,6 +338,80 @@
             "divider": "Separadores visuais",
             "spacer": "Espaçamento entre seções"
           }
+        }
+      },
+      "fast_writing": {
+        "hero_subtitle": "Arquitete pouco, escreva muito",
+        "main_title": "Escrita Rápida e Eficiente",
+        "main_subtitle": "Aprenda a técnica de escrever rapidamente criando apenas o necessário e revisando a cada 10 capítulos",
+        "intro": "A melhor forma de escrever é <1>escrevendo</1>. Muitos autores passam meses planejando sem escrever uma palavra. Esta técnica te ensina a <3>arquitetar o mínimo necessário</3> e começar a escrever o mais rápido possível, usando ciclos de 10 capítulos.",
+        "step1": {
+          "title": "Passo 1: Crie Seu Primeiro Arco",
+          "description": "Antes de escrever, vá na tab Enredo e crie um arco usando as features de detalhe do arco. Liste o que você espera nesse primeiro bloco de capítulos.",
+          "why_title": "Por que criar o arco primeiro?",
+          "why_description": "O arco serve como sua <1>bússola</1>. Você não precisa colocar tudo naquele momento - pode ir mudando com o tempo conforme escreve. Apenas o suficiente para saber a direção geral dos próximos capítulos.",
+          "what_include_title": "O que incluir no arco:",
+          "what_include": {
+            "goal": "Objetivo principal deste bloco de capítulos",
+            "conflict": "Conflito ou problema central",
+            "outcome": "Como você quer que este bloco termine",
+            "key_events": "Eventos chaves que você tem em mente naquele momento"
+          },
+          "tip": "Não se preocupe com perfeição! O arco é um guia, não uma prisão. Você pode ajustá-lo conforme escreve."
+        },
+        "step2": {
+          "title": "Passo 2: Escreva 10 Capítulos",
+          "description": "Agora é hora de <1>escrever</1>. Foque em produzir conteúdo, não em perfeição. Use as ferramentas do app para te ajudar.",
+          "features_title": "Ferramentas que te ajudam:",
+          "features": {
+            "arc_reference": "Visualize o arco enquanto escreve para não perder o rumo",
+            "entity_links": "Crie personagens, locais e itens conforme mencionados",
+            "quick_notes": "Use anotações no editor para ideias que surgirem",
+            "references": "Use a feature Referências para consultar dados rapidamente durante a escrita"
+          },
+          "writing_tip_title": "Dica de escrita:",
+          "writing_tip": "Escreva em <1>sessões focadas</1>. Melhor escrever 500 palavras por dia durante 10 dias do que tentar escrever 5000 palavras de uma vez."
+        },
+        "step3": {
+          "title": "Passo 3: Revise a Cada 10 Capítulos",
+          "description": "Após escrever 10 capítulos, <1>pare e revise</1>. Este é o momento de se tornar o arquiteto.",
+          "review_checklist_title": "Lista de revisão:",
+          "review_checklist": {
+            "arc_alignment": "Os capítulos seguiram o arco que você criou?",
+            "consistency": "Há inconsistências de personagens ou plot?",
+            "pacing": "O ritmo está adequado?",
+            "opportunities": "Surgiram oportunidades de plot que você pode explorar?"
+          },
+          "after_review_title": "Após a revisão:",
+          "after_review": {
+            "update_entities": "Atualize fichas de personagens, itens, facções e outros dados mencionados",
+            "create_next_arc": "Crie o próximo arco baseado no que aconteceu",
+            "fix_inconsistencies": "Corrija pequenas inconsistências (grandes podem esperar)",
+            "note_future_plots": "Anote ideias de plots futuros no Dashboard"
+          }
+        },
+        "cycle": {
+          "title": "O Ciclo de 10 Capítulos",
+          "description": "Repita este ciclo até terminar seu livro. A cada ciclo você aprende mais sobre sua história e seus personagens.",
+          "benefits_title": "Benefícios desta abordagem:",
+          "benefits": {
+            "momentum": "Mantém o momento de escrita ativo",
+            "organic": "Personagens e plot se desenvolvem organicamente",
+            "less_planning": "Menos tempo planejando, mais tempo escrevendo",
+            "flexibility": "Flexibilidade para explorar ideias que surgem"
+          },
+          "cycle_visual_title": "Visualização do ciclo:"
+        },
+        "tips": {
+          "title": "Dicas Avançadas",
+          "tip1_title": "Use a feature Referências",
+          "tip1": "Use a feature Referências do editor para consultar personagens, locais e outros dados rapidamente enquanto escreve, sem perder o foco.",
+          "tip2_title": "Não edite enquanto escreve",
+          "tip2": "A edição vem depois. No modo jardineiro (primeiros 10 capítulos), foque apenas em <1>produzir conteúdo</1>.",
+          "tip3_title": "Celebre pequenas vitórias",
+          "tip3": "Cada ciclo de 10 capítulos concluído é uma vitória. Você está <1>progredindo</1>, não apenas planejando.",
+          "tip4_title": "Ajuste o ciclo se necessário",
+          "tip4": "10 capítulos é uma sugestão. Se preferir revisar a cada 5 ou 15, ajuste para o que funciona para você."
         }
       }
     }

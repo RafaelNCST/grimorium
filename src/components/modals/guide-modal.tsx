@@ -8,6 +8,7 @@ import {
   X,
   ChevronRight,
   Wand2,
+  Zap,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -55,6 +56,13 @@ export function GuideModal({ isOpen, onClose, onGuideSelect }: GuideModalProps) 
       description: t("guides.list.power_system.description"),
       category: "magic",
       icon: <Wand2 className="h-5 w-5" />,
+    },
+    {
+      id: "fast_writing",
+      title: t("guides.list.fast_writing.title"),
+      description: t("guides.list.fast_writing.description"),
+      category: "plot",
+      icon: <Zap className="h-5 w-5" />,
     },
     {
       id: "creative-block",
