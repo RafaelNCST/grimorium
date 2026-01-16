@@ -180,6 +180,10 @@
       "fast_writing": {
         "title": "Escrita Rápida e Eficiente",
         "description": "Aprenda a arquitetar o mínimo necessário e começar a escrever rapidamente usando arcos e referências"
+      },
+      "using_logs": {
+        "title": "Sistema de Registros",
+        "description": "Aprenda a usar registros para gravar eventos importantes da sua história e de suas entidades para consulta futura"
       }
     },
     "content": {
@@ -412,6 +416,87 @@
           "tip3": "Cada ciclo de 10 capítulos concluído é uma vitória. Você está <1>progredindo</1>, não apenas planejando.",
           "tip4_title": "Ajuste o ciclo se necessário",
           "tip4": "10 capítulos é uma sugestão. Se preferir revisar a cada 5 ou 15, ajuste para o que funciona para você."
+        }
+      },
+      "using_logs": {
+        "hero_subtitle": "Nunca esqueça um detalhe importante",
+        "main_title": "Sistema de Registros",
+        "main_subtitle": "Use registros para gravar eventos, mudanças e marcos da sua história e entidades",
+        "intro": "Durante a escrita, muitos detalhes importantes acontecem: um personagem revela um segredo, uma profecia é mencionada, uma mudança importante ocorre. O <1>Sistema de Registros</1> te ajuda a <3>documentar e encontrar</3> esses momentos rapidamente.",
+        "types": {
+          "title": "Tipos de Registro",
+          "description": "Cada registro precisa ser classificado em um dos três tipos de importância:",
+          "hook": {
+            "title": "Gancho",
+            "description": "Eventos que geram expectativa ou puxam a narrativa para frente. Ex: Um personagem faz uma promessa importante."
+          },
+          "lore": {
+            "title": "Lore",
+            "description": "Informações de background do mundo, história ou conceitos. Ex: Explicação sobre como a magia funciona."
+          },
+          "foreshadowing": {
+            "title": "Foreshadowing",
+            "description": "Antecipações sutis de eventos futuros. Ex: Um objeto mencionado que será importante depois."
+          }
+        },
+        "global_logs": {
+          "title": "Registros Globais",
+          "subtitle": "Acessível pelo ícone no topo do Dashboard",
+          "description": "Os <1>Registros Globais</1> são o coração do sistema. Aqui você pode ver todos os eventos importantes do seu livro em um só lugar.",
+          "features_title": "O que você pode fazer:",
+          "features": {
+            "create": "Criar novos registros com tipo, momento e descrição",
+            "link": "Vincular um registro a múltiplas entidades (personagens, facções, itens, raças, regiões)",
+            "search": "Buscar registros por nome ou descrição",
+            "filter": "Filtrar por tipo de registro ou momento",
+            "reorder": "Reordenar manualmente com drag & drop"
+          },
+          "use_case_title": "Quando usar:",
+          "use_case": "Use registros globais quando um evento envolve múltiplas entidades ou quando você quer ter uma visão geral de todos os acontecimentos importantes."
+        },
+        "local_logs": {
+          "title": "Registros Locais de Entidade",
+          "subtitle": "Acessível pelo botão 'Logs' no detalhe de cada entidade",
+          "description": "Além dos registros globais, cada entidade (personagem, facção, etc) tem sua própria <1>vista de registros</1> mostrando apenas os eventos vinculados a ela.",
+          "example_title": "Exemplo com Personagens:",
+          "example_description": "Ao abrir o detalhe de um personagem e clicar em 'Logs', você verá apenas os registros vinculados àquele personagem.",
+          "features_title": "Funcionalidades:",
+          "features": {
+            "view": "Visualizar apenas registros da entidade",
+            "create": "Criar novo registro (automaticamente vinculado)",
+            "edit": "Editar registro (se vinculado apenas a essa entidade)",
+            "delete": "Deletar registro",
+            "reorder": "Reordenar na ordem que faz sentido para aquela entidade",
+            "access_global": "Acessar 'Registros Globais' para edição cruzada"
+          },
+          "restriction_title": "⚠️ Importante:",
+          "restriction": "Se um registro está vinculado a múltiplas entidades, você não pode editá-lo pela vista local. Use 'Registros Globais' para editar."
+        },
+        "workflow": {
+          "title": "Fluxo de Trabalho Recomendado",
+          "step1": {
+            "title": "Enquanto escreve",
+            "description": "Quando algo importante acontecer, crie um registro rapidamente anotando o tipo, capítulo e uma breve descrição."
+          },
+          "step2": {
+            "title": "Vincule às entidades",
+            "description": "Depois, vincule o registro às entidades envolvidas (personagens, locais, facções, etc)."
+          },
+          "step3": {
+            "title": "Consulte quando necessário",
+            "description": "Use a busca e filtros para encontrar informações rapidamente. Acesse pela vista global ou local de cada entidade."
+          }
+        },
+        "tips": {
+          "title": "Dicas de Uso",
+          "tip1_title": "Seja conciso",
+          "tip1": "Descrições curtas e diretas funcionam melhor. Você pode sempre adicionar mais detalhes depois.",
+          "tip2_title": "Use tags estrategicamente",
+          "tip2": "Marque como <1>Gancho</1> eventos que você precisa resolver, <1>Lore</1> para informações de mundo, e <1>Foreshadowing</1> para pistas que você plantou.",
+          "tip3_title": "Revise periodicamente",
+          "tip3": "A cada alguns capítulos, revise seus registros para não esquecer de resolver ganchos pendentes ou usar foreshadowings que você plantou.",
+          "tip4_title": "Registros vs Notas",
+          "tip4": "Use registros para eventos e mudanças importantes. Use notas do editor para ideias soltas e rascunhos."
         }
       }
     }

@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Wand2,
   Zap,
+  ScrollText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -65,25 +66,11 @@ export function GuideModal({ isOpen, onClose, onGuideSelect }: GuideModalProps) 
       icon: <Zap className="h-5 w-5" />,
     },
     {
-      id: "creative-block",
-      title: t("guides.list.creative_block.title"),
-      description: t("guides.list.creative_block.description"),
-      category: "starting",
-      icon: <Sparkles className="h-5 w-5" />,
-    },
-    {
-      id: "creating-characters",
-      title: t("guides.list.creating_characters.title"),
-      description: t("guides.list.creating_characters.description"),
-      category: "characters",
-      icon: <Users className="h-5 w-5" />,
-    },
-    {
-      id: "building-world",
-      title: t("guides.list.building_world.title"),
-      description: t("guides.list.building_world.description"),
-      category: "worldbuilding",
-      icon: <MapPin className="h-5 w-5" />,
+      id: "using_logs",
+      title: t("guides.list.using_logs.title"),
+      description: t("guides.list.using_logs.description"),
+      category: "plot",
+      icon: <ScrollText className="h-5 w-5" />,
     },
   ];
 

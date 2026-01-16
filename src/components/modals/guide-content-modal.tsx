@@ -38,6 +38,7 @@ import {
 import { PowerLinkCard } from "@/pages/dashboard/tabs/power-system/components/power-link-card";
 import type { IPowerBlock, IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
 import { FastWritingGuide } from "@/components/modals/guide-fast-writing";
+import { UsingLogsGuide } from "@/components/modals/guide-using-logs";
 
 interface GuideContentModalProps {
   isOpen: boolean;
@@ -63,6 +64,8 @@ export function GuideContentModal({
         return <PowerSystemGuide t={t} onClose={onClose} />;
       case "fast_writing":
         return <FastWritingGuide t={t} onClose={onClose} />;
+      case "using_logs":
+        return <UsingLogsGuide t={t} onClose={onClose} />;
       default:
         return null;
     }
