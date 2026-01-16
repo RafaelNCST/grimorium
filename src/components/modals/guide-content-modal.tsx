@@ -16,10 +16,27 @@ import {
   Layers,
   Users,
   ChevronRight,
+  Trash2,
+  Edit,
+  Edit2,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
+import {
+  HeadingBlock,
+  ParagraphBlock,
+  AttributesBlock,
+  InformativeBlock,
+  IconGroupBlock,
+  DropdownBlock,
+  TagListBlock,
+  NumberedListBlock,
+  StarsBlock,
+  NavigatorBlock,
+} from "@/pages/dashboard/tabs/power-system/components/blocks";
+import { PowerLinkCard } from "@/pages/dashboard/tabs/power-system/components/power-link-card";
+import type { IPowerBlock, IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
 
 interface GuideContentModalProps {
   isOpen: boolean;
@@ -492,6 +509,132 @@ function PowerSystemGuide({ t, onClose }: { t: any; onClose: () => void }) {
     });
   };
 
+  // Mock blocks data for visual examples
+  const mockBlocks: Record<string, IPowerBlock> = {
+    heading: {
+      id: "demo-heading",
+      sectionId: "demo",
+      type: "heading",
+      orderIndex: 0,
+      content: { text: "Descrição", level: 2, alignment: "left" },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    },
+    paragraph: {
+      id: "demo-paragraph",
+      sectionId: "demo",
+      type: "paragraph",
+      orderIndex: 1,
+      content: {
+        text: "A Bola de Fogo é uma das magias elementais mais básicas e essenciais do arsenal de qualquer mago de fogo. Consiste em conjurar uma esfera flamejante que pode ser arremessada contra inimigos.",
+      },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    },
+    attributes: {
+      id: "demo-attributes",
+      sectionId: "demo",
+      type: "attributes",
+      orderIndex: 2,
+      content: { max: 10, current: 7, color: "red" },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    },
+    informative: {
+      id: "demo-informative",
+      sectionId: "demo",
+      type: "informative",
+      orderIndex: 3,
+      content: {
+        icon: "info" as const,
+        text: "Para iniciantes, é recomendado praticar com alvos estáticos antes de tentar acertar inimigos em movimento.",
+      },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    },
+    iconGroup: {
+      id: "demo-icon-group",
+      sectionId: "demo",
+      type: "icon-group",
+      orderIndex: 4,
+      content: {
+        icons: [
+          {
+            id: "icon-1",
+            title: "Dano Direto",
+            description: "Causa dano imediato ao alvo",
+          },
+          {
+            id: "icon-2",
+            title: "Queimadura",
+            description: "Pode causar efeito contínuo",
+          },
+        ],
+      },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    },
+    dropdown: {
+      id: "demo-dropdown",
+      sectionId: "demo",
+      type: "dropdown",
+      orderIndex: 5,
+      content: {
+        dataSource: "manual" as const,
+        options: ["Arkan, o Piromante", "Lyra, a Curandeira"],
+        selectedValue: "Arkan, o Piromante",
+      },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    },
+    tags: {
+      id: "demo-tags",
+      sectionId: "demo",
+      type: "tag-list",
+      orderIndex: 6,
+      content: { tags: ["Fogo", "Ataque", "À Distância"] },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    },
+    numberedList: {
+      id: "demo-numbered-list",
+      sectionId: "demo",
+      type: "numbered-list",
+      orderIndex: 7,
+      content: {
+        items: [
+          { id: "1", text: "Concentre-se na fonte de mana interna" },
+          { id: "2", text: "Visualize o elemento fogo em sua mente" },
+          { id: "3", text: "Canalize a energia através das mãos" },
+          { id: "4", text: "Projete a esfera flamejante para o alvo" },
+        ],
+      },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    },
+    stars: {
+      id: "demo-stars",
+      sectionId: "demo",
+      type: "stars",
+      orderIndex: 8,
+      content: { rating: 3, size: "medium" },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    },
+    navigator: {
+      id: "demo-navigator",
+      sectionId: "demo",
+      type: "navigator",
+      orderIndex: 9,
+      content: {
+        linkedPageId: "fake-page-id",
+        title: "Ver também: Escudo de Chamas",
+      },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    },
+  };
+
   return (
     <>
       {/* Header fixo com botão de fechar */}
@@ -542,669 +685,610 @@ function PowerSystemGuide({ t, onClose }: { t: any; onClose: () => void }) {
           </p>
         </div>
 
-        {/* Introdução */}
-        <div className="prose prose-lg max-w-4xl mx-auto mb-16">
-          <p className="text-foreground/90 text-base lg:text-lg leading-relaxed text-center">
-            {parseInlineMarkup(guide.intro)}
-          </p>
-        </div>
-
-        {/* Seção: Conceitos Básicos */}
+        {/* Introdução - O que vamos criar */}
         <div className="mb-16">
-          <div className="border border-blue-500/20 bg-blue-500/5 rounded-xl p-8 lg:p-12 max-w-5xl mx-auto">
-            <div className="flex items-center gap-3 lg:gap-4 mb-6">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-blue-500/10 flex items-center justify-center">
-                <BookOpenCheck className="h-6 w-6 lg:h-7 lg:w-7 text-blue-600" />
-              </div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
-                {guide.basics.title}
+          <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-8 lg:p-12 max-w-5xl mx-auto">
+            <div className="text-center mb-6">
+              <Wand2 className="h-16 w-16 lg:h-20 lg:w-20 text-purple-600 mx-auto mb-4" />
+              <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
+                Exemplo Prático: Sistema de Magia Elemental
               </h2>
             </div>
-
-            <p className="text-foreground/80 mb-6 leading-relaxed text-sm lg:text-base">
-              {guide.basics.description}
-            </p>
-
-            <div className="bg-background/50 rounded-lg p-6 mb-6">
-              <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-blue-600" />
-                {guide.basics.strengths_title}
-              </h3>
-              <ul className="space-y-2">
-                <li className="flex items-start gap-2 text-sm">
-                  <Sparkles className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-foreground/80">
-                    {guide.basics.strengths.fundamentals}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2 text-sm">
-                  <Sparkles className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-foreground/80">
-                    {guide.basics.strengths.energy}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2 text-sm">
-                  <Sparkles className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-foreground/80">
-                    {guide.basics.strengths.costs}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2 text-sm">
-                  <Sparkles className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-foreground/80">
-                    {guide.basics.strengths.rules}
-                  </span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-              <h4 className="font-semibold text-sm text-blue-700 dark:text-blue-300 mb-2">
-                💡 {guide.basics.example_title}
-              </h4>
-              <p className="text-sm text-foreground/80">{guide.basics.example}</p>
+            <div className="space-y-4 max-w-3xl mx-auto">
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+                <p className="text-foreground/90 text-sm lg:text-base leading-relaxed text-center">
+                  <strong>⚠️ Importante:</strong> Este guia demonstra como organizar e trabalhar com um sistema de poder <strong>após tê-lo criado</strong> na aba "Sistema de Poder". Certifique-se de criar seu sistema primeiro!
+                </p>
+              </div>
+              <p className="text-foreground/90 text-base lg:text-lg leading-relaxed text-center">
+                Neste guia, vamos explorar <strong>passo a passo</strong> como estruturar um sistema de magia completo. Você aprenderá a organizar páginas, criar habilidades detalhadas, linkar aos personagens e navegar entre páginas. Vamos usar como exemplo um <strong>Sistema de Magia Elemental</strong> com fogo, cura e muito mais!
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Seção: Habilidades Específicas */}
-        <div className="mb-16">
-          <div className="border border-amber-500/20 bg-amber-500/5 rounded-xl p-8 lg:p-12 max-w-5xl mx-auto">
-            <div className="flex items-center gap-3 lg:gap-4 mb-6">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-amber-500/10 flex items-center justify-center">
-                <Zap className="h-6 w-6 lg:h-7 lg:w-7 text-amber-600" />
-              </div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
-                {guide.abilities.title}
-              </h2>
-            </div>
-
-            <p className="text-foreground/80 mb-6 leading-relaxed text-sm lg:text-base">
-              {parseInlineMarkup(guide.abilities.description)}
-            </p>
-
-            <div className="bg-background/50 rounded-lg p-6 mb-6">
-              <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-amber-600" />
-                {guide.abilities.strengths_title}
-              </h3>
-              <ul className="space-y-2">
-                <li className="flex items-start gap-2 text-sm">
-                  <Sparkles className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                  <span className="text-foreground/80">
-                    {guide.abilities.strengths.folders}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2 text-sm">
-                  <Sparkles className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                  <span className="text-foreground/80">
-                    {guide.abilities.strengths.links}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2 text-sm">
-                  <Sparkles className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                  <span className="text-foreground/80">
-                    {guide.abilities.strengths.visual}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2 text-sm">
-                  <Sparkles className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                  <span className="text-foreground/80">
-                    {guide.abilities.strengths.custom}
-                  </span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
-              <h4 className="font-semibold text-sm text-amber-700 dark:text-amber-300 mb-2">
-                💡 {guide.abilities.example_title}
-              </h4>
-              <p className="text-sm text-foreground/80">{guide.abilities.example}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Seção: Conceitos Avançados */}
-        <div className="mb-16">
-          <div className="border border-purple-500/20 bg-purple-500/5 rounded-xl p-8 lg:p-12 max-w-5xl mx-auto">
-            <div className="flex items-center gap-3 lg:gap-4 mb-6">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-purple-500/10 flex items-center justify-center">
-                <Crown className="h-6 w-6 lg:h-7 lg:w-7 text-purple-600" />
-              </div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
-                {guide.advanced.title}
-              </h2>
-            </div>
-
-            <p className="text-foreground/80 mb-6 leading-relaxed text-sm lg:text-base">
-              {guide.advanced.description}
-            </p>
-
-            <div className="bg-background/50 rounded-lg p-6 mb-6">
-              <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-purple-600" />
-                {guide.advanced.strengths_title}
-              </h3>
-              <ul className="space-y-2">
-                <li className="flex items-start gap-2 text-sm">
-                  <Sparkles className="h-4 w-4 text-purple-600 shrink-0 mt-0.5" />
-                  <span className="text-foreground/80">
-                    {guide.advanced.strengths.complex}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2 text-sm">
-                  <Sparkles className="h-4 w-4 text-purple-600 shrink-0 mt-0.5" />
-                  <span className="text-foreground/80">
-                    {guide.advanced.strengths.rare}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2 text-sm">
-                  <Sparkles className="h-4 w-4 text-purple-600 shrink-0 mt-0.5" />
-                  <span className="text-foreground/80">
-                    {guide.advanced.strengths.plot}
-                  </span>
-                </li>
-                <li className="flex items-start gap-2 text-sm">
-                  <Sparkles className="h-4 w-4 text-purple-600 shrink-0 mt-0.5" />
-                  <span className="text-foreground/80">
-                    {guide.advanced.strengths.evolution}
-                  </span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
-              <h4 className="font-semibold text-sm text-purple-700 dark:text-purple-300 mb-2">
-                💡 {guide.advanced.example_title}
-              </h4>
-              <p className="text-sm text-foreground/80">{guide.advanced.example}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Seção: Como Organizar (4 passos) */}
-        <div className="mb-16">
-          <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-8 lg:p-12 max-w-5xl mx-auto">
-            <div className="flex items-center gap-3 lg:gap-4 mb-6">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-green-500/10 flex items-center justify-center">
-                <FolderTree className="h-6 w-6 lg:h-7 lg:w-7 text-green-600" />
-              </div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
-                {guide.organization.title}
-              </h2>
-            </div>
-
-            <div className="bg-background/50 rounded-lg p-6 lg:p-8 border border-green-500/30">
-              <h3 className="text-xl font-semibold text-foreground mb-6 flex items-center gap-2">
-                <Compass className="h-5 w-5 text-green-600" />
-                {guide.organization.recommended_title}
-              </h3>
-
-              <div className="space-y-6">
-                {/* Step 1 */}
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-700 dark:text-green-300 font-bold text-lg">
-                    1
-                  </div>
-                  <div>
-                    <p className="text-foreground/90 leading-relaxed text-sm lg:text-base">
-                      <strong className="text-green-600">
-                        {guide.organization.step1_title}
-                      </strong>{" "}
-                      {parseInlineMarkup(guide.organization.step1_description)}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 2 */}
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-700 dark:text-green-300 font-bold text-lg">
-                    2
-                  </div>
-                  <div>
-                    <p className="text-foreground/90 leading-relaxed text-sm lg:text-base">
-                      <strong className="text-green-600">
-                        {guide.organization.step2_title}
-                      </strong>{" "}
-                      {parseInlineMarkup(guide.organization.step2_description)}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 3 */}
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-700 dark:text-green-300 font-bold text-lg">
-                    3
-                  </div>
-                  <div>
-                    <p className="text-foreground/90 leading-relaxed text-sm lg:text-base">
-                      <strong className="text-green-600">
-                        {guide.organization.step3_title}
-                      </strong>{" "}
-                      {parseInlineMarkup(guide.organization.step3_description)}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 4 */}
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-700 dark:text-green-300 font-bold text-lg">
-                    4
-                  </div>
-                  <div>
-                    <p className="text-foreground/90 leading-relaxed text-sm lg:text-base">
-                      <strong className="text-green-600">
-                        {guide.organization.step4_title}
-                      </strong>{" "}
-                      {parseInlineMarkup(guide.organization.step4_description)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Seção: Blocos (16 tipos) */}
-        <div className="mb-12">
-          <div className="bg-gradient-to-br from-pink-500/10 to-rose-500/10 border border-pink-500/20 rounded-xl p-8 lg:p-12 max-w-5xl mx-auto">
-            <div className="flex items-center gap-3 lg:gap-4 mb-6">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-pink-500/10 flex items-center justify-center">
-                <Grid3x3 className="h-6 w-6 lg:h-7 lg:w-7 text-pink-600" />
-              </div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
-                {guide.blocks.title}
-              </h2>
-            </div>
-
-            <p className="text-foreground/80 mb-8 leading-relaxed text-sm lg:text-base">
-              {guide.blocks.description}
-            </p>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Texto & Organização */}
-              <div className="bg-background/50 rounded-lg p-6 border border-pink-500/20">
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Layers className="h-5 w-5 text-pink-600" />
-                  {guide.blocks.text_title}
-                </h3>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.text_blocks.heading}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.text_blocks.paragraph}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.text_blocks.lists}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.text_blocks.tags}
-                    </span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Dados & Links */}
-              <div className="bg-background/50 rounded-lg p-6 border border-pink-500/20">
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Layers className="h-5 w-5 text-pink-600" />
-                  {guide.blocks.interactive_title}
-                </h3>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.interactive_blocks.dropdown}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.interactive_blocks.multi}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.interactive_blocks.navigator}
-                    </span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Visual & Mídia */}
-              <div className="bg-background/50 rounded-lg p-6 border border-pink-500/20">
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Layers className="h-5 w-5 text-pink-600" />
-                  {guide.blocks.visual_title}
-                </h3>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.visual_blocks.image}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.visual_blocks.icon}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.visual_blocks.icon_group}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.visual_blocks.attributes}
-                    </span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Informação */}
-              <div className="bg-background/50 rounded-lg p-6 border border-pink-500/20">
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Layers className="h-5 w-5 text-pink-600" />
-                  {guide.blocks.info_title}
-                </h3>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.info_blocks.informative}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.info_blocks.stars}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.info_blocks.divider}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-pink-600 shrink-0">•</span>
-                    <span className="text-foreground/80">
-                      {guide.blocks.info_blocks.spacer}
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Seção: Exemplos Visuais de Organização */}
+        {/* Passo 1: Estrutura de Organização */}
         <div className="mb-16">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-8 text-center">
-              Exemplos Visuais
-            </h2>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="text-xl font-bold text-primary">1</span>
+              </div>
+              <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
+                Passo 1: Estrutura de Organização
+              </h2>
+            </div>
+
+            <p className="text-foreground/80 mb-8 leading-relaxed">
+              Primeiro, vamos organizar nosso sistema. Começamos com uma <strong>página base</strong> para conceitos gerais, depois criamos <strong>pastas</strong> para agrupar habilidades similares.
+            </p>
+
+            <div className="bg-muted/30 border border-border rounded-lg p-6">
+              <div className="font-mono text-sm space-y-2">
+                {/* Página base */}
+                <div className="flex items-start gap-2 text-foreground">
+                  <BookOpenCheck className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                  <div className="flex-1">
+                    <span className="font-semibold">📄 Fundamentos da Magia</span>
+                    <span className="text-xs text-muted-foreground ml-2">(Página base com conceitos gerais)</span>
+                  </div>
+                </div>
+
+                {/* Pasta: Magias de Fogo */}
+                <div className="mt-4">
+                  <div className="flex items-center gap-2 text-foreground">
+                    <FolderTree className="h-4 w-4 text-amber-500 shrink-0" />
+                    <span className="font-semibold">📁 Magias de Fogo</span>
+                  </div>
+                  {/* Páginas dentro da pasta */}
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-amber-500/30 pl-4">
+                    <div className="flex items-center gap-2 text-foreground/80">
+                      <span>📄 Bola de Fogo</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-foreground/80">
+                      <span>📄 Escudo de Chamas</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-foreground/60">
+                      <span>📄 Fênix</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pasta: Magias de Cura */}
+                <div className="mt-3">
+                  <div className="flex items-center gap-2 text-foreground">
+                    <FolderTree className="h-4 w-4 text-purple-500 shrink-0" />
+                    <span className="font-semibold">📁 Magias de Cura</span>
+                  </div>
+                  {/* Páginas dentro da pasta */}
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-purple-500/30 pl-4">
+                    <div className="flex items-center gap-2 text-foreground/80">
+                      <span>📄 Toque Restaurador</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-foreground/60">
+                      <span>📄 Ressurreição</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Dicas de Organização */}
+            <div className="mt-8 bg-green-500/5 border border-green-500/20 rounded-lg p-6">
+              <h3 className="font-semibold text-green-700 dark:text-green-300 mb-3 flex items-center gap-2">
+                <Sparkles className="h-5 w-5" />
+                Dicas de Organização
+              </h3>
+              <ul className="space-y-2 text-sm text-foreground/80">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 shrink-0 mt-0.5">✓</span>
+                  <span><strong>Crie uma página base</strong> com conceitos gerais antes de criar habilidades específicas</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 shrink-0 mt-0.5">✓</span>
+                  <span><strong>Organize por categorias</strong> usando pastas (ex: Fogo, Água, Cura, Ataque)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 shrink-0 mt-0.5">✓</span>
+                  <span><strong>Uma página por habilidade</strong> permite detalhamento completo e links aos personagens</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 shrink-0 mt-0.5">✓</span>
+                  <span><strong>Use navegadores</strong> para conectar páginas relacionadas formando uma wiki interativa</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Passo 2: Como seria cada página */}
+        <div className="mb-16">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="text-xl font-bold text-primary">2</span>
+              </div>
+              <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
+                Passo 2: Como Seria Cada Página
+              </h2>
+            </div>
+
+            <p className="text-foreground/80 mb-8 leading-relaxed">
+              Agora vamos ver como cada tipo de página fica na prática. Vamos explorar desde páginas base com conceitos gerais até habilidades específicas com todos os detalhes.
+            </p>
+
+            {/* Blocos Disponíveis */}
+            <div className="mb-12 bg-pink-500/5 border border-pink-500/20 rounded-lg p-6">
+              <h3 className="font-semibold text-pink-700 dark:text-pink-300 mb-4 flex items-center gap-2">
+                <Grid3x3 className="h-5 w-5" />
+                Blocos Disponíveis para Construir suas Páginas
+              </h3>
+              <p className="text-sm text-foreground/80 mb-4">
+                Você tem <strong>16 tipos de blocos</strong> para criar páginas visuais e organizadas:
+              </p>
+              <div className="grid md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="font-semibold text-foreground mb-2">📝 Texto & Organização:</p>
+                  <ul className="space-y-1 text-foreground/70 ml-4">
+                    <li>• Cabeçalhos (5 níveis)</li>
+                    <li>• Parágrafos</li>
+                    <li>• Listas (ordenadas e não-ordenadas)</li>
+                    <li>• Tags para categorização</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground mb-2">🎨 Visual & Mídia:</p>
+                  <ul className="space-y-1 text-foreground/70 ml-4">
+                    <li>• Imagens com editor</li>
+                    <li>• Ícones circulares</li>
+                    <li>• Grupos de ícones</li>
+                    <li>• Barras de atributos</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground mb-2">🔗 Dados & Links:</p>
+                  <ul className="space-y-1 text-foreground/70 ml-4">
+                    <li>• Dropdowns (personagens/itens)</li>
+                    <li>• Seleção múltipla</li>
+                    <li>• Navegadores entre páginas</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground mb-2">ℹ️ Informação:</p>
+                  <ul className="space-y-1 text-foreground/70 ml-4">
+                    <li>• Blocos informativos destacados</li>
+                    <li>• Avaliação com estrelas</li>
+                    <li>• Divisores e espaçadores</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
 
             {/* Exemplo de Estrutura de Páginas */}
             <div className="mb-12">
               <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
                 <FolderTree className="h-5 w-5 text-primary" />
-                Como Organizar as Páginas
+                Visão Geral da Organização
               </h3>
               <div className="bg-muted/30 border border-border rounded-lg p-6">
-                <div className="font-mono text-sm space-y-1">
-                  <div className="flex items-center gap-2 text-foreground">
-                    <BookOpenCheck className="h-4 w-4 text-blue-500" />
-                    <span className="font-semibold">📄 Fundamentos da Magia</span>
+                <div className="font-mono text-sm space-y-2">
+                  {/* Página base */}
+                  <div className="flex items-start gap-2 text-foreground">
+                    <BookOpenCheck className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                    <div className="flex-1">
+                      <span className="font-semibold">📄 Fundamentos da Magia</span>
+                      <span className="text-xs text-muted-foreground ml-2">(Página base com conceitos gerais)</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-foreground ml-6">
-                    <BookOpenCheck className="h-4 w-4 text-blue-500" />
-                    <span className="font-semibold">📄 Leis Universais</span>
+
+                  {/* Pasta: Magias de Fogo */}
+                  <div className="mt-4">
+                    <div className="flex items-center gap-2 text-foreground">
+                      <FolderTree className="h-4 w-4 text-amber-500 shrink-0" />
+                      <span className="font-semibold">📁 Magias de Fogo</span>
+                    </div>
+                    {/* Páginas dentro da pasta */}
+                    <div className="ml-6 mt-1 space-y-1 border-l-2 border-amber-500/30 pl-4">
+                      <div className="flex items-center gap-2 text-foreground/80">
+                        <span>📄 Bola de Fogo</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-foreground/80">
+                        <span>📄 Escudo de Chamas</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-foreground/60">
+                        <span>📄 Fênix</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-foreground mt-3">
-                    <FolderTree className="h-4 w-4 text-amber-500" />
-                    <span className="font-semibold">📁 Magias de Fogo</span>
+
+                  {/* Pasta: Magias de Cura */}
+                  <div className="mt-3">
+                    <div className="flex items-center gap-2 text-foreground">
+                      <FolderTree className="h-4 w-4 text-purple-500 shrink-0" />
+                      <span className="font-semibold">📁 Magias de Cura</span>
+                    </div>
+                    {/* Páginas dentro da pasta */}
+                    <div className="ml-6 mt-1 space-y-1 border-l-2 border-purple-500/30 pl-4">
+                      <div className="flex items-center gap-2 text-foreground/80">
+                        <span>📄 Toque Restaurador</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-foreground/60">
+                        <span>📄 Ressurreição</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-muted-foreground ml-6">
-                    <span>📄 Bola de Fogo</span>
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">→ Arkan</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground ml-6">
-                    <span>📄 Escudo de Chamas</span>
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">→ Arkan</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground ml-6">
-                    <span>📄 Fênix</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-foreground mt-3">
-                    <FolderTree className="h-4 w-4 text-purple-500" />
-                    <span className="font-semibold">📁 Magias de Cura</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground ml-6">
-                    <span>📄 Toque Restaurador</span>
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">→ Lyra</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground ml-6">
-                    <span>📄 Ressurreição</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-foreground mt-3">
-                    <Crown className="h-4 w-4 text-purple-500" />
-                    <span className="font-semibold">📄 Magia Ancestral (Avançado)</span>
+
+                  {/* Página avançada */}
+                  <div className="mt-3">
+                    <div className="flex items-center gap-2 text-foreground">
+                      <Crown className="h-4 w-4 text-purple-500 shrink-0" />
+                      <span className="font-semibold">📄 Magia Ancestral (Avançado)</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Exemplos Visuais de Blocos */}
-            <div>
-              <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                <Grid3x3 className="h-5 w-5 text-primary" />
-                Como os Blocos Ficam
+            {/* Página Base */}
+            <div className="mb-12">
+              <h3 className="text-xl font-semibold text-foreground mb-6 flex items-center gap-2">
+                <BookOpenCheck className="h-5 w-5 text-blue-500" />
+                2.1 Página Base - "Fundamentos da Magia"
               </h3>
 
-              <div className="space-y-6">
-                {/* Exemplo de Página Completa */}
-                <div className="bg-background border-2 border-border rounded-lg overflow-hidden">
-                  {/* Header da página simulada */}
-                  <div className="bg-muted/50 px-6 py-3 border-b border-border">
-                    <div className="flex items-center gap-2">
-                      <Zap className="h-4 w-4 text-amber-500" />
-                      <span className="font-semibold text-sm">Bola de Fogo</span>
-                    </div>
+              <p className="text-foreground/80 mb-6 leading-relaxed">
+                A página base contém <strong>conceitos gerais</strong> do sistema. Use blocos simples para explicar regras universais, custos de energia, etc.
+              </p>
+
+              <div className="bg-background border-2 border-border rounded-lg overflow-hidden">
+                <div className="bg-muted/50 px-6 py-3 border-b border-border">
+                  <div className="flex items-center gap-2">
+                    <BookOpenCheck className="h-4 w-4 text-blue-500" />
+                    <span className="font-semibold text-sm">Fundamentos da Magia</span>
                   </div>
+                </div>
 
-                  {/* Conteúdo da página simulada */}
-                  <div className="p-6 space-y-6">
-                    {/* Heading */}
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-1 font-mono">Bloco: Heading H2</div>
-                      <h2 className="text-2xl font-bold text-foreground">Descrição</h2>
-                    </div>
-
-                    {/* Paragraph */}
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-1 font-mono">Bloco: Paragraph</div>
-                      <p className="text-foreground/80 leading-relaxed">
-                        A Bola de Fogo é uma das magias elementais mais básicas e essenciais do arsenal de qualquer mago de fogo. Consiste em conjurar uma esfera flamejante que pode ser arremessada contra inimigos.
-                      </p>
-                    </div>
-
-                    {/* Attributes (stats bars) */}
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-2 font-mono">Bloco: Attributes</div>
-                      <div className="space-y-3 bg-muted/30 rounded-lg p-4 border border-border">
-                        <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="text-foreground/80">Poder</span>
-                            <span className="text-foreground font-semibold">75%</span>
-                          </div>
-                          <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-red-500 rounded-full" style={{ width: "75%" }}></div>
-                          </div>
-                        </div>
-                        <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="text-foreground/80">Custo de Mana</span>
-                            <span className="text-foreground font-semibold">40%</span>
-                          </div>
-                          <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-500 rounded-full" style={{ width: "40%" }}></div>
-                          </div>
-                        </div>
-                        <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="text-foreground/80">Dificuldade</span>
-                            <span className="text-foreground font-semibold">30%</span>
-                          </div>
-                          <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-green-500 rounded-full" style={{ width: "30%" }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Informative Block */}
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-2 font-mono">Bloco: Informative (Info)</div>
-                      <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-                        <div className="flex gap-3">
-                          <AlertCircle className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-                          <div>
-                            <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-1">Dica</h4>
-                            <p className="text-sm text-foreground/80">
-                              Para iniciantes, é recomendado praticar com alvos estáticos antes de tentar acertar inimigos em movimento.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Icon Group */}
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-2 font-mono">Bloco: Icon Group</div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="flex flex-col items-center text-center p-4 bg-muted/30 rounded-lg border border-border">
-                          <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mb-2">
-                            <Zap className="h-6 w-6 text-red-500" />
-                          </div>
-                          <span className="font-semibold text-sm">Dano Direto</span>
-                          <span className="text-xs text-muted-foreground mt-1">Causa dano imediato ao alvo</span>
-                        </div>
-                        <div className="flex flex-col items-center text-center p-4 bg-muted/30 rounded-lg border border-border">
-                          <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center mb-2">
-                            <Sparkles className="h-6 w-6 text-orange-500" />
-                          </div>
-                          <span className="font-semibold text-sm">Queimadura</span>
-                          <span className="text-xs text-muted-foreground mt-1">Pode causar efeito contínuo</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Dropdown (character link) */}
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-2 font-mono">Bloco: Dropdown (Link para Personagem)</div>
-                      <div className="bg-muted/30 rounded-lg p-4 border border-border">
-                        <label className="text-sm text-foreground/80 block mb-2">Usuário desta habilidade</label>
-                        <div className="bg-background border border-border rounded-md px-3 py-2 flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-                              <Users className="h-3 w-3 text-primary" />
-                            </div>
-                            <span className="text-sm font-medium">Arkan, o Piromante</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Tags */}
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-2 font-mono">Bloco: Tags</div>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="px-3 py-1 bg-red-500/10 text-red-600 dark:text-red-400 rounded-full text-xs font-medium border border-red-500/20">
-                          Fogo
-                        </span>
-                        <span className="px-3 py-1 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-full text-xs font-medium border border-orange-500/20">
-                          Ataque
-                        </span>
-                        <span className="px-3 py-1 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded-full text-xs font-medium border border-yellow-500/20">
-                          À Distância
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* List */}
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-2 font-mono">Bloco: List (Ordered)</div>
-                      <div className="bg-muted/30 rounded-lg p-4 border border-border">
-                        <h4 className="font-semibold text-sm mb-3">Passos para Conjurar:</h4>
-                        <ol className="space-y-2 list-decimal list-inside text-sm text-foreground/80">
-                          <li>Concentre-se na fonte de mana interna</li>
-                          <li>Visualize o elemento fogo em sua mente</li>
-                          <li>Canalize a energia através das mãos</li>
-                          <li>Projete a esfera flamejante para o alvo</li>
-                        </ol>
-                      </div>
-                    </div>
-
-                    {/* Stars Rating */}
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-2 font-mono">Bloco: Stars (Rating)</div>
-                      <div className="bg-muted/30 rounded-lg p-4 border border-border">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-foreground/80">Nível de Perigo</span>
-                          <div className="flex gap-1">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Sparkles
-                                key={star}
-                                className={`h-5 w-5 ${star <= 3 ? "text-yellow-500 fill-yellow-500" : "text-muted-foreground"}`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Navigator */}
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-2 font-mono">Bloco: Navigator (Link para outra página)</div>
-                      <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-lg p-4 hover:border-primary/40 transition-colors cursor-pointer">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-                              <BookOpen className="h-5 w-5 text-primary" />
-                            </div>
-                            <div>
-                              <div className="font-semibold text-sm text-foreground">Ver também: Escudo de Chamas</div>
-                              <div className="text-xs text-muted-foreground">Técnica defensiva de fogo</div>
-                            </div>
-                          </div>
-                          <ChevronRight className="h-5 w-5 text-primary" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <div className="p-6 space-y-4">
+                  <HeadingBlock
+                    block={{
+                      id: "base-1",
+                      sectionId: "demo",
+                      type: "heading",
+                      orderIndex: 0,
+                      content: { text: "O que é Magia?", level: 2, alignment: "left" },
+                      createdAt: Date.now(),
+                      updatedAt: Date.now(),
+                    }}
+                    isEditMode={false}
+                    onUpdate={() => {}}
+                    onDelete={() => {}}
+                  />
+                  <ParagraphBlock
+                    block={{
+                      id: "base-2",
+                      sectionId: "demo",
+                      type: "paragraph",
+                      orderIndex: 1,
+                      content: {
+                        text: "Magia é a capacidade de manipular energia elemental do mundo ao seu redor. Cada mago precisa de mana para conjurar feitiços."
+                      },
+                      createdAt: Date.now(),
+                      updatedAt: Date.now(),
+                    }}
+                    isEditMode={false}
+                    onUpdate={() => {}}
+                    onDelete={() => {}}
+                  />
                 </div>
               </div>
             </div>
+
+            {/* Habilidade Individual Completa */}
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-6 flex items-center gap-2">
+                <Zap className="h-5 w-5 text-amber-500" />
+                2.2 Habilidade Individual - "Bola de Fogo"
+              </h3>
+
+              <p className="text-foreground/80 mb-6 leading-relaxed">
+                Agora criamos uma habilidade específica dentro da pasta "Magias de Fogo". Aqui você pode usar <strong>todos os tipos de blocos</strong> para detalhar a habilidade: descrição, atributos de poder, usuários, tags, e mais!
+              </p>
+
+              {/* Benefícios de Habilidades Específicas */}
+              <div className="mb-6 bg-amber-500/5 border border-amber-500/20 rounded-lg p-6">
+                <h4 className="font-semibold text-amber-700 dark:text-amber-300 mb-3 flex items-center gap-2">
+                  <Zap className="h-5 w-5" />
+                  Por que criar páginas para cada habilidade?
+                </h4>
+                <ul className="space-y-2 text-sm text-foreground/80">
+                  <li className="flex items-start gap-2">
+                    <span className="text-amber-600 shrink-0 mt-0.5">✓</span>
+                    <span><strong>Link direto aos personagens:</strong> Conecte automaticamente a habilidade ao perfil do personagem</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-amber-600 shrink-0 mt-0.5">✓</span>
+                    <span><strong>Detalhamento visual:</strong> Use barras de atributos, ícones e imagens para explicar visualmente</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-amber-600 shrink-0 mt-0.5">✓</span>
+                    <span><strong>Organização por pastas:</strong> Agrupe por elemento, tipo ou raridade</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-amber-600 shrink-0 mt-0.5">✓</span>
+                    <span><strong>Navegação inteligente:</strong> Crie links entre habilidades relacionadas</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-background border-2 border-border rounded-lg overflow-hidden">
+                <div className="bg-muted/50 px-6 py-3 border-b border-border">
+                  <div className="flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-amber-500" />
+                    <span className="font-semibold text-sm">Bola de Fogo</span>
+                  </div>
+                </div>
+
+                <div className="p-6 space-y-4">
+                  <HeadingBlock
+                    block={mockBlocks.heading}
+                    isEditMode={false}
+                    onUpdate={() => {}}
+                    onDelete={() => {}}
+                  />
+
+                  <ParagraphBlock
+                    block={mockBlocks.paragraph}
+                    isEditMode={false}
+                    onUpdate={() => {}}
+                    onDelete={() => {}}
+                  />
+
+                  <AttributesBlock
+                    block={mockBlocks.attributes}
+                    isEditMode={false}
+                    onUpdate={() => {}}
+                    onDelete={() => {}}
+                  />
+
+                  <TagListBlock
+                    block={mockBlocks.tags}
+                    isEditMode={false}
+                    onUpdate={() => {}}
+                    onDelete={() => {}}
+                  />
+
+                  <NavigatorBlock
+                    block={mockBlocks.navigator}
+                    isEditMode={false}
+                    onUpdate={() => {}}
+                    onDelete={() => {}}
+                    pages={[{ id: "fake-page-id", name: "Escudo de Chamas", systemId: "demo", orderIndex: 0, createdAt: Date.now(), updatedAt: Date.now() }]}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Passo 3: Navegação Entre Páginas */}
+        <div className="mb-16">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="text-xl font-bold text-primary">3</span>
+              </div>
+              <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
+                Passo 3: Navegação Entre Páginas
+              </h2>
+            </div>
+
+            <p className="text-foreground/80 mb-6 leading-relaxed">
+              Use o bloco <strong>Navigator</strong> para criar links entre páginas relacionadas. Por exemplo, ao final da página "Bola de Fogo", você pode linkar para "Escudo de Chamas" (outra magia de fogo).
+            </p>
+
+            <div className="bg-muted/30 border border-border rounded-lg p-6">
+              <h3 className="font-semibold text-foreground mb-4">Exemplo de Navigator em ação:</h3>
+              <NavigatorBlock
+                block={{
+                  id: "demo-nav",
+                  sectionId: "demo",
+                  type: "navigator",
+                  orderIndex: 0,
+                  content: {
+                    linkedPageId: "escudo-chamas-id",
+                    title: "Ver também: Escudo de Chamas",
+                  },
+                  createdAt: Date.now(),
+                  updatedAt: Date.now(),
+                }}
+                isEditMode={false}
+                onUpdate={() => {}}
+                onDelete={() => {}}
+                pages={[
+                  {
+                    id: "escudo-chamas-id",
+                    name: "Escudo de Chamas",
+                    systemId: "demo",
+                    orderIndex: 0,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now(),
+                  },
+                ]}
+              />
+              <p className="text-xs text-muted-foreground mt-3">
+                💡 Ao clicar, o usuário é levado direto para a página "Escudo de Chamas"
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Passo 4: Linkando ao Personagem */}
+        <div className="mb-16">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="text-xl font-bold text-primary">4</span>
+              </div>
+              <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
+                Passo 4: Linkando ao Personagem
+              </h2>
+            </div>
+
+            <p className="text-foreground/80 mb-6 leading-relaxed">
+              Você pode linkar <strong>páginas inteiras</strong> ou <strong>seções específicas</strong> do seu sistema de poder aos personagens! Quando você faz isso, o link aparece automaticamente no <strong>perfil do personagem</strong>, facilitando a navegação.
+            </p>
+
+            <div className="bg-purple-500/5 border border-purple-500/20 rounded-lg p-4 mb-6">
+              <p className="text-sm text-foreground/80 mb-3">
+                <strong>💡 Diferença entre Página e Seção:</strong>
+              </p>
+              <ul className="space-y-2 text-sm text-foreground/80">
+                <li className="flex items-start gap-2">
+                  <span className="text-purple-600 shrink-0 mt-0.5">📄</span>
+                  <span><strong>Página inteira:</strong> Ao clicar na etiqueta, abre toda a página "Bola de Fogo". O nome padrão será "Bola de Fogo".</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-purple-600 shrink-0 mt-0.5">📑</span>
+                  <span><strong>Seção específica:</strong> Ao clicar, abre apenas aquela seção (ex: só a "Descrição"). O nome padrão será o nome da seção, independente de quantas seções a página tem.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-muted/30 border border-border rounded-lg p-6 mb-6">
+              <h3 className="font-semibold text-foreground mb-4">Como fica no perfil do personagem:</h3>
+              <PowerLinkCard
+                link={{
+                  id: "demo-link-1",
+                  characterId: "arkan-id",
+                  pageId: "bola-fogo-id",
+                  customLabel: "",
+                  createdAt: new Date().toISOString(),
+                }}
+                pageTitle="Bola de Fogo"
+                sectionTitle=""
+                isEditing={false}
+                onClick={() => {}}
+              />
+            </div>
+
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-6">
+              <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-3 flex items-center gap-2">
+                <Sparkles className="h-5 w-5" />
+                Personalizando a Etiqueta
+              </h4>
+              <p className="text-foreground/80 text-sm mb-4">
+                Você pode dar uma <strong>etiqueta customizada</strong> para deixar mais claro. Por exemplo, em vez de aparecer "Bola de Fogo", pode aparecer "Magia Principal" ou "Especialidade em Fogo".
+              </p>
+
+              <div className="bg-blue-950/30 border border-blue-500/30 rounded-lg p-4 mb-4">
+                <div className="flex items-start gap-2 mb-4">
+                  <AlertCircle className="h-4 w-4 text-blue-400 mt-0.5 shrink-0" />
+                  <div className="text-xs text-blue-200">
+                    <strong className="text-blue-100">Como editar a etiqueta:</strong> Clique no botão de <strong>editar</strong> no canto superior direito da página do personagem:
+                  </div>
+                </div>
+
+                {/* Header com botões */}
+                <div className="bg-background border border-border rounded-lg p-3 mb-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Menu superior da página</span>
+                    <div className="flex items-center gap-2">
+                      {/* Botão Editar - DESTACADO */}
+                      <div className="relative">
+                        <div className="absolute inset-0 rounded-md border-2 border-red-500 animate-pulse pointer-events-none" style={{ margin: '-4px' }} />
+                        <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                          <Edit2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                      {/* Botão Excluir */}
+                      <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10 text-destructive hover:text-destructive hover:bg-destructive/10">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-xs text-blue-300 mb-4">↑ Clique no botão de lápis (circulado em vermelho) para entrar em modo de edição</p>
+
+                {/* Card do poder em modo de edição */}
+                <div className="space-y-3">
+                  <p className="text-xs text-blue-200 font-semibold">Após entrar em modo de edição, os poderes linkados terão botões de editar e excluir:</p>
+                  <div className="border border-purple-500/30 bg-purple-950/40 rounded-lg p-6">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-purple-100 font-medium text-lg truncate">Bola de Fogo</h3>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {/* Botão Edit - DESTACADO */}
+                        <div className="relative">
+                          <div className="absolute inset-0 rounded-md border-2 border-red-500 animate-pulse pointer-events-none" style={{ margin: '-3px' }} />
+                          <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8">
+                            <Edit className="h-4 w-4" />
+                          </button>
+                        </div>
+                        <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-blue-300">↑ Clique no ícone de lápis (circulado em vermelho) ao lado do poder para editar sua etiqueta customizada</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs font-semibold text-foreground mb-2">Sem etiqueta customizada:</p>
+                  <PowerLinkCard
+                    link={{
+                      id: "demo-link-1b",
+                      characterId: "arkan-id",
+                      pageId: "bola-fogo-id",
+                      customLabel: "",
+                      createdAt: new Date().toISOString(),
+                    }}
+                    pageTitle="Bola de Fogo"
+                    sectionTitle=""
+                    isEditing={false}
+                    onClick={() => {}}
+                  />
+                </div>
+
+                <div>
+                  <p className="text-xs font-semibold text-foreground mb-2">Com etiqueta customizada "Magia Principal":</p>
+                  <PowerLinkCard
+                    link={{
+                      id: "demo-link-2",
+                      characterId: "arkan-id",
+                      pageId: "bola-fogo-id",
+                      customLabel: "Magia Principal",
+                      createdAt: new Date().toISOString(),
+                    }}
+                    pageTitle="Bola de Fogo"
+                    sectionTitle=""
+                    isEditing={false}
+                    onClick={() => {}}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Conclusão */}
+        <div className="mb-8">
+          <div className="max-w-5xl mx-auto bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-8 text-center">
+            <div className="mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-500/20 mb-4">
+                <CheckCircle2 className="h-8 w-8 text-purple-600" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-foreground mb-3">
+              Pronto! Seu Sistema Está Completo
+            </h2>
+            <p className="text-foreground/80 leading-relaxed max-w-2xl mx-auto">
+              Agora você sabe como criar sistemas de poder completos: organizar páginas em pastas, detalhar habilidades com blocos diversos, linkar aos personagens e navegar entre páginas. Use sua criatividade para criar sistemas incríveis! ✨
+            </p>
           </div>
         </div>
       </div>
