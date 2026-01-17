@@ -25,6 +25,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Book as BookType } from "@/stores/book-store";
 
 import { GlobalEntityLogsModal } from "@/components/modals/global-entity-logs-modal";
+import { FirstTimeGuideModal } from "@/components/modals/first-time-guide-modal";
 
 import { Header } from "./components/header";
 import { TabsBar } from "./components/tabs-bar";
@@ -96,6 +97,9 @@ interface PropsDashboardView {
   onNavigateToGallery: () => void;
   onShowDeleteDialog: (show: boolean) => void;
   onDeleteInputChange: (value: string) => void;
+  showFirstTimeModal: boolean;
+  onFirstTimeModalChange: (show: boolean) => void;
+  onOpenGuidesFromWelcome: () => void;
   onDraftBookChange: (updates: Partial<BookType>) => void;
 }
 
@@ -144,6 +148,9 @@ export function DashboardView({
   onShowDeleteDialog,
   onDeleteInputChange,
   onDraftBookChange,
+  showFirstTimeModal,
+  onFirstTimeModalChange,
+  onOpenGuidesFromWelcome,
 }: PropsDashboardView) {
   const { t } = useTranslation(["dialogs"]);
 
@@ -312,6 +319,13 @@ export function DashboardView({
           open={showGlobalLogsModal}
           onOpenChange={onGlobalLogsModalChange}
           bookId={bookId}
+        />
+
+        {/* First Time Guide Modal */}
+        <FirstTimeGuideModal
+          open={showFirstTimeModal}
+          onOpenChange={onFirstTimeModalChange}
+          onOpenGuides={onOpenGuidesFromWelcome}
         />
       </div>
     </TooltipProvider>

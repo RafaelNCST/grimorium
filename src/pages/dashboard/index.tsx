@@ -58,6 +58,7 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
   const [draftBook, setDraftBook] = useState<BookType | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showGlobalLogsModal, setShowGlobalLogsModal] = useState(false);
+  const [showFirstTimeModal, setShowFirstTimeModal] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
   const [tabs, setTabs] = useState<TabConfig[]>(
     storeTabs.length > 0 ? storeTabs : DEFAULT_TABS_CONSTANT
@@ -147,6 +148,18 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
     },
     [setIsEditingHeader]
   );
+
+  // Check if it's the first book - show welcome modal only for first book ever created
+  useEffect(() => {
+    const hasSeenFirstBookWelcome = localStorage.getItem("grimorium_first_book_welcome_shown");
+    if (!hasSeenFirstBookWelcome) {
+      // Show modal after a brief delay for better UX
+      const timer = setTimeout(() => {
+        setShowFirstTimeModal(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
@@ -443,6 +456,20 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
     });
   }, [navigate, bookId]);
 
+  const handleFirstTimeModalClose = useCallback((open: boolean) => {
+    if (!open) {
+      localStorage.setItem("grimorium_first_book_welcome_shown", "true");
+    }
+    setShowFirstTimeModal(open);
+  }, []);
+
+  const handleOpenGuidesFromWelcome = useCallback(() => {
+    localStorage.setItem("grimorium_first_book_welcome_shown", "true");
+    setShowFirstTimeModal(false);
+    // Emit custom event to open guides from title bar
+    window.dispatchEvent(new CustomEvent("open-guides-modal"));
+  }, []);
+
   const handleShowDeleteDialog = useCallback((show: boolean) => {
     setShowDeleteDialog(show);
   }, []);
@@ -507,6 +534,9 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
       onShowDeleteDialog={handleShowDeleteDialog}
       onDeleteInputChange={handleDeleteInputChange}
       onDraftBookChange={handleDraftBookChange}
+      showFirstTimeModal={showFirstTimeModal}
+      onFirstTimeModalChange={handleFirstTimeModalClose}
+      onOpenGuidesFromWelcome={handleOpenGuidesFromWelcome}
     />
   );
 }

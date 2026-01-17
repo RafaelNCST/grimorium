@@ -172,6 +172,16 @@ export const TitleBar = () => {
     }
   }, [isInboxOpen, markAllAsRead]);
 
+  // Listen for custom event to open guides modal
+  useEffect(() => {
+    const handleOpenGuides = () => {
+      setIsGuidesOpen(true);
+    };
+
+    window.addEventListener("open-guides-modal", handleOpenGuides);
+    return () => window.removeEventListener("open-guides-modal", handleOpenGuides);
+  }, []);
+
   // Detect if a Dialog modal is open
   useEffect(() => {
     const checkModalState = () => {

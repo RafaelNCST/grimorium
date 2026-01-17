@@ -147,6 +147,12 @@
     "title": "Guias de Escrita",
     "search_placeholder": "Buscar guias...",
     "empty": "Nenhum guia encontrado",
+    "welcome": {
+      "title": "Parabéns pelo Seu Primeiro Livro!",
+      "description": "Criamos alguns guias para te ajudar a começar. Eles explicam como usar algumas features do app e dão dicas de escrita. Você pode acessá-los a qualquer momento clicando no ícone de guias no topo da página.",
+      "dismiss": "Fechar",
+      "view_guides": "Ver Guias"
+    },
     "categories": {
       "all": "Todos",
       "starting": "Começando",
