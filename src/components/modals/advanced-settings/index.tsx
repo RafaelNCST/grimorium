@@ -9,7 +9,6 @@ import { useState } from "react";
 import {
   User,
   LayoutDashboard,
-  Bell,
   Shield,
   Info,
   Edit2,
@@ -31,7 +30,6 @@ import { AboutSection } from "./sections/AboutSection";
 import { AccountSection } from "./sections/AccountSection";
 import { DashboardSection } from "./sections/DashboardSection";
 import { DataSection } from "./sections/DataSection";
-import { NotificationsSection } from "./sections/NotificationsSection";
 import { SettingsSection, SettingsSectionConfig } from "./types";
 
 interface AdvancedSettingsModalProps {
@@ -53,7 +51,6 @@ export function AdvancedSettingsModal({
   const sections: SettingsSectionConfig[] = [
     { id: "account", labelKey: "sections.account", icon: User },
     { id: "dashboard", labelKey: "sections.dashboard", icon: LayoutDashboard },
-    { id: "notifications", labelKey: "sections.notifications", icon: Bell },
     { id: "data", labelKey: "sections.data_privacy", icon: Shield },
     { id: "about", labelKey: "sections.about", icon: Info },
   ];
@@ -76,8 +73,6 @@ export function AdvancedSettingsModal({
         return <AccountSection />;
       case "dashboard":
         return <DashboardSection />;
-      case "notifications":
-        return <NotificationsSection />;
       case "data":
         return <DataSection />;
       case "about":

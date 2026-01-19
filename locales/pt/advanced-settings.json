@@ -6,7 +6,6 @@
   "sections": {
     "account": "Minha Conta",
     "dashboard": "Dashboard",
-    "notifications": "Notificações",
     "data_privacy": "Dados e privacidade",
     "about": "Sobre"
   },
@@ -76,15 +75,6 @@
       "magic": "Magia",
       "species": "Raças",
       "items": "Itens"
-    }
-  },
-  "notifications": {
-    "sound": {
-      "title": "Sons e Áudio",
-      "description": "Configure como as notificações se comportam",
-      "label": "Sons de Notificação",
-      "help": "Reproduzir sons ao receber notificações do sistema",
-      "note": "Os sons ajudam a chamar sua atenção para avisos importantes de metas e progresso de escrita."
     }
   },
   "data": {

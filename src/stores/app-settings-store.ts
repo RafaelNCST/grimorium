@@ -14,9 +14,6 @@ import {
 } from "@/types/app-settings";
 
 interface AppSettingsState extends AppSettings {
-  // Actions para Notificações
-  setSoundEnabled: (enabled: boolean) => void;
-
   // Actions para Dashboard
   setDefaultVisibleTabs: (tabs: DashboardTabId[]) => void;
   toggleDefaultTab: (tabId: DashboardTabId) => void;
@@ -29,12 +26,6 @@ export const useAppSettingsStore = create<AppSettingsState>()(
   persist(
     (set) => ({
       ...DEFAULT_APP_SETTINGS,
-
-      // Notificações
-      setSoundEnabled: (enabled) =>
-        set((state) => ({
-          notifications: { ...state.notifications, soundEnabled: enabled },
-        })),
 
       // Dashboard
       setDefaultVisibleTabs: (tabs) =>

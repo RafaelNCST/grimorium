@@ -5,7 +5,6 @@
 export type SettingsSection =
   | "account"
   | "dashboard"
-  | "notifications"
   | "data"
   | "about";
 

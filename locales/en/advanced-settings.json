@@ -6,7 +6,6 @@
   "sections": {
     "account": "My Account",
     "dashboard": "Dashboard",
-    "notifications": "Notifications",
     "data_privacy": "Data & privacy",
     "about": "About"
   },
@@ -76,15 +75,6 @@
       "magic": "Magic",
       "species": "Races",
       "items": "Items"
-    }
-  },
-  "notifications": {
-    "sound": {
-      "title": "Sounds and Audio",
-      "description": "Configure how notifications behave",
-      "label": "Notification Sounds",
-      "help": "Play sounds when receiving system notifications",
-      "note": "Sounds help draw your attention to important warnings about goals and writing progress."
     }
   },
   "data": {
