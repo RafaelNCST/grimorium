@@ -81,8 +81,6 @@ interface PropsDashboardView {
   onHeaderHiddenChange: (hidden: boolean) => void;
   onCustomizingChange: (customizing: boolean) => void;
   onCustomizingToggle: () => void;
-  onTabsUpdate: (tabs: TabConfig[]) => void;
-  onToggleTabVisibility: (tabId: string) => void;
   onDragStart: (event: DragStartEvent) => void;
   onDragMove: (event: DragMoveEvent) => void;
   onDragEnd: (event: DragEndEvent) => void;

@@ -41,7 +41,7 @@ export const ALL_DASHBOARD_TABS: DashboardTabId[] = [
 ];
 
 export const DEFAULT_DASHBOARD_SETTINGS: DashboardSettings = {
-  defaultVisibleTabs: ALL_DASHBOARD_TABS,
+  defaultVisibleTabs: ALL_DASHBOARD_TABS, // All tabs visible by default for new books
 };
 
 // Configurações gerais da aplicação (consolidado)

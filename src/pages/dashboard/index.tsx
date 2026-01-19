@@ -45,13 +45,10 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
     isEditingHeader,
     isHeaderHidden,
     isCustomizing,
-    tabs: storeTabs,
     setActiveTab,
     setIsEditingHeader,
     setIsHeaderHidden,
     setIsCustomizing,
-    updateTabs,
-    toggleTabVisibility,
     getCurrentArc,
   } = useDashboardStore();
 
@@ -60,9 +57,7 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
   const [showGlobalLogsModal, setShowGlobalLogsModal] = useState(false);
   const [showFirstTimeModal, setShowFirstTimeModal] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
-  const [tabs, setTabs] = useState<TabConfig[]>(
-    storeTabs.length > 0 ? storeTabs : DEFAULT_TABS_CONSTANT
-  );
+  const [tabs, setTabs] = useState<TabConfig[]>(DEFAULT_TABS_CONSTANT);
   const [draggedTabId, setDraggedTabId] = useState<string | null>(null);
   const [previewTabs, setPreviewTabs] = useState<TabConfig[]>([]);
 
@@ -104,27 +99,18 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
               : defaultTab;
           });
           setTabs(mergedTabs);
-          updateTabs(mergedTabs);
         } else {
           // No saved config, use defaults
           setTabs(DEFAULT_TABS_CONSTANT);
-          updateTabs(DEFAULT_TABS_CONSTANT);
         }
       } catch (error) {
         console.error("Error loading tabs config:", error);
         setTabs(DEFAULT_TABS_CONSTANT);
-        updateTabs(DEFAULT_TABS_CONSTANT);
       }
     };
 
     loadTabsConfig();
-  }, [bookId, updateTabs]);
-
-  useEffect(() => {
-    if (storeTabs.length === 0) {
-      updateTabs(DEFAULT_TABS_CONSTANT);
-    }
-  }, [storeTabs, updateTabs]);
+  }, [bookId]);
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -351,7 +337,6 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
         newTabs.splice(finalIndex, 0, movedTab);
 
         setTabs(newTabs);
-        updateTabs(newTabs);
 
         // Save to database
         const tabsForDB = newTabs.map(({ id, label, visible }) => ({
@@ -367,7 +352,7 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
       setDraggedTabId(null);
       setPreviewTabs([]);
     },
-    [tabs, updateTabs, draggedTabId, bookId]
+    [tabs, draggedTabId, bookId]
   );
 
   const handleToggleVisibility = useCallback(
@@ -376,7 +361,6 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
         tab.id === tabId ? { ...tab, visible: !tab.visible } : tab
       );
       setTabs(updatedTabs);
-      toggleTabVisibility(tabId);
 
       // Save to database
       const tabsForDB = updatedTabs.map(({ id, label, visible }) => ({
@@ -388,7 +372,7 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
         console.error("Error saving tabs config:", error)
       );
     },
-    [tabs, toggleTabVisibility, bookId]
+    [tabs, bookId]
   );
 
   const handleSave = useCallback(() => {
@@ -517,8 +501,6 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
       onHeaderHiddenChange={setIsHeaderHidden}
       onCustomizingChange={setIsCustomizing}
       onCustomizingToggle={handleCustomizingToggle}
-      onTabsUpdate={updateTabs}
-      onToggleTabVisibility={toggleTabVisibility}
       onDragStart={handleDragStart}
       onDragMove={handleDragMove}
       onDragEnd={handleDragEnd}

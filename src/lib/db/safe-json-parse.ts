@@ -116,7 +116,7 @@ export const tabConfigSchema = z.object({
   id: z.string(),
   label: z.string(),
   visible: z.boolean(),
-  order: z.number(),
+  order: z.number().optional(), // Optional for backward compatibility
 });
 
 export const tabsConfigSchema = z.array(tabConfigSchema);
