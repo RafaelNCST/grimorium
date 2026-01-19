@@ -348,6 +348,65 @@
             "divider": "Separadores visuais",
             "spacer": "Espaçamento entre seções"
           }
+        },
+        "examples": {
+          "visual_demo_title": "Exemplo Prático: Sistema de Magia Elemental",
+          "visual_demo_subtitle": "Neste guia, vamos explorar passo a passo como estruturar um sistema de magia completo. Você aprenderá a organizar páginas, criar habilidades detalhadas, linkar aos personagens e navegar entre páginas. Vamos usar como exemplo um Sistema de Magia Elemental com fogo, cura e muito mais!",
+          "page_base_title": "Página Base - 'Fundamentos da Magia'",
+          "page_base_description": "A página base contém conceitos gerais do sistema. Use blocos simples para explicar regras universais, custos de energia, etc.",
+          "page_base_example_title": "Fundamentos da Magia",
+          "page_base_example_heading": "O que é Magia?",
+          "page_base_example_text": "Magia é a capacidade de manipular energia elemental do mundo ao seu redor. Cada mago precisa de mana para conjurar feitiços.",
+          "ability_page_title": "Habilidade Individual - 'Bola de Fogo'",
+          "ability_page_description": "Agora criamos uma habilidade específica dentro da pasta 'Magias de Fogo'. Aqui você pode usar todos os tipos de blocos para detalhar a habilidade: descrição, atributos de poder, usuários, tags, e mais!",
+          "ability_benefits_title": "Por que criar páginas para cada habilidade?",
+          "ability_benefits": {
+            "character_link": "Link direto aos personagens: Conecte automaticamente a habilidade ao perfil do personagem",
+            "visual_detail": "Detalhamento visual: Use barras de atributos, ícones e imagens para explicar visualmente",
+            "folder_organization": "Organização por pastas: Agrupe por elemento, tipo ou raridade",
+            "smart_navigation": "Navegação inteligente: Crie links entre habilidades relacionadas"
+          },
+          "ability_example_title": "Bola de Fogo",
+          "ability_example_heading": "Descrição",
+          "ability_example_text": "A Bola de Fogo é uma das magias elementais mais básicas e essenciais do arsenal de qualquer mago de fogo. Consiste em conjurar uma esfera flamejante que pode ser arremessada contra inimigos.",
+          "ability_example_tags": ["Fogo", "Ataque", "À Distância"],
+          "ability_example_navigator": "Ver também: Escudo de Chamas",
+          "navigation_title": "Navegação Entre Páginas",
+          "navigation_description": "Use o bloco Navigator para criar links entre páginas relacionadas. Por exemplo, ao final da página 'Bola de Fogo', você pode linkar para 'Escudo de Chamas' (outra magia de fogo).",
+          "navigation_example_title": "Exemplo de Navigator em ação:",
+          "navigation_example_text": "Ver também: Escudo de Chamas",
+          "navigation_tip": "💡 Ao clicar, o usuário é levado direto para a página 'Escudo de Chamas'",
+          "character_linking_title": "Linkando ao Personagem",
+          "character_linking_description": "Você pode linkar páginas inteiras ou seções específicas do seu sistema de poder aos personagens! Quando você faz isso, o link aparece automaticamente no perfil do personagem, facilitando a navegação.",
+          "character_linking_difference_title": "💡 Diferença entre Página e Seção:",
+          "character_linking_difference": {
+            "page": "Página inteira: Ao clicar na etiqueta, abre toda a página 'Bola de Fogo'. O nome padrão será 'Bola de Fogo'.",
+            "section": "Seção específica: Ao clicar, abre apenas aquela seção (ex: só a 'Descrição'). O nome padrão será o nome da seção, independente de quantas seções a página tem."
+          },
+          "character_profile_title": "Como fica no perfil do personagem:",
+          "customizing_label_title": "Personalizando a Etiqueta",
+          "customizing_label_description": "Você pode dar uma etiqueta customizada para deixar mais claro. Por exemplo, em vez de aparecer 'Bola de Fogo', pode aparecer 'Magia Principal' ou 'Especialidade em Fogo'.",
+          "customizing_label_how_title": "Como editar a etiqueta:",
+          "customizing_label_how_description": "Clique no botão de editar no canto superior direito da página do personagem:",
+          "customizing_label_menu": "Menu superior da página",
+          "customizing_label_edit_tip": "↑ Clique no botão de lápis (circulado em vermelho) para entrar em modo de edição",
+          "customizing_label_edit_mode": "Após entrar em modo de edição, os poderes linkados terão botões de editar e excluir:",
+          "customizing_label_edit_power_tip": "↑ Clique no ícone de lápis (circulado em vermelho) ao lado do poder para editar sua etiqueta customizada",
+          "customizing_label_without": "Sem etiqueta customizada:",
+          "customizing_label_with": "Com etiqueta customizada 'Magia Principal':",
+          "conclusion_title": "Pronto! Seu Sistema Está Completo",
+          "conclusion_description": "Agora você sabe como criar sistemas de poder completos: organizar páginas em pastas, detalhar habilidades com blocos diversos, linkar aos personagens e navegar entre páginas. Use sua criatividade para criar sistemas incríveis! ✨",
+          "folder_names": {
+            "magic_fundamentals": "Fundamentos da Magia",
+            "fire_spells": "Magias de Fogo",
+            "healing_spells": "Magias de Cura",
+            "fireball": "Bola de Fogo",
+            "flame_shield": "Escudo de Chamas",
+            "phoenix": "Fênix",
+            "healing_touch": "Toque Restaurador",
+            "resurrection": "Ressurreição",
+            "ancestral_magic": "Magia Ancestral (Avançado)"
+          }
         }
       },
       "fast_writing": {

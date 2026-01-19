@@ -176,6 +176,14 @@
       "power_system": {
         "title": "Creating a Power System",
         "description": "Organize and explain your story's magic or power system in a visual and didactic way"
+      },
+      "fast_writing": {
+        "title": "Fast and Efficient Writing",
+        "description": "Learn to plan the bare minimum and start writing quickly using arcs and references"
+      },
+      "using_logs": {
+        "title": "Log System",
+        "description": "Learn to use logs to record important events in your story and entities for future reference"
       }
     },
     "content": {
@@ -334,6 +342,220 @@
             "divider": "Visual separators",
             "spacer": "Spacing between sections"
           }
+        },
+        "examples": {
+          "visual_demo_title": "Practical Example: Elemental Magic System",
+          "visual_demo_subtitle": "In this guide, we'll explore step by step how to structure a complete magic system. You'll learn to organize pages, create detailed abilities, link to characters, and navigate between pages. Let's use an Elemental Magic System with fire, healing, and more as an example!",
+          "page_base_title": "Base Page - 'Magic Fundamentals'",
+          "page_base_description": "The base page contains general concepts of the system. Use simple blocks to explain universal rules, energy costs, etc.",
+          "page_base_example_title": "Magic Fundamentals",
+          "page_base_example_heading": "What is Magic?",
+          "page_base_example_text": "Magic is the ability to manipulate elemental energy from the world around you. Each mage needs mana to cast spells.",
+          "ability_page_title": "Individual Ability - 'Fireball'",
+          "ability_page_description": "Now we create a specific ability within the 'Fire Spells' folder. Here you can use all types of blocks to detail the ability: description, power attributes, users, tags, and more!",
+          "ability_benefits_title": "Why create pages for each ability?",
+          "ability_benefits": {
+            "character_link": "Direct character link: Automatically connect the ability to the character profile",
+            "visual_detail": "Visual detailing: Use attribute bars, icons, and images to explain visually",
+            "folder_organization": "Folder organization: Group by element, type, or rarity",
+            "smart_navigation": "Smart navigation: Create links between related abilities"
+          },
+          "ability_example_title": "Fireball",
+          "ability_example_heading": "Description",
+          "ability_example_text": "Fireball is one of the most basic and essential elemental spells in any fire mage's arsenal. It consists of conjuring a flaming sphere that can be thrown at enemies.",
+          "ability_example_tags": ["Fire", "Attack", "Ranged"],
+          "ability_example_navigator": "See also: Flame Shield",
+          "navigation_title": "Page Navigation",
+          "navigation_description": "Use the Navigator block to create links between related pages. For example, at the end of the 'Fireball' page, you can link to 'Flame Shield' (another fire spell).",
+          "navigation_example_title": "Navigator in action example:",
+          "navigation_example_text": "See also: Flame Shield",
+          "navigation_tip": "💡 When clicked, the user is taken directly to the 'Flame Shield' page",
+          "character_linking_title": "Linking to Characters",
+          "character_linking_description": "You can link entire pages or specific sections of your power system to characters! When you do this, the link automatically appears on the character profile, making navigation easier.",
+          "character_linking_difference_title": "💡 Difference between Page and Section:",
+          "character_linking_difference": {
+            "page": "Entire page: Clicking the tag opens the entire 'Fireball' page. The default name will be 'Fireball'.",
+            "section": "Specific section: Clicking opens only that section (e.g., just 'Description'). The default name will be the section name, regardless of how many sections the page has."
+          },
+          "character_profile_title": "How it looks on the character profile:",
+          "customizing_label_title": "Customizing the Label",
+          "customizing_label_description": "You can give a custom label to make it clearer. For example, instead of showing 'Fireball', it can show 'Main Magic' or 'Fire Specialty'.",
+          "customizing_label_how_title": "How to edit the label:",
+          "customizing_label_how_description": "Click the edit button in the upper right corner of the character page:",
+          "customizing_label_menu": "Page top menu",
+          "customizing_label_edit_tip": "↑ Click the pencil button (circled in red) to enter edit mode",
+          "customizing_label_edit_mode": "After entering edit mode, linked powers will have edit and delete buttons:",
+          "customizing_label_edit_power_tip": "↑ Click the pencil icon (circled in red) next to the power to edit its custom label",
+          "customizing_label_without": "Without custom label:",
+          "customizing_label_with": "With custom label 'Main Magic':",
+          "conclusion_title": "Ready! Your System Is Complete",
+          "conclusion_description": "Now you know how to create complete power systems: organize pages in folders, detail abilities with various blocks, link to characters, and navigate between pages. Use your creativity to create amazing systems! ✨",
+          "folder_names": {
+            "magic_fundamentals": "Magic Fundamentals",
+            "fire_spells": "Fire Spells",
+            "healing_spells": "Healing Spells",
+            "fireball": "Fireball",
+            "flame_shield": "Flame Shield",
+            "phoenix": "Phoenix",
+            "healing_touch": "Healing Touch",
+            "resurrection": "Resurrection",
+            "ancestral_magic": "Ancestral Magic (Advanced)"
+          }
+        }
+      },
+      "fast_writing": {
+        "hero_subtitle": "Plan little, write a lot",
+        "main_title": "Fast and Efficient Writing",
+        "main_subtitle": "Learn the technique of writing quickly by creating only what's necessary and reviewing every 10 chapters",
+        "intro": "The best way to write is by <1>writing</1>. Many authors spend months planning without writing a single word. This technique teaches you to <3>plan the bare minimum</3> and start writing as quickly as possible, using 10-chapter cycles.",
+        "step1": {
+          "title": "Step 1: Create Your First Arc",
+          "description": "Before writing, go to the Plot tab and create an arc using the arc detail features. List what you expect in this first block of chapters.",
+          "why_title": "Why create the arc first?",
+          "why_description": "The arc serves as your <1>compass</1>. You don't need to put everything in at that moment - you can keep changing it over time as you write. Just enough to know the general direction of the next chapters.",
+          "what_include_title": "What to include in the arc:",
+          "what_include": {
+            "goal": "Main objective of this block of chapters",
+            "conflict": "Central conflict or problem",
+            "outcome": "How you want this block to end",
+            "key_events": "Key events you have in mind at that moment"
+          },
+          "tip": "Don't worry about perfection! The arc is a guide, not a prison. You can adjust it as you write."
+        },
+        "step2": {
+          "title": "Step 2: Write 10 Chapters",
+          "description": "Now it's time to <1>write</1>. Focus on producing content, not perfection. Use the app's tools to help you.",
+          "features_title": "Tools that help you:",
+          "features": {
+            "arc_reference": "View the arc while writing to stay on track",
+            "entity_links": "Create characters, locations, and items as they're mentioned",
+            "quick_notes": "Use editor annotations for ideas that come up",
+            "references": "Use the References feature to quickly consult data while writing"
+          },
+          "writing_tip_title": "Writing tip:",
+          "writing_tip": "Write in <1>focused sessions</1>. Better to write 500 words per day for 10 days than try to write 5000 words at once."
+        },
+        "step3": {
+          "title": "Step 3: Review Every 10 Chapters",
+          "description": "After writing 10 chapters, <1>stop and review</1>. This is the moment to become the architect.",
+          "review_checklist_title": "Review checklist:",
+          "review_checklist": {
+            "arc_alignment": "Did the chapters follow the arc you created?",
+            "consistency": "Are there character or plot inconsistencies?",
+            "pacing": "Is the pacing appropriate?",
+            "opportunities": "Did plot opportunities arise that you can explore?"
+          },
+          "after_review_title": "After review:",
+          "after_review": {
+            "update_entities": "Update character sheets, items, factions, and other mentioned data",
+            "create_next_arc": "Create the next arc based on what happened",
+            "fix_inconsistencies": "Fix small inconsistencies (big ones can wait)",
+            "note_future_plots": "Note future plot ideas in the Dashboard"
+          }
+        },
+        "cycle": {
+          "title": "The 10-Chapter Cycle",
+          "description": "Repeat this cycle until you finish your book. With each cycle you learn more about your story and characters.",
+          "benefits_title": "Benefits of this approach:",
+          "benefits": {
+            "momentum": "Keeps writing momentum active",
+            "organic": "Characters and plot develop organically",
+            "less_planning": "Less time planning, more time writing",
+            "flexibility": "Flexibility to explore ideas that arise"
+          },
+          "cycle_visual_title": "Cycle visualization:"
+        },
+        "tips": {
+          "title": "Advanced Tips",
+          "tip1_title": "Use the References feature",
+          "tip1": "Use the editor's References feature to quickly consult characters, locations, and other data while writing, without losing focus.",
+          "tip2_title": "Don't edit while writing",
+          "tip2": "Editing comes later. In gardener mode (first 10 chapters), focus only on <1>producing content</1>.",
+          "tip3_title": "Celebrate small victories",
+          "tip3": "Each completed 10-chapter cycle is a victory. You're <1>making progress</1>, not just planning.",
+          "tip4_title": "Adjust the cycle if needed",
+          "tip4": "10 chapters is a suggestion. If you prefer to review every 5 or 15, adjust to what works for you."
+        }
+      },
+      "using_logs": {
+        "hero_subtitle": "Never forget an important detail",
+        "main_title": "Log System",
+        "main_subtitle": "Use logs to record events, changes, and milestones of your story and entities",
+        "intro": "During writing, many important details happen: a character reveals a secret, a prophecy is mentioned, an important change occurs. The <1>Log System</1> helps you <3>document and find</3> these moments quickly.",
+        "types": {
+          "title": "Log Types",
+          "description": "Each log needs to be classified into one of three types of importance:",
+          "hook": {
+            "title": "Hook",
+            "description": "Events that generate expectation or pull the narrative forward. Ex: A character makes an important promise."
+          },
+          "lore": {
+            "title": "Lore",
+            "description": "Background information about the world, history, or concepts. Ex: Explanation of how magic works."
+          },
+          "foreshadowing": {
+            "title": "Foreshadowing",
+            "description": "Subtle anticipations of future events. Ex: An object mentioned that will be important later."
+          }
+        },
+        "global_logs": {
+          "title": "Global Logs",
+          "subtitle": "Accessible via the icon at the top of the Dashboard",
+          "description": "The <1>Global Logs</1> are the heart of the system. Here you can see all the important events of your book in one place.",
+          "features_title": "What you can do:",
+          "features": {
+            "create": "Create new logs with type, moment, and description",
+            "link": "Link a log to multiple entities (characters, factions, items, races, regions)",
+            "search": "Search logs by name or description",
+            "filter": "Filter by log type or moment",
+            "reorder": "Manually reorder with drag & drop"
+          },
+          "use_case_title": "When to use:",
+          "use_case": "Use global logs when an event involves multiple entities or when you want to have an overview of all important events."
+        },
+        "local_logs": {
+          "title": "Entity Local Logs",
+          "subtitle": "Accessible via the 'Logs' button in each entity's detail",
+          "description": "In addition to global logs, each entity (character, faction, etc) has its own <1>logs view</1> showing only events linked to it.",
+          "example_title": "Example with Characters:",
+          "example_description": "When opening a character's details and clicking 'Logs', you'll see only logs linked to that character.",
+          "features_title": "Features:",
+          "features": {
+            "view": "View only entity logs",
+            "create": "Create new log (automatically linked)",
+            "edit": "Edit log (if linked only to this entity)",
+            "delete": "Delete log",
+            "reorder": "Reorder in the order that makes sense for that entity",
+            "access_global": "Access 'Global Logs' for cross-editing"
+          },
+          "restriction_title": "⚠️ Important:",
+          "restriction": "If a log is linked to multiple entities, you cannot edit it from the local view. Use 'Global Logs' to edit."
+        },
+        "workflow": {
+          "title": "Recommended Workflow",
+          "step1": {
+            "title": "While writing",
+            "description": "When something important happens, quickly create a log noting the type, chapter, and a brief description."
+          },
+          "step2": {
+            "title": "Link to entities",
+            "description": "Then, link the log to the involved entities (characters, locations, factions, etc)."
+          },
+          "step3": {
+            "title": "Consult when needed",
+            "description": "Use search and filters to quickly find information. Access from the global or local view of each entity."
+          }
+        },
+        "tips": {
+          "title": "Usage Tips",
+          "tip1_title": "Be concise",
+          "tip1": "Short and direct descriptions work best. You can always add more details later.",
+          "tip2_title": "Use tags strategically",
+          "tip2": "Mark as <1>Hook</1> events you need to resolve, <1>Lore</1> for world information, and <1>Foreshadowing</1> for clues you've planted.",
+          "tip3_title": "Review periodically",
+          "tip3": "Every few chapters, review your logs to not forget to resolve pending hooks or use foreshadowing you've planted.",
+          "tip4_title": "Logs vs Notes",
+          "tip4": "Use logs for events and important changes. Use editor notes for loose ideas and drafts."
         }
       }
     }
