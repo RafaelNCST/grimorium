@@ -419,14 +419,7 @@ export async function deleteFaction(id: string): Promise<void> {
     // 2. Remove from plot_arcs.important_factions
     await removeFromJSONArray("plot_arcs", "important_factions", id);
 
-    // 3. Remove from region_timeline_events.factions_involved
-    await removeFromJSONArray(
-      "region_timeline_events",
-      "factions_involved",
-      id
-    );
-
-    // 4. Remove from factions.timeline[].events[].factionsInvolved
+    // 3. Remove from factions.timeline[].events[].factionsInvolved
     await removeFromNestedJSONArray("factions", "timeline", id, [
       "timeline",
       "*",
@@ -435,7 +428,7 @@ export async function deleteFaction(id: string): Promise<void> {
       "factionsInvolved",
     ]);
 
-    // 5. Finally, delete the faction (CASCADE will handle versions)
+    // 4. Finally, delete the faction (CASCADE will handle versions)
     await db.execute("DELETE FROM factions WHERE id = $1", [id]);
   }, "deleteFaction");
 }

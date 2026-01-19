@@ -18,14 +18,10 @@ function bookToDBBook(book: Book, tabsConfig?: string): DBBook {
   return {
     id: book.id,
     title: book.title,
-    subtitle: undefined,
-    description: undefined,
     cover_image_path: book.coverImage,
     genre: JSON.stringify(book.genre),
     visual_style: book.visualStyle,
     status: book.status,
-    word_count_goal: undefined,
-    current_word_count: 0,
     synopsis: book.synopsis,
     author_summary: book.authorSummary,
     story_summary: book.storySummary,
@@ -101,26 +97,22 @@ export async function createBook(
 
     await db.execute(
       `INSERT INTO books (
-        id, title, subtitle, description, cover_image_path, genre, visual_style,
-        status, word_count_goal, current_word_count, synopsis, author_summary, story_summary,
+        id, title, cover_image_path, genre, visual_style,
+        status, synopsis, author_summary, story_summary,
         current_arc, chapters, created_at, updated_at, last_opened_at,
         words_per_day, chapters_per_week, estimated_arcs, estimated_chapters,
         completed_arcs, current_arc_progress, sticky_notes, checklist_items, sections_config, tabs_config
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18,
-        $19, $20, $21, $22, $23, $24, $25, $26, $27, $28
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
+        $15, $16, $17, $18, $19, $20, $21, $22, $23, $24
       )`,
       [
         dbBook.id,
         dbBook.title,
-        dbBook.subtitle,
-        dbBook.description,
         dbBook.cover_image_path,
         dbBook.genre,
         dbBook.visual_style,
         dbBook.status,
-        dbBook.word_count_goal,
-        dbBook.current_word_count,
         dbBook.synopsis,
         dbBook.author_summary,
         dbBook.story_summary,

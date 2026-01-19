@@ -290,17 +290,10 @@ export async function deleteCharacter(id: string): Promise<void> {
     // 2. Remove from plot_arcs.important_characters
     await removeFromJSONArray("plot_arcs", "important_characters", id);
 
-    // 3. Remove from region_timeline_events.characters_involved
-    await removeFromJSONArray(
-      "region_timeline_events",
-      "characters_involved",
-      id
-    );
-
-    // 4. Remove from factions.founders
+    // 3. Remove from factions.founders
     await removeFromJSONArray("factions", "founders", id);
 
-    // 5. Remove from factions.hierarchy[].characterIds
+    // 4. Remove from factions.hierarchy[].characterIds
     const factions = await db.select<Array<{ id: string; hierarchy: string }>>(
       "SELECT id, hierarchy FROM factions WHERE hierarchy IS NOT NULL"
     );
@@ -336,7 +329,7 @@ export async function deleteCharacter(id: string): Promise<void> {
       }
     }
 
-    // 6. Remove from factions.timeline[].events[].charactersInvolved
+    // 5. Remove from factions.timeline[].events[].charactersInvolved
     await removeFromNestedJSONArray("factions", "timeline", id, [
       "timeline",
       "*",
@@ -345,7 +338,7 @@ export async function deleteCharacter(id: string): Promise<void> {
       "charactersInvolved",
     ]);
 
-    // 7. Finally, delete the character (CASCADE will handle versions, relationships, power_character_links)
+    // 6. Finally, delete the character (CASCADE will handle versions, relationships, power_character_links)
     await db.execute("DELETE FROM characters WHERE id = $1", [id]);
   }, "deleteCharacter");
 }

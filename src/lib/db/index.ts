@@ -1203,6 +1203,9 @@ async function runMigrations(database: Database): Promise<void> {
     // Migrate race domain values from Portuguese to English
     await migrateRaceDomainValues(database);
 
+    // Remove deprecated and unused fields from database
+    await removeDeprecatedFields(database);
+
     // Commit transaction
     await database.execute("COMMIT");
   } catch (_error) {
@@ -1450,6 +1453,340 @@ async function migrateRaceDomainValues(database: Database): Promise<void> {
   } catch (_error) {
     console.error("[db] Error during race domain migration:", _error);
     // Don't throw - this is a non-critical migration
+  }
+}
+
+// Migration: Remove deprecated and unused fields from database schema
+async function removeDeprecatedFields(database: Database): Promise<void> {
+  try {
+    // Check if migration has already been applied by checking if deprecated field exists
+    // We'll check if books table still has the "subtitle" column
+    const tableInfo = await database.select<{ sql: string }[]>(
+      "SELECT sql FROM sqlite_master WHERE type='table' AND name='books'"
+    );
+
+    if (tableInfo.length === 0) {
+      console.log("[Migration] Books table not found, skipping deprecated fields removal");
+      return;
+    }
+
+    // Check if subtitle column exists (indicating migration hasn't run yet)
+    const hasSubtitleColumn = tableInfo[0].sql.toLowerCase().includes("subtitle");
+
+    if (!hasSubtitleColumn) {
+      console.log("[Migration] Deprecated fields already removed, skipping");
+      return;
+    }
+
+    console.log("[Migration] Removing deprecated fields from database schema...");
+
+    // Execute each statement from the migration separately
+    // Books table migration
+    await database.execute(`
+      CREATE TABLE books_new (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        cover_image_path TEXT,
+        genre TEXT,
+        visual_style TEXT,
+        status TEXT DEFAULT 'draft',
+        synopsis TEXT,
+        author_summary TEXT,
+        story_summary TEXT,
+        current_arc TEXT,
+        chapters INTEGER DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        last_opened_at INTEGER,
+        words_per_day INTEGER DEFAULT 0,
+        chapters_per_week INTEGER DEFAULT 0,
+        estimated_arcs INTEGER DEFAULT 0,
+        estimated_chapters INTEGER DEFAULT 0,
+        completed_arcs INTEGER DEFAULT 0,
+        current_arc_progress INTEGER DEFAULT 0,
+        sticky_notes TEXT,
+        checklist_items TEXT,
+        sections_config TEXT,
+        tabs_config TEXT
+      )
+    `);
+
+    await database.execute(`
+      INSERT INTO books_new
+      SELECT
+        id, title, cover_image_path, genre, visual_style, status, synopsis, author_summary, story_summary,
+        current_arc, chapters, created_at, updated_at, last_opened_at,
+        words_per_day, chapters_per_week, estimated_arcs, estimated_chapters,
+        completed_arcs, current_arc_progress, sticky_notes, checklist_items, sections_config, tabs_config
+      FROM books
+    `);
+
+    await database.execute("DROP TABLE books");
+    await database.execute("ALTER TABLE books_new RENAME TO books");
+    await database.execute("CREATE INDEX IF NOT EXISTS idx_books_last_opened ON books(last_opened_at DESC)");
+
+    console.log("[Migration] Books table migrated successfully");
+
+    // Items table migration (remove section_visibility)
+    await database.execute(`
+      CREATE TABLE items_new (
+        id TEXT PRIMARY KEY,
+        book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+        name TEXT NOT NULL,
+        status TEXT,
+        category TEXT,
+        custom_category TEXT,
+        basic_description TEXT,
+        image TEXT,
+        appearance TEXT,
+        origin TEXT,
+        alternative_names TEXT,
+        story_rarity TEXT,
+        narrative_purpose TEXT,
+        usage_requirements TEXT,
+        usage_consequences TEXT,
+        item_usage TEXT,
+        ui_state TEXT,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      )
+    `);
+
+    await database.execute(`
+      INSERT INTO items_new
+      SELECT
+        id, book_id, name, status, category, custom_category, basic_description, image,
+        appearance, origin, alternative_names, story_rarity, narrative_purpose,
+        usage_requirements, usage_consequences, item_usage, ui_state, created_at, updated_at
+      FROM items
+    `);
+
+    await database.execute("DROP TABLE items");
+    await database.execute("ALTER TABLE items_new RENAME TO items");
+    await database.execute("CREATE INDEX IF NOT EXISTS idx_items_book_id ON items(book_id)");
+
+    console.log("[Migration] Items table migrated successfully");
+
+    // Races table migration (remove field_visibility and section_visibility)
+    const racesTableInfo = await database.select<{ sql: string }[]>(
+      "SELECT sql FROM sqlite_master WHERE type='table' AND name='races'"
+    );
+
+    if (racesTableInfo.length > 0 && racesTableInfo[0].sql.toLowerCase().includes("field_visibility")) {
+      await database.execute(`
+        CREATE TABLE races_new (
+          id TEXT PRIMARY KEY,
+          book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+          group_id TEXT REFERENCES race_groups(id) ON DELETE SET NULL,
+          name TEXT NOT NULL,
+          domain TEXT NOT NULL,
+          summary TEXT NOT NULL,
+          image TEXT,
+          scientific_name TEXT,
+          alternative_names TEXT,
+          cultural_notes TEXT,
+          general_appearance TEXT,
+          life_expectancy TEXT,
+          average_height TEXT,
+          average_weight TEXT,
+          special_physical_characteristics TEXT,
+          habits TEXT,
+          reproductive_cycle TEXT,
+          other_reproductive_cycle_description TEXT,
+          diet TEXT,
+          elemental_diet TEXT,
+          communication TEXT,
+          other_communication TEXT,
+          moral_tendency TEXT,
+          social_organization TEXT,
+          habitat TEXT,
+          physical_capacity TEXT,
+          special_characteristics TEXT,
+          weaknesses TEXT,
+          story_motivation TEXT,
+          inspirations TEXT,
+          ui_state TEXT,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL
+        )
+      `);
+
+      await database.execute(`
+        INSERT INTO races_new
+        SELECT
+          id, book_id, group_id, name, domain, summary, image, scientific_name,
+          alternative_names, cultural_notes, general_appearance, life_expectancy,
+          average_height, average_weight, special_physical_characteristics, habits,
+          reproductive_cycle, other_reproductive_cycle_description, diet, elemental_diet,
+          communication, other_communication, moral_tendency, social_organization, habitat,
+          physical_capacity, special_characteristics, weaknesses, story_motivation,
+          inspirations, ui_state, created_at, updated_at
+        FROM races
+      `);
+
+      await database.execute("DROP TABLE races");
+      await database.execute("ALTER TABLE races_new RENAME TO races");
+      await database.execute("CREATE INDEX IF NOT EXISTS idx_races_book_id ON races(book_id)");
+      await database.execute("CREATE INDEX IF NOT EXISTS idx_races_group_id ON races(group_id)");
+
+      console.log("[Migration] Races table migrated successfully");
+    }
+
+    // Plot arcs table migration (remove field_visibility)
+    const plotArcsTableInfo = await database.select<{ sql: string }[]>(
+      "SELECT sql FROM sqlite_master WHERE type='table' AND name='plot_arcs'"
+    );
+
+    if (plotArcsTableInfo.length > 0 && plotArcsTableInfo[0].sql.toLowerCase().includes("field_visibility")) {
+      await database.execute(`
+        CREATE TABLE plot_arcs_new (
+          id TEXT PRIMARY KEY,
+          book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+          name TEXT NOT NULL,
+          size TEXT NOT NULL,
+          focus TEXT NOT NULL,
+          description TEXT NOT NULL,
+          progress REAL DEFAULT 0,
+          status TEXT NOT NULL,
+          order_index INTEGER NOT NULL DEFAULT 0,
+          important_characters TEXT,
+          important_factions TEXT,
+          important_items TEXT,
+          important_regions TEXT,
+          arc_message TEXT,
+          world_impact TEXT,
+          ui_state TEXT,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL
+        )
+      `);
+
+      await database.execute(`
+        INSERT INTO plot_arcs_new
+        SELECT
+          id, book_id, name, size, focus, description, progress, status, order_index,
+          important_characters, important_factions, important_items, important_regions,
+          arc_message, world_impact, ui_state, created_at, updated_at
+        FROM plot_arcs
+      `);
+
+      await database.execute("DROP TABLE plot_arcs");
+      await database.execute("ALTER TABLE plot_arcs_new RENAME TO plot_arcs");
+      await database.execute("CREATE INDEX IF NOT EXISTS idx_plot_arcs_book_id ON plot_arcs(book_id)");
+      await database.execute("CREATE INDEX IF NOT EXISTS idx_plot_arcs_order ON plot_arcs(book_id, order_index)");
+
+      console.log("[Migration] Plot arcs table migrated successfully");
+    }
+
+    // Regions table migration (remove section_visibility, keep timeline)
+    const regionsTableInfo = await database.select<{ sql: string }[]>(
+      "SELECT sql FROM sqlite_master WHERE type='table' AND name='regions'"
+    );
+
+    if (regionsTableInfo.length > 0 && regionsTableInfo[0].sql.toLowerCase().includes("section_visibility")) {
+      await database.execute(`
+        CREATE TABLE regions_new (
+          id TEXT PRIMARY KEY,
+          book_id TEXT NOT NULL,
+          name TEXT NOT NULL,
+          parent_id TEXT,
+          scale TEXT NOT NULL,
+          summary TEXT,
+          image TEXT,
+          order_index INTEGER NOT NULL DEFAULT 0,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL,
+          climate TEXT,
+          current_season TEXT,
+          custom_season_name TEXT,
+          general_description TEXT,
+          region_anomalies TEXT,
+          resident_factions TEXT,
+          dominant_factions TEXT,
+          important_characters TEXT,
+          races_found TEXT,
+          items_found TEXT,
+          narrative_purpose TEXT,
+          unique_characteristics TEXT,
+          political_importance TEXT,
+          religious_importance TEXT,
+          world_perception TEXT,
+          region_mysteries TEXT,
+          inspirations TEXT,
+          ui_state TEXT,
+          timeline TEXT,
+          FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
+          FOREIGN KEY (parent_id) REFERENCES regions(id) ON DELETE SET NULL
+        )
+      `);
+
+      await database.execute(`
+        INSERT INTO regions_new
+        SELECT
+          id, book_id, name, parent_id, scale, summary, image, order_index, created_at, updated_at,
+          climate, current_season, custom_season_name, general_description, region_anomalies,
+          resident_factions, dominant_factions, important_characters, races_found, items_found,
+          narrative_purpose, unique_characteristics, political_importance, religious_importance,
+          world_perception, region_mysteries, inspirations, ui_state, timeline
+        FROM regions
+      `);
+
+      await database.execute("DROP TABLE regions");
+      await database.execute("ALTER TABLE regions_new RENAME TO regions");
+      await database.execute("CREATE INDEX IF NOT EXISTS idx_regions_book_id ON regions(book_id)");
+      await database.execute("CREATE INDEX IF NOT EXISTS idx_regions_parent_id ON regions(parent_id)");
+
+      console.log("[Migration] Regions table migrated successfully");
+    }
+
+    // Gallery items table migration (remove thumbnail_base64)
+    const galleryTableInfo = await database.select<{ sql: string }[]>(
+      "SELECT sql FROM sqlite_master WHERE type='table' AND name='gallery_items'"
+    );
+
+    if (galleryTableInfo.length > 0 && galleryTableInfo[0].sql.toLowerCase().includes("thumbnail_base64")) {
+      await database.execute(`
+        CREATE TABLE gallery_items_new (
+          id TEXT PRIMARY KEY,
+          book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+          title TEXT NOT NULL,
+          description TEXT,
+          thumbnail_path TEXT,
+          original_path TEXT NOT NULL,
+          original_filename TEXT NOT NULL,
+          file_size INTEGER NOT NULL,
+          width INTEGER,
+          height INTEGER,
+          mime_type TEXT NOT NULL,
+          order_index INTEGER NOT NULL DEFAULT 0,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL
+        )
+      `);
+
+      await database.execute(`
+        INSERT INTO gallery_items_new
+        SELECT
+          id, book_id, title, description, thumbnail_path, original_path,
+          original_filename, file_size, width, height, mime_type, order_index,
+          created_at, updated_at
+        FROM gallery_items
+      `);
+
+      await database.execute("DROP TABLE gallery_items");
+      await database.execute("ALTER TABLE gallery_items_new RENAME TO gallery_items");
+      await database.execute("CREATE INDEX IF NOT EXISTS idx_gallery_items_book_id ON gallery_items(book_id)");
+      await database.execute("CREATE INDEX IF NOT EXISTS idx_gallery_items_updated_at ON gallery_items(updated_at DESC)");
+      await database.execute("CREATE INDEX IF NOT EXISTS idx_gallery_items_order ON gallery_items(book_id, order_index)");
+
+      console.log("[Migration] Gallery items table migrated successfully");
+    }
+
+    console.log("[Migration] All deprecated fields removed successfully");
+
+  } catch (error) {
+    console.error("[Migration] Error removing deprecated fields:", error);
+    // Don't throw - this is a non-critical migration that can be retried
   }
 }
 

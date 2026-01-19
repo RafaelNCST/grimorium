@@ -3,14 +3,10 @@
 export interface DBBook {
   id: string;
   title: string;
-  subtitle?: string;
-  description?: string;
   cover_image_path?: string;
   genre?: string; // JSON array string
   visual_style?: string;
   status: string;
-  word_count_goal?: number;
-  current_word_count: number;
   synopsis?: string;
   author_summary?: string;
   story_summary?: string;
@@ -115,9 +111,6 @@ export interface DBItem {
   usage_consequences?: string;
   item_usage?: string;
 
-  // UI State (legacy - to be removed)
-  section_visibility?: string; // JSON object string
-
   // UI State
   ui_state?: string; // JSON object string
 
@@ -180,10 +173,6 @@ export interface DBRace {
   // Narrative
   story_motivation?: string;
   inspirations?: string;
-
-  // UI State (legacy - to be removed)
-  field_visibility?: string; // DEPRECATED - JSON object string
-  section_visibility?: string; // DEPRECATED - JSON object string
 
   // UI State
   ui_state?: string; // JSON object string
@@ -283,9 +272,6 @@ export interface DBPlotArc {
   important_regions?: string; // JSON array string
   arc_message?: string;
   world_impact?: string;
-
-  // UI State (legacy - to be removed)
-  field_visibility?: string; // DEPRECATED - JSON object string
 
   // UI State
   ui_state?: string; // JSON object string
@@ -387,7 +373,6 @@ export interface DBGalleryItem {
   book_id: string;
   title: string;
   description?: string;
-  thumbnail_base64?: string; // DEPRECATED: migrar para thumbnail_path
   thumbnail_path?: string; // Path para thumbnail no filesystem
   original_path: string;
   original_filename: string;

@@ -287,16 +287,13 @@ export async function deleteRace(id: string): Promise<void> {
     // 1. Clean common entity references (mentions, gallery, notes)
     await cleanCommonEntityReferences(id, "race");
 
-    // 2. Remove from region_timeline_events.races_involved
-    await removeFromJSONArray("region_timeline_events", "races_involved", id);
-
-    // 3. Remove from characters.species_and_race
+    // 2. Remove from characters.species_and_race
     await removeFromJSONArray("characters", "species_and_race", id);
 
-    // 4. Remove from factions.races
+    // 3. Remove from factions.races
     await removeFromJSONArray("factions", "races", id);
 
-    // 5. Remove from factions.timeline[].events[].racesInvolved
+    // 4. Remove from factions.timeline[].events[].racesInvolved
     await removeFromNestedJSONArray("factions", "timeline", id, [
       "timeline",
       "*",
@@ -305,7 +302,7 @@ export async function deleteRace(id: string): Promise<void> {
       "racesInvolved",
     ]);
 
-    // 6. Finally, delete the race (CASCADE will handle versions, relationships)
+    // 5. Finally, delete the race (CASCADE will handle versions, relationships)
     await db.execute("DELETE FROM races WHERE id = $1", [id]);
   }, "deleteRace");
 }

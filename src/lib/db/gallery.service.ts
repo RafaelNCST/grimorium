@@ -25,7 +25,6 @@ function galleryItemToDBGalleryItem(item: IGalleryItem): DBGalleryItem {
     book_id: item.bookId,
     title: item.title,
     description: item.description,
-    thumbnail_base64: item.thumbnailBase64, // DEPRECATED: para compatibilidade temporária
     thumbnail_path: item.thumbnailPath,
     original_path: item.originalPath,
     original_filename: item.originalFilename,
@@ -52,7 +51,6 @@ function dbGalleryItemToGalleryItem(
     bookId: dbItem.book_id,
     title: dbItem.title,
     description: dbItem.description,
-    thumbnailBase64: dbItem.thumbnail_base64, // DEPRECATED: para compatibilidade temporária
     thumbnailPath: dbItem.thumbnail_path || getThumbnailPath(dbItem.id),
     originalPath: dbItem.original_path,
     originalFilename: dbItem.original_filename,
@@ -475,16 +473,15 @@ export async function createGalleryItem(item: IGalleryItem): Promise<void> {
 
     await db.execute(
       `INSERT INTO gallery_items (
-        id, book_id, title, description, thumbnail_base64, thumbnail_path, original_path,
+        id, book_id, title, description, thumbnail_path, original_path,
         original_filename, file_size, width, height, mime_type, order_index,
         created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
       [
         dbItem.id,
         dbItem.book_id,
         dbItem.title,
         dbItem.description,
-        null, // thumbnail_base64 - não salvamos mais
         thumbnailPath,
         dbItem.original_path,
         dbItem.original_filename,
@@ -546,10 +543,6 @@ export async function updateGalleryItem(
       // Atualizar thumbnail_path no banco
       updateFields.push(`thumbnail_path = $${updateValues.length + 1}`);
       updateValues.push(newThumbnailPath);
-
-      // Limpar thumbnail_base64
-      updateFields.push(`thumbnail_base64 = $${updateValues.length + 1}`);
-      updateValues.push(null);
     }
 
     // Se thumbnailPath foi fornecido diretamente
