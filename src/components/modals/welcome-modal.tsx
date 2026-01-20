@@ -1,5 +1,6 @@
-import { BookOpen, Sparkles, BookMarked } from "lucide-react";
+import { BookOpen, Sparkles, BookMarked, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { open as openUrl } from "@tauri-apps/plugin-shell";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useLicense } from "@/hooks/useLicense";
 
 interface WelcomeModalProps {
   open: boolean;
@@ -18,6 +20,12 @@ interface WelcomeModalProps {
 
 export function WelcomeModal({ open, onClose }: WelcomeModalProps) {
   const { t } = useTranslation("welcome");
+  const { daysRemaining } = useLicense();
+
+  const handleBuyLicense = async () => {
+    // TODO: Replace with actual purchase URL
+    await openUrl("https://example.com/buy-grimorium");
+  };
 
   const features = [
     {
@@ -49,6 +57,25 @@ export function WelcomeModal({ open, onClose }: WelcomeModalProps) {
             {t("description")}
           </DialogDescription>
         </DialogHeader>
+
+        {/* Trial Info Banner */}
+        <div className="rounded-lg border-2 border-primary/20 bg-primary/5 p-4 text-center">
+          <h3 className="text-lg font-semibold text-primary mb-2">
+            {t("trial.title")}
+          </h3>
+          <p className="text-sm text-muted-foreground mb-3">
+            {t("trial.description", { days: daysRemaining })}
+          </p>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleBuyLicense}
+            className="gap-2"
+          >
+            {t("trial.cta")}
+            <ExternalLink className="h-3.5 w-3.5" />
+          </Button>
+        </div>
 
         {/* Features Grid */}
         <div className="grid gap-4 py-6 sm:grid-cols-3">

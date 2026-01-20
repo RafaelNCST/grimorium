@@ -92,7 +92,8 @@ export function ResetDatabaseButton() {
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button
-              variant="outline"
+              variant="secondary"
+              size="lg"
               onClick={() => setShowDialog(false)}
               disabled={isResetting}
             >

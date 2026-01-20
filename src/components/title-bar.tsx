@@ -2,14 +2,14 @@ import { useEffect, useState, useMemo } from "react";
 
 import { useRouterState } from "@tanstack/react-router";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { BookOpen, Inbox, Minus, Settings, Square, X } from "lucide-react";
+import { BookOpen, Sword, Minus, Settings, Square, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
 import { AdvancedSettingsModal } from "@/components/modals/advanced-settings";
 import { GuideContentModal } from "@/components/modals/guide-content-modal";
 import { GuideModal } from "@/components/modals/guide-modal";
-import { InboxNotificationModal } from "@/components/modals/inbox-notification-modal";
+import { HowToActivateLicenseModal } from "@/components/modals/how-to-activate-license-modal";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useBookStore } from "@/stores/book-store";
-import { useInboxStore } from "@/stores/inbox-store";
+import { useLicense } from "@/hooks/useLicense";
 
 type TitleKey =
   | "home"
@@ -100,7 +100,7 @@ const getPageTitleKey = (pathname: string): TitleKey => {
 export const TitleBar = () => {
   const routerState = useRouterState();
   const [isMaximized, setIsMaximized] = useState(false);
-  const [isInboxOpen, setIsInboxOpen] = useState(false);
+  const [isLicenseModalOpen, setIsLicenseModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isGuidesOpen, setIsGuidesOpen] = useState(false);
   const [selectedGuideId, setSelectedGuideId] = useState<string | null>(null);
@@ -109,19 +109,17 @@ export const TitleBar = () => {
     top: 0,
     right: 0,
   });
-  const { t: tInbox } = useTranslation("inbox");
+  const { t: tLicense } = useTranslation("license");
   const { t: tCommon } = useTranslation("common");
   const { t: tSettings } = useTranslation("settings");
-  const messages = useInboxStore((state) => state.messages);
-  const markAllAsRead = useInboxStore((state) => state.markAllAsRead);
+  const { status } = useLicense();
   const { books } = useBookStore();
+
+  const isLicensed = status?.is_licensed ?? false;
 
   const { pathname } = routerState.location;
   const pageTitleKey = getPageTitleKey(pathname);
   const pageTitle = tCommon(`title_bar.${pageTitleKey}`);
-  const unreadCount = messages.filter(
-    (msg) => !msg.isDeleted && !msg.isRead
-  ).length;
 
   // Extract book ID from pathname and get book name
   const bookInfo = useMemo(() => {
@@ -165,12 +163,6 @@ export const TitleBar = () => {
       if (unlisten) unlisten();
     };
   }, []);
-
-  useEffect(() => {
-    if (isInboxOpen) {
-      markAllAsRead();
-    }
-  }, [isInboxOpen, markAllAsRead]);
 
   // Listen for custom event to open guides modal
   useEffect(() => {
@@ -378,33 +370,33 @@ export const TitleBar = () => {
               </TooltipContent>
             </Tooltip>
 
-            <Tooltip open={isInboxOpen ? false : undefined}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  disabled={isModalOpen}
-                  onClick={() => setIsInboxOpen(!isInboxOpen)}
-                  className={cn(
-                    "h-8 w-12 rounded-none hover:bg-gray-50 hover:text-secondary relative",
-                    "transition-colors duration-200",
-                    isInboxOpen && "bg-gray-50 text-secondary",
-                    isModalOpen && "opacity-50 cursor-not-allowed"
-                  )}
-                  aria-label="Inbox"
-                >
-                  <Inbox
-                    className={cn("h-4 w-4 transition-colors duration-200")}
-                  />
-                  {unreadCount > 0 && !isInboxOpen && (
-                    <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary animate-pulse" />
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>{tInbox("tooltip")}</p>
-              </TooltipContent>
-            </Tooltip>
+            {!isLicensed && (
+              <Tooltip open={isLicenseModalOpen ? false : undefined}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    disabled={isModalOpen}
+                    onClick={() => setIsLicenseModalOpen(!isLicenseModalOpen)}
+                    className={cn(
+                      "h-8 w-12 rounded-none hover:bg-yellow-50 hover:text-yellow-600 relative",
+                      "transition-colors duration-200",
+                      isLicenseModalOpen && "bg-yellow-50 text-yellow-600",
+                      isModalOpen && "opacity-50 cursor-not-allowed"
+                    )}
+                    aria-label="Become a Knight"
+                  >
+                    <Sword
+                      className={cn("h-4 w-4 transition-colors duration-200")}
+                    />
+                    <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>{tLicense("how_to_activate.title")}</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
           </TooltipProvider>
           {/* Placeholder to maintain spacing - invisible but takes up space */}
           <div
@@ -445,10 +437,10 @@ export const TitleBar = () => {
         />
       )}
 
-      {/* Inbox Notification Modal - Custom modal, não usa Popover */}
-      <InboxNotificationModal
-        isOpen={isInboxOpen}
-        onClose={() => setIsInboxOpen(false)}
+      {/* How to Activate License Modal */}
+      <HowToActivateLicenseModal
+        open={isLicenseModalOpen}
+        onClose={() => setIsLicenseModalOpen(false)}
       />
 
       {/* Advanced Settings Modal */}

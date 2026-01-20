@@ -2,8 +2,8 @@ import { useState } from "react";
 
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 
-import { ResetDatabaseButton } from "@/components/dev-tools/reset-database-button";
-import { InboxInitializer } from "@/components/inbox-initializer";
+import { DevToolsMenu } from "@/components/dev-tools/dev-tools-menu";
+import { LicenseGuard } from "@/components/license";
 import { ChapterOrderWarningModal } from "@/components/modals/chapter-order-warning-modal";
 import { DatabaseErrorModal } from "@/components/modals/database-error-modal";
 import { SplashScreen } from "@/components/splash-screen";
@@ -37,23 +37,24 @@ const App = () => {
   }
 
   return (
-    <TooltipProvider>
-      <ChapterArcWarningProvider>
-        <InboxInitializer />
-        <RouterProvider router={router} />
-        <ResetDatabaseButton />
+    <LicenseGuard>
+      <TooltipProvider>
+        <ChapterArcWarningProvider>
+          <RouterProvider router={router} />
+          <DevToolsMenu />
 
-        {errorType && (
-          <DatabaseErrorModal
-            isOpen={isOpen}
-            errorType={errorType}
-            onClose={hideError}
-          />
-        )}
+          {errorType && (
+            <DatabaseErrorModal
+              isOpen={isOpen}
+              errorType={errorType}
+              onClose={hideError}
+            />
+          )}
 
-        <ChapterOrderWarningModal />
-      </ChapterArcWarningProvider>
-    </TooltipProvider>
+          <ChapterOrderWarningModal />
+        </ChapterArcWarningProvider>
+      </TooltipProvider>
+    </LicenseGuard>
   );
 };
 

@@ -1,0 +1,45 @@
+{
+  "title": "Termos de Uso e Licença",
+  "subtitle": "Por favor, leia e aceite os termos antes de continuar",
+  "intro": {
+    "title": "Bem-vindo ao Grimorium",
+    "text": "Este Acordo de Licença de Usuário Final ('EULA') é um acordo legal entre você e Grimorium. Ao usar este software, você concorda com todos os termos e condições descritos abaixo."
+  },
+  "license_grant": {
+    "title": "Concessão de Licença",
+    "item1": "Você recebe uma licença pessoal, não exclusiva e intransferível para usar o Grimorium.",
+    "item2": "A licença Cavaleiro é vitalícia e inclui todas as atualizações futuras do software.",
+    "item3": "Você pode instalar e usar o Grimorium em múltiplos dispositivos de sua propriedade."
+  },
+  "restrictions": {
+    "title": "Restrições Importantes",
+    "item1": "PROIBIDO compartilhar, vender, alugar ou distribuir sua conta/licença para terceiros.",
+    "item2": "PROIBIDO publicar sua chave de licença em sites públicos, fóruns ou redes sociais.",
+    "item3": "PROIBIDO usar a mesma licença comercialmente para múltiplos usuários ou empresas.",
+    "item4": "PROIBIDO fazer engenharia reversa, descompilar ou modificar o código do software.",
+    "item5": "PROIBIDO remover ou alterar avisos de direitos autorais ou marcas registradas."
+  },
+  "account_sharing": {
+    "title": "Compartilhamento de Conta",
+    "text": "Cada licença é vinculada a um email específico e é para uso pessoal. Compartilhar credenciais com outras pessoas viola este acordo.",
+    "warning": "⚠️ Violações podem resultar na revogação da sua licença sem reembolso."
+  },
+  "trial": {
+    "title": "Período de Avaliação (Trial)",
+    "text": "O período de trial de 30 dias é oferecido gratuitamente para avaliar o software. Após o término, é necessário adquirir uma licença para continuar usando o Grimorium."
+  },
+  "termination": {
+    "title": "Rescisão",
+    "text": "Este acordo é efetivo até ser rescindido. Seus direitos sob esta licença serão automaticamente rescindidos sem aviso se você violar qualquer termo deste EULA."
+  },
+  "warranty": {
+    "title": "Garantia e Responsabilidade",
+    "text": "O software é fornecido 'como está', sem garantias de qualquer tipo. Grimorium não se responsabiliza por perda de dados, danos ou quaisquer problemas decorrentes do uso do software."
+  },
+  "support": {
+    "title": "Suporte",
+    "text": "Usuários licenciados têm direito a suporte técnico via email. Respondemos dentro de 48 horas úteis."
+  },
+  "footer": "Ao usar o Grimorium, você concorda com todos os termos deste acordo. Última atualização: Janeiro 2025.",
+  "close": "Fechar"
+}

@@ -12,52 +12,35 @@
   "account": {
     "profile": {
       "title": "Profile",
-      "description": "Manage your personal information",
-      "avatar_options": "Photo Options",
-      "upload_photo": "Upload Photo",
-      "remove_photo": "Remove Photo",
-      "change_avatar": "Change Photo",
-      "avatar_help": "PNG, JPG or GIF. Max 2MB.",
+      "description": "Customize how you appear in the app",
       "display_name": "Display Name",
-      "edit_name": "Edit",
-      "email": "Email",
-      "email_help": "Email cannot be changed",
-      "password": "Password",
-      "change_password": "Change Password"
+      "display_name_placeholder": "How would you like to be called?",
+      "display_name_help": "This name will be used to refer to you in the app"
     },
-    "subscription": {
-      "title": "Subscription",
-      "description": "Manage your plan and benefits",
+    "license": {
+      "title": "License",
+      "description": "Manage your Grimorium license",
       "currently_you_are": "Currently you are",
-      "tier_free": "Peasant",
-      "tier_premium": "Royalty",
-      "status_active": "Active",
-      "renewal_date": "Next billing",
-      "free_description": "Free access with basic features",
-      "upgrade_button": "Upgrade to Royalty"
-    },
-    "payment": {
-      "title": "Payment",
-      "description": "Manage payment method and billing",
-      "method": "Method",
-      "method_credit_card": "Credit Card",
-      "method_pix": "PIX",
-      "method_paypal": "PayPal",
-      "card_number": "Card",
-      "manage_button": "Manage Payment"
+      "tier_peasant": "Peasant",
+      "tier_knight": "Knight",
+      "days_remaining": "{{days}} days remaining in trial",
+      "licensed_description": "Lifetime access to all Grimorium features",
+      "become_knight": "Become a knight!",
+      "activate_button": "Activate License",
+      "activate_title": "Activate your license",
+      "activate_description": "Enter the email and license key you received after purchase",
+      "email_label": "Email",
+      "key_label": "License Key",
+      "cancel": "Cancel",
+      "activate": "Activate",
+      "activating": "Activating...",
+      "error_empty_fields": "Please fill in all fields",
+      "error_invalid_key": "Invalid license key. Check your email and key and try again."
     },
     "language": {
       "title": "Language",
       "description": "Choose your app language",
       "select_label": "Preferred language"
-    },
-    "auth": {
-      "title": "Authentication",
-      "description": "Manage your account and access",
-      "provider_google": "Connected via Google",
-      "provider_email": "Connected via Email",
-      "logout_button": "Sign Out",
-      "logout_confirm": "Are you sure you want to sign out? You'll need to log in again."
     }
   },
   "dashboard": {
@@ -169,11 +152,10 @@
       "button": "Make Suggestion on GitHub",
       "help": "Share ideas and feedback with the community"
     },
-    "info": {
-      "title": "Technical Information",
-      "technology": "Technology",
-      "platform": "Platform",
-      "license": "License"
+    "eula": {
+      "title": "Terms of Use",
+      "description": "Read our software terms and conditions",
+      "button": "View Terms of Use"
     },
     "footer": {
       "made_with": "Made with",

@@ -12,52 +12,35 @@
   "account": {
     "profile": {
       "title": "Perfil",
-      "description": "Gerencie suas informações pessoais",
-      "avatar_options": "Opções de Foto",
-      "upload_photo": "Enviar Foto",
-      "remove_photo": "Remover Foto",
-      "change_avatar": "Trocar Foto",
-      "avatar_help": "PNG, JPG ou GIF. Máximo 2MB.",
+      "description": "Personalize como você aparece no aplicativo",
       "display_name": "Nome de Exibição",
-      "edit_name": "Editar",
-      "email": "Email",
-      "email_help": "O email não pode ser alterado",
-      "password": "Senha",
-      "change_password": "Alterar Senha"
+      "display_name_placeholder": "Como você gostaria de ser chamado?",
+      "display_name_help": "Este nome será usado para se referir a você no aplicativo"
     },
-    "subscription": {
-      "title": "Assinatura",
-      "description": "Gerencie seu plano e benefícios",
+    "license": {
+      "title": "Licença",
+      "description": "Gerencie sua licença do Grimorium",
       "currently_you_are": "Atualmente você é",
-      "tier_free": "Camponês",
-      "tier_premium": "Realeza",
-      "status_active": "Ativo",
-      "renewal_date": "Próxima cobrança",
-      "free_description": "Acesso gratuito com funcionalidades básicas",
-      "upgrade_button": "Evoluir para Realeza"
-    },
-    "payment": {
-      "title": "Pagamento",
-      "description": "Gerenciar forma de pagamento e cobranças",
-      "method": "Método",
-      "method_credit_card": "Cartão de Crédito",
-      "method_pix": "PIX",
-      "method_paypal": "PayPal",
-      "card_number": "Cartão",
-      "manage_button": "Gerenciar Pagamento"
+      "tier_peasant": "Camponês",
+      "tier_knight": "Cavaleiro",
+      "days_remaining": "{{days}} dias restantes no trial",
+      "licensed_description": "Acesso vitalício a todos os recursos do Grimorium",
+      "become_knight": "Torne-se um cavaleiro!",
+      "activate_button": "Ativar Licença",
+      "activate_title": "Ativar sua licença",
+      "activate_description": "Digite o email e a chave de licença que você recebeu após a compra",
+      "email_label": "Email",
+      "key_label": "Chave de Licença",
+      "cancel": "Cancelar",
+      "activate": "Ativar",
+      "activating": "Ativando...",
+      "error_empty_fields": "Por favor, preencha todos os campos",
+      "error_invalid_key": "Chave de licença inválida. Verifique o email e a chave e tente novamente."
     },
     "language": {
       "title": "Idioma",
       "description": "Escolha o idioma do aplicativo",
       "select_label": "Idioma preferido"
-    },
-    "auth": {
-      "title": "Autenticação",
-      "description": "Gerenciar sua conta e acesso",
-      "provider_google": "Conectado via Google",
-      "provider_email": "Conectado via E-mail",
-      "logout_button": "Sair da Conta",
-      "logout_confirm": "Tem certeza que deseja sair? Você precisará fazer login novamente."
     }
   },
   "dashboard": {
@@ -169,11 +152,10 @@
       "button": "Fazer Sugestão no GitHub",
       "help": "Compartilhar ideias e feedback com a comunidade"
     },
-    "info": {
-      "title": "Informações Técnicas",
-      "technology": "Tecnologia",
-      "platform": "Plataforma",
-      "license": "Licença"
+    "eula": {
+      "title": "Termos de Uso",
+      "description": "Leia nossos termos e condições de uso do software",
+      "button": "Ver Termos de Uso"
     },
     "footer": {
       "made_with": "Feito com",

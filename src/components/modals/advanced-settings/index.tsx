@@ -12,7 +12,7 @@ import {
   Shield,
   Info,
   Edit2,
-  Crown,
+  Sword,
   Wheat,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useUserAccountStore } from "@/stores/user-account-store";
+import { useLicense } from "@/hooks/useLicense";
 
 import { AboutSection } from "./sections/AboutSection";
 import { AccountSection } from "./sections/AccountSection";
@@ -43,10 +44,11 @@ export function AdvancedSettingsModal({
 }: AdvancedSettingsModalProps) {
   const { t } = useTranslation("advanced-settings");
   const { user, updateDisplayName } = useUserAccountStore();
+  const { status } = useLicense();
   const [activeSection, setActiveSection] =
     useState<SettingsSection>("account");
   const [isEditingName, setIsEditingName] = useState(false);
-  const [tempName, setTempName] = useState(user?.displayName || "");
+  const [tempName, setTempName] = useState(user.displayName);
 
   const sections: SettingsSectionConfig[] = [
     { id: "account", labelKey: "sections.account", icon: User },
@@ -63,7 +65,7 @@ export function AdvancedSettingsModal({
   };
 
   const handleCancelEditName = () => {
-    setTempName(user?.displayName || "");
+    setTempName(user.displayName);
     setIsEditingName(false);
   };
 
@@ -82,11 +84,7 @@ export function AdvancedSettingsModal({
     }
   };
 
-  if (!user) {
-    return null;
-  }
-
-  const isPremium = user.subscription.tier === "realeza";
+  const isLicensed = status?.is_licensed ?? false;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -109,27 +107,23 @@ export function AdvancedSettingsModal({
             {/* User Profile Header */}
             <div className="p-4 border-b bg-background/50 flex-shrink-0">
               <div className="flex items-start gap-3">
-                {/* Avatar */}
-                <div className="relative">
-                  {user.avatarUrl ? (
-                    <img
-                      src={user.avatarUrl}
-                      alt={user.displayName}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center select-none">
-                      <User className="w-6 h-6 text-primary" />
-                    </div>
+                {/* Tier Icon */}
+                <div
+                  className={cn(
+                    "w-12 h-12 rounded-lg flex items-center justify-center select-none",
+                    isLicensed
+                      ? "bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 dark:from-yellow-900/30 dark:to-yellow-950/40"
+                      : "bg-gradient-to-br from-green-500/20 to-green-600/20 dark:from-green-900/30 dark:to-green-950/40"
                   )}
-                  {isPremium && (
-                    <div className="absolute -top-1 -right-1 bg-amber-500 rounded-full p-1">
-                      <Crown className="w-3 h-3 text-white" />
-                    </div>
+                >
+                  {isLicensed ? (
+                    <Sword className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+                  ) : (
+                    <Wheat className="w-6 h-6 text-green-600 dark:text-green-400" />
                   )}
                 </div>
 
-                {/* Name and Email */}
+                {/* Name */}
                 <div className="flex-1 min-w-0">
                   {isEditingName ? (
                     <div className="space-y-2">
@@ -180,8 +174,10 @@ export function AdvancedSettingsModal({
                           <Edit2 className="h-3 w-3" />
                         </Button>
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {user.email}
+                      <p className="text-xs text-muted-foreground">
+                        {isLicensed
+                          ? t("account.license.tier_knight")
+                          : t("account.license.tier_peasant")}
                       </p>
                     </>
                   )}
@@ -219,29 +215,36 @@ export function AdvancedSettingsModal({
             <div className="p-3 border-t bg-background/50 flex-shrink-0">
               <div
                 className={cn(
-                  "px-4 py-3 rounded-lg text-center border transition-colors",
-                  isPremium
-                    ? "bg-gradient-to-br from-purple-500/20 to-purple-600/20 border-purple-500/30 dark:from-purple-400/20 dark:to-purple-500/20 dark:border-purple-400/30"
-                    : "bg-gradient-to-br from-green-500/20 to-green-600/20 border-green-500/30 dark:from-green-400/20 dark:to-green-500/20 dark:border-green-400/30"
+                  "px-4 py-3 rounded-lg text-center relative overflow-hidden transition-colors",
+                  isLicensed
+                    ? "bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 dark:from-yellow-900/30 dark:to-yellow-950/40"
+                    : "bg-gradient-to-br from-green-500/20 to-green-600/20 dark:from-green-900/30 dark:to-green-950/40"
                 )}
               >
-                <div className="flex items-center justify-center gap-2">
-                  {isPremium ? (
-                    <Crown className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                {/* Small decorative circle */}
+                <div
+                  className={cn(
+                    "absolute -right-3 -bottom-3 w-12 h-12 rounded-full opacity-20",
+                    isLicensed ? "bg-yellow-500" : "bg-green-500"
+                  )}
+                />
+                <div className="flex items-center justify-center gap-2 relative">
+                  {isLicensed ? (
+                    <Sword className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
                   ) : (
                     <Wheat className="w-4 h-4 text-green-600 dark:text-green-400" />
                   )}
                   <span
                     className={cn(
                       "text-sm font-bold",
-                      isPremium
-                        ? "text-purple-700 dark:text-purple-300"
+                      isLicensed
+                        ? "text-yellow-700 dark:text-yellow-300"
                         : "text-green-700 dark:text-green-300"
                     )}
                   >
-                    {isPremium
-                      ? t("account.subscription.tier_premium")
-                      : t("account.subscription.tier_free")}
+                    {isLicensed
+                      ? t("account.license.tier_knight")
+                      : t("account.license.tier_peasant")}
                   </span>
                 </div>
               </div>

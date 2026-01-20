@@ -1,0 +1,45 @@
+{
+  "title": "End User License Agreement",
+  "subtitle": "Please read and accept the terms before continuing",
+  "intro": {
+    "title": "Welcome to Grimorium",
+    "text": "This End User License Agreement ('EULA') is a legal agreement between you and Grimorium. By using this software, you agree to all the terms and conditions described below."
+  },
+  "license_grant": {
+    "title": "License Grant",
+    "item1": "You receive a personal, non-exclusive, and non-transferable license to use Grimorium.",
+    "item2": "The Knight license is lifetime and includes all future software updates.",
+    "item3": "You may install and use Grimorium on multiple devices that you own."
+  },
+  "restrictions": {
+    "title": "Important Restrictions",
+    "item1": "PROHIBITED to share, sell, rent, or distribute your account/license to third parties.",
+    "item2": "PROHIBITED to post your license key on public websites, forums, or social media.",
+    "item3": "PROHIBITED to use the same license commercially for multiple users or companies.",
+    "item4": "PROHIBITED to reverse engineer, decompile, or modify the software code.",
+    "item5": "PROHIBITED to remove or alter copyright notices or trademarks."
+  },
+  "account_sharing": {
+    "title": "Account Sharing",
+    "text": "Each license is tied to a specific email and is for personal use. Sharing credentials with others violates this agreement.",
+    "warning": "⚠️ Violations may result in license revocation without refund."
+  },
+  "trial": {
+    "title": "Trial Period",
+    "text": "The 30-day trial period is offered free to evaluate the software. After it ends, you must purchase a license to continue using Grimorium."
+  },
+  "termination": {
+    "title": "Termination",
+    "text": "This agreement is effective until terminated. Your rights under this license will automatically terminate without notice if you violate any term of this EULA."
+  },
+  "warranty": {
+    "title": "Warranty and Liability",
+    "text": "The software is provided 'as is', without warranties of any kind. Grimorium is not responsible for data loss, damages, or any issues arising from software use."
+  },
+  "support": {
+    "title": "Support",
+    "text": "Licensed users are entitled to technical support via email. We respond within 48 business hours."
+  },
+  "footer": "By using Grimorium, you agree to all terms of this agreement. Last updated: January 2025.",
+  "close": "Close"
+}

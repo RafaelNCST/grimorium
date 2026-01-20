@@ -1,4 +1,3 @@
-import { ResetDatabaseButton } from "@/components/dev-tools/reset-database-button";
 import {
   CreateBookModal,
   IBookFormData,
@@ -61,9 +60,6 @@ export function HomeView({
         onClose={onCloseCreateModal}
         onConfirm={onCreateBook}
       />
-
-      {/* Dev Tools - Only visible in development */}
-      <ResetDatabaseButton />
     </div>
   );
 }

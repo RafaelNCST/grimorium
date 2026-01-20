@@ -124,6 +124,7 @@ const AlertDialogAction = React.forwardRef<
       | "ghost"
       | "link"
       | "magical"
+      | "magical-red"
       | "ghost-destructive";
   }
 >(({ className, variant, ...props }, ref) => (

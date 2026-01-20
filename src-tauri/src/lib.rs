@@ -2,6 +2,8 @@ use std::fs;
 use std::path::Path;
 use tauri::Manager;
 
+mod license;
+
 #[tauri::command]
 async fn reset_database(app: tauri::AppHandle) -> Result<String, String> {
     let app_data_dir = app
@@ -120,19 +122,108 @@ async fn open_data_folder(app: tauri::AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+#[tauri::command]
+async fn check_license_status(app: tauri::AppHandle) -> Result<license::LicenseStatus, String> {
+    let app_data_dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("Failed to get app data directory: {}", e))?;
+
+    license::get_license_status(&app_data_dir)
+}
+
+#[tauri::command]
+async fn activate_license_key(
+    app: tauri::AppHandle,
+    email: String,
+    license_key: String,
+) -> Result<license::LicenseStatus, String> {
+    let app_data_dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("Failed to get app data directory: {}", e))?;
+
+    license::activate_license(&app_data_dir, &email, &license_key)
+}
+
+#[cfg(debug_assertions)]
+#[tauri::command]
+async fn reset_license(app: tauri::AppHandle) -> Result<String, String> {
+    let app_data_dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("Failed to get app data directory: {}", e))?;
+
+    license::deactivate_license(&app_data_dir)?;
+    Ok("License reset successfully".to_string())
+}
+
+#[cfg(debug_assertions)]
+#[tauri::command]
+async fn activate_dev_license(app: tauri::AppHandle) -> Result<license::LicenseStatus, String> {
+    let app_data_dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("Failed to get app data directory: {}", e))?;
+
+    // Ativar licença com email e chave de desenvolvedor
+    let dev_email = "dev@grimorium.com";
+    let dev_key = license::generate_license_key(dev_email);
+
+    license::activate_license(&app_data_dir, dev_email, &dev_key)
+}
+
+#[cfg(debug_assertions)]
+#[tauri::command]
+async fn reset_trial(app: tauri::AppHandle) -> Result<String, String> {
+    let app_data_dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("Failed to get app data directory: {}", e))?;
+
+    license::reset_trial(&app_data_dir)?;
+    Ok("Trial reset successfully".to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-  tauri::Builder::default()
+  let mut builder = tauri::Builder::default()
     .plugin(tauri_plugin_sql::Builder::default().build())
     .plugin(tauri_plugin_dialog::init())
     .plugin(tauri_plugin_fs::init())
-    .invoke_handler(tauri::generate_handler![
+    .plugin(tauri_plugin_shell::init());
+
+  // Register handlers with conditional compilation
+  #[cfg(debug_assertions)]
+  {
+    builder = builder.invoke_handler(tauri::generate_handler![
       reset_database,
       get_database_path,
       get_app_data_path,
       get_app_data_size,
-      open_data_folder
-    ])
+      open_data_folder,
+      check_license_status,
+      activate_license_key,
+      reset_license,
+      activate_dev_license,
+      reset_trial
+    ]);
+  }
+
+  #[cfg(not(debug_assertions))]
+  {
+    builder = builder.invoke_handler(tauri::generate_handler![
+      reset_database,
+      get_database_path,
+      get_app_data_path,
+      get_app_data_size,
+      open_data_folder,
+      check_license_status,
+      activate_license_key
+    ]);
+  }
+
+  builder
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }

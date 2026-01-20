@@ -22,6 +22,7 @@ import enEmptyStates from "../../locales/en/empty-states.json";
 import enEntityLogs from "../../locales/en/entity-logs.json";
 import enEntityReference from "../../locales/en/entity-reference.json";
 import enErrors from "../../locales/en/errors.json";
+import enEula from "../../locales/en/eula.json";
 import enExportPreview from "../../locales/en/export-preview.json";
 import enFactionDetail from "../../locales/en/faction-detail.json";
 import enFactions from "../../locales/en/factions.json";
@@ -33,6 +34,7 @@ import enHome from "../../locales/en/home.json";
 import enInbox from "../../locales/en/inbox.json";
 import enItemDetail from "../../locales/en/item-detail.json";
 import enItems from "../../locales/en/items.json";
+import enLicense from "../../locales/en/license.json";
 import enLoading from "../../locales/en/loading.json";
 import enOverview from "../../locales/en/overview.json";
 import enPlot from "../../locales/en/plot.json";
@@ -67,6 +69,7 @@ import ptEmptyStates from "../../locales/pt/empty-states.json";
 import ptEntityLogs from "../../locales/pt/entity-logs.json";
 import ptEntityReference from "../../locales/pt/entity-reference.json";
 import ptErrors from "../../locales/pt/errors.json";
+import ptEula from "../../locales/pt/eula.json";
 import ptExportPreview from "../../locales/pt/export-preview.json";
 import ptFactionDetail from "../../locales/pt/faction-detail.json";
 import ptFactions from "../../locales/pt/factions.json";
@@ -78,6 +81,7 @@ import ptHome from "../../locales/pt/home.json";
 import ptInbox from "../../locales/pt/inbox.json";
 import ptItemDetail from "../../locales/pt/item-detail.json";
 import ptItems from "../../locales/pt/items.json";
+import ptLicense from "../../locales/pt/license.json";
 import ptLoading from "../../locales/pt/loading.json";
 import ptOverview from "../../locales/pt/overview.json";
 import ptPlot from "../../locales/pt/plot.json";
@@ -117,6 +121,7 @@ const resources = {
     "entity-logs": enEntityLogs,
     "entity-reference": enEntityReference,
     errors: enErrors,
+    eula: enEula,
     "export-preview": enExportPreview,
     "faction-detail": enFactionDetail,
     factions: enFactions,
@@ -126,6 +131,7 @@ const resources = {
     "global-logs": enGlobalLogs,
     "item-detail": enItemDetail,
     items: enItems,
+    license: enLicense,
     loading: enLoading,
     overview: enOverview,
     plot: enPlot,
@@ -164,6 +170,7 @@ const resources = {
     "entity-logs": ptEntityLogs,
     "entity-reference": ptEntityReference,
     errors: ptErrors,
+    eula: ptEula,
     "export-preview": ptExportPreview,
     "faction-detail": ptFactionDetail,
     factions: ptFactions,
@@ -173,6 +180,7 @@ const resources = {
     "global-logs": ptGlobalLogs,
     "item-detail": ptItemDetail,
     items: ptItems,
+    license: ptLicense,
     loading: ptLoading,
     overview: ptOverview,
     plot: ptPlot,

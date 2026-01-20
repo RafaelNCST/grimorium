@@ -1,24 +1,16 @@
 /**
  * Account Section
  *
- * Gerenciamento de perfil, assinatura, pagamento e autenticação
+ * Gerenciamento de perfil e licença
  */
 
 import { useState } from "react";
 
-import {
-  Crown,
-  CreditCard,
-  LogOut,
-  Mail,
-  Calendar,
-  Camera,
-  X,
-  User,
-} from "lucide-react";
+import { Sword, Wheat, Calendar, Key } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { UpgradeModal } from "@/components/modals/upgrade-modal";
+import { useLicense } from "@/hooks/useLicense";
+import { ActivateLicenseModal } from "@/components/modals/activate-license-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,57 +28,23 @@ import { useUserAccountStore } from "@/stores/user-account-store";
 
 export function AccountSection() {
   const { t } = useTranslation("advanced-settings");
-  const { user, logout, updateDisplayName, updateAvatar } =
-    useUserAccountStore();
+  const { user, updateDisplayName } = useUserAccountStore();
   const { language, setLanguage } = useLanguageStore();
-  const [displayName, setDisplayName] = useState(user?.displayName || "");
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const { status, loading } = useLicense();
 
-  if (!user) return null;
+  const [displayName, setDisplayName] = useState(user.displayName);
+  const [showActivateModal, setShowActivateModal] = useState(false);
 
   const hasNameChanged =
     displayName !== user.displayName && displayName.trim() !== "";
 
-  const isPremium = user.subscription.tier === "realeza";
-
-  const formatDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString(
-      language === "pt" ? "pt-BR" : "en-US",
-      {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }
-    );
+  const isLicensed = status?.is_licensed ?? false;
+  const daysRemaining = status?.days_remaining ?? 0;
 
   const handleSaveName = () => {
     if (displayName.trim() && hasNameChanged) {
       updateDisplayName(displayName.trim());
     }
-  };
-
-  const handleAvatarClick = () => {
-    // Abrir seletor de arquivo imediatamente
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const url = event.target?.result as string;
-          updateAvatar(url);
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-    input.click();
-  };
-
-  const handleRemoveAvatar = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    updateAvatar("");
   };
 
   return (
@@ -103,223 +61,134 @@ export function AccountSection() {
         </div>
 
         <div className="space-y-4">
-          {/* Avatar with Name and Email */}
-          <div className="flex items-center gap-4">
-            <div className="relative group flex-shrink-0">
-              <div
-                className="relative cursor-pointer"
-                onClick={handleAvatarClick}
-              >
-                {user.avatarUrl ? (
-                  <img
-                    src={user.avatarUrl}
-                    alt={user.displayName}
-                    className="w-20 h-20 rounded-full object-cover transition-opacity group-hover:opacity-50"
-                  />
-                ) : (
-                  <div className="w-20 h-20 rounded-full bg-primary/[0.15] flex items-center justify-center transition-opacity group-hover:opacity-50 select-none">
-                    <User className="w-10 h-10 text-primary" />
-                  </div>
-                )}
-                {isPremium && (
-                  <div className="absolute -bottom-1 -right-1 bg-amber-500 rounded-full p-1.5 transition-opacity group-hover:opacity-50 z-10">
-                    <Crown className="w-4 h-4 text-white" />
-                  </div>
-                )}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                  <Camera className="w-8 h-8 text-primary" />
-                </div>
-              </div>
-
-              {/* Botão X para remover foto - aparece embaixo do avatar quando tem foto */}
-              {user.avatarUrl && (
-                <div className="absolute top-[84px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    className="h-6 w-6 rounded-full shadow-lg"
-                    onClick={handleRemoveAvatar}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            <div className="flex-1 space-y-3">
-              {/* Display Name */}
-              <div>
-                <Label className="text-sm font-medium mb-2 block">
-                  {t("account.profile.display_name")}
-                </Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="flex-1"
-                    maxLength={50}
-                  />
-                  <Button
-                    variant="magical"
-                    size="sm"
-                    onClick={handleSaveName}
-                    disabled={!hasNameChanged}
-                  >
-                    {t("user_profile.save")}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Email */}
-              <div>
-                <Label className="text-sm font-medium mb-2 block">
-                  {t("account.profile.email")}
-                </Label>
-                <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted/50 border text-sm">
-                  <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                  <span className="text-muted-foreground">{user.email}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Password */}
+          {/* Display Name */}
           <div>
             <Label className="text-sm font-medium mb-2 block">
-              {t("account.profile.password")}
+              {t("account.profile.display_name")}
             </Label>
-            <Button variant="secondary" size="sm" className="w-full">
-              {t("account.profile.change_password")}
-            </Button>
+            <div className="flex gap-2">
+              <Input
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="flex-1"
+                maxLength={50}
+                placeholder={t("account.profile.display_name_placeholder")}
+              />
+              <Button
+                variant="magical"
+                size="sm"
+                onClick={handleSaveName}
+                disabled={!hasNameChanged}
+              >
+                {t("user_profile.save")}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1.5">
+              {t("account.profile.display_name_help")}
+            </p>
           </div>
         </div>
       </div>
 
       <Separator />
 
-      {/* Subscription Info */}
+      {/* License Info */}
       <div className="space-y-4">
         <div>
           <h3 className="text-base font-semibold mb-1">
-            {t("account.subscription.title")}
+            {t("account.license.title")}
           </h3>
           <p className="text-sm text-muted-foreground">
-            {t("account.subscription.description")}
+            {t("account.license.description")}
           </p>
         </div>
 
         <div
           className={cn(
-            "border rounded-lg p-4",
-            isPremium
-              ? "bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/20 dark:to-amber-900/10 border-amber-200 dark:border-amber-800"
-              : "bg-muted/50"
+            "rounded-lg p-4 relative overflow-hidden",
+            isLicensed
+              ? "bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 dark:from-yellow-900/30 dark:to-yellow-950/40"
+              : "bg-gradient-to-br from-green-500/20 to-green-600/20 dark:from-green-900/30 dark:to-green-950/40"
           )}
         >
-          <div className="flex items-start justify-between">
+          {/* Icon Badge */}
+          <div
+            className={cn(
+              "absolute -right-6 -top-6 w-24 h-24 rounded-full opacity-20",
+              isLicensed ? "bg-yellow-500" : "bg-green-500"
+            )}
+          />
+
+          <div className="flex items-start justify-between relative">
             <div className="space-y-3 flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                {isPremium && <Crown className="w-5 h-5 text-amber-600" />}
-                <div className="flex items-baseline gap-2">
-                  <span className="text-sm text-white">
-                    {t("account.subscription.currently_you_are")}
+              <div className="flex items-center gap-3">
+                <div
+                  className={cn(
+                    "p-2 rounded-lg",
+                    isLicensed
+                      ? "bg-yellow-500/20 dark:bg-yellow-500/30"
+                      : "bg-green-500/20 dark:bg-green-500/30"
+                  )}
+                >
+                  {isLicensed ? (
+                    <Sword className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+                  ) : (
+                    <Wheat className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-xs text-muted-foreground">
+                    {t("account.license.currently_you_are")}
                   </span>
                   <h4
                     className={cn(
-                      "font-bold text-lg",
-                      isPremium
-                        ? "text-purple-600 dark:text-purple-400"
-                        : "text-green-600 dark:text-green-400"
+                      "font-bold text-lg leading-none",
+                      isLicensed
+                        ? "text-yellow-700 dark:text-yellow-300"
+                        : "text-green-700 dark:text-green-300"
                     )}
                   >
-                    {isPremium
-                      ? t("account.subscription.tier_premium")
-                      : t("account.subscription.tier_free")}
+                    {isLicensed
+                      ? t("account.license.tier_knight")
+                      : t("account.license.tier_peasant")}
                   </h4>
                 </div>
               </div>
 
-              {isPremium && user.subscription.renewalDate && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    {t("account.subscription.renewal_date")}:{" "}
-                    {formatDate(user.subscription.renewalDate)}
+              {!isLicensed && !loading && (
+                <div className="flex items-center gap-2 text-sm pl-1">
+                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-foreground/80 font-medium">
+                    {t("account.license.days_remaining", { days: daysRemaining })}
                   </span>
                 </div>
               )}
 
-              {!isPremium && (
-                <p className="text-sm text-muted-foreground">
-                  {t("account.subscription.free_description")}
+              {isLicensed && (
+                <p className="text-sm text-foreground/70 pl-1">
+                  {t("account.license.licensed_description")}
                 </p>
               )}
             </div>
 
-            {!isPremium && (
-              <Button
-                variant="magical"
-                size="sm"
-                className="ml-4"
-                onClick={() => setShowUpgradeModal(true)}
-              >
-                <Crown className="w-4 h-4 mr-2" />
-                {t("account.subscription.upgrade_button")}
-              </Button>
+            {!isLicensed && (
+              <div className="ml-4 shrink-0 flex flex-col items-end gap-1">
+                <span className="text-xs text-muted-foreground italic">
+                  {t("account.license.become_knight")}
+                </span>
+                <Button
+                  variant="magical"
+                  size="sm"
+                  onClick={() => setShowActivateModal(true)}
+                >
+                  <Key className="w-4 h-4 mr-2" />
+                  {t("account.license.activate_button")}
+                </Button>
+              </div>
             )}
           </div>
         </div>
       </div>
-
-      {/* Payment Info (only for premium) */}
-      {isPremium && user.subscription.paymentInfo && (
-        <>
-          <Separator />
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-base font-semibold mb-1 flex items-center gap-2">
-                <CreditCard className="w-4 h-4" />
-                {t("account.payment.title")}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {t("account.payment.description")}
-              </p>
-            </div>
-
-            <div className="border rounded-lg p-4 bg-muted/50">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    {t("account.payment.method")}
-                  </span>
-                  <span className="text-sm font-medium">
-                    {user.subscription.paymentInfo.method === "credit_card"
-                      ? t("account.payment.method_credit_card")
-                      : user.subscription.paymentInfo.method === "pix"
-                        ? t("account.payment.method_pix")
-                        : t("account.payment.method_paypal")}
-                  </span>
-                </div>
-
-                {user.subscription.paymentInfo.lastFourDigits && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      {t("account.payment.card_number")}
-                    </span>
-                    <span className="text-sm font-medium font-mono">
-                      •••• {user.subscription.paymentInfo.lastFourDigits}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <Button variant="outline" size="sm" className="w-full mt-3">
-                {t("account.payment.manage_button")}
-              </Button>
-            </div>
-          </div>
-        </>
-      )}
 
       {/* Language */}
       <Separator />
@@ -349,49 +218,10 @@ export function AccountSection() {
         </div>
       </div>
 
-      {/* Logout */}
-      <Separator />
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-base font-semibold mb-1">
-            {t("account.auth.title")}
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {t("account.auth.description")}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border">
-          <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-          <div className="flex-1">
-            <p className="text-sm font-medium">{user.email}</p>
-            <p className="text-xs text-muted-foreground">
-              {user.authProvider === "google"
-                ? t("account.auth.provider_google")
-                : t("account.auth.provider_email")}
-            </p>
-          </div>
-        </div>
-
-        <Button
-          variant="destructive"
-          className="w-full"
-          onClick={() => {
-            // eslint-disable-next-line no-alert
-            if (window.confirm(t("account.auth.logout_confirm"))) {
-              logout();
-            }
-          }}
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          {t("account.auth.logout_button")}
-        </Button>
-      </div>
-
-      {/* Upgrade Modal */}
-      <UpgradeModal
-        open={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
+      {/* Activate License Modal */}
+      <ActivateLicenseModal
+        open={showActivateModal}
+        onClose={() => setShowActivateModal(false)}
       />
     </div>
   );

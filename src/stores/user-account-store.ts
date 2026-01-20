@@ -1,53 +1,31 @@
 /**
  * User Account Store
  *
- * Gerencia os dados da conta do usuário incluindo perfil, assinatura e pagamento
+ * Gerencia o perfil offline do usuário (apenas nome de exibição)
  */
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { UserAccount, MOCK_USER } from "@/types/user-account";
+import { UserAccount, DEFAULT_USER } from "@/types/user-account";
 
 interface UserAccountState {
-  user: UserAccount | null;
-  isAuthenticated: boolean;
+  user: UserAccount;
 
   // Actions
-  setUser: (user: UserAccount) => void;
   updateDisplayName: (name: string) => void;
-  updateAvatar: (url: string) => void;
-  logout: () => void;
 }
 
 export const useUserAccountStore = create<UserAccountState>()(
   persist(
     (set) => ({
-      // Estado inicial com mock user para desenvolvimento
-      user: MOCK_USER,
-      isAuthenticated: true,
-
-      setUser: (user) =>
-        set({
-          user,
-          isAuthenticated: true,
-        }),
+      // Estado inicial
+      user: DEFAULT_USER,
 
       updateDisplayName: (name) =>
         set((state) => ({
-          user: state.user ? { ...state.user, displayName: name } : null,
+          user: { ...state.user, displayName: name },
         })),
-
-      updateAvatar: (url) =>
-        set((state) => ({
-          user: state.user ? { ...state.user, avatarUrl: url } : null,
-        })),
-
-      logout: () =>
-        set({
-          user: null,
-          isAuthenticated: false,
-        }),
     }),
     {
       name: "user-account-storage",

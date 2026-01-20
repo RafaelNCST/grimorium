@@ -1,6 +1,11 @@
 {
   "title": "Welcome to Grimorium",
   "description": "Your ultimate companion for creative writing and story management",
+  "trial": {
+    "title": "🎉 Enjoy 30 days free!",
+    "description": "You have {{days}} days to explore all Grimorium features with no commitment.",
+    "cta": "Buy License"
+  },
   "features": {
     "writing": {
       "title": "Focused Writing",
