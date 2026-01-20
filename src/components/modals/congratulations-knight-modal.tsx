@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { open as openUrl } from "@tauri-apps/plugin-shell";
 
 import { Button } from "@/components/ui/button";
+import { EXTERNAL_URLS } from "@/config/external-urls";
 import {
   Dialog,
   DialogContent,
@@ -30,13 +31,11 @@ export function CongratulationsKnightModal({
   const { t } = useTranslation("license");
 
   const handleBugReport = async () => {
-    // TODO: Replace with actual bug report URL
-    await openUrl("https://github.com/yourrepo/issues");
+    await openUrl(EXTERNAL_URLS.bugReport);
   };
 
   const handleFeedback = async () => {
-    // TODO: Replace with actual feedback URL/email
-    await openUrl("mailto:feedback@grimorium.com");
+    await openUrl(EXTERNAL_URLS.suggestions);
   };
 
   return (

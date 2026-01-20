@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Calendar, Check, Clock, Key, RefreshCw } from "lucide-react";
 
 import { useLicense } from "@/hooks/useLicense";
+import { EXTERNAL_URLS } from "@/config/external-urls";
 
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -131,7 +132,7 @@ export function LicenseInfo() {
           <div className="pt-2 text-xs text-center text-muted-foreground">
             Need a license?{" "}
             <a
-              href="https://yourwebsite.com/purchase"
+              href={EXTERNAL_URLS.purchase}
               className="text-primary hover:underline"
               target="_blank"
               rel="noopener noreferrer"

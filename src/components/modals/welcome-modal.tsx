@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { open as openUrl } from "@tauri-apps/plugin-shell";
 
 import { Button } from "@/components/ui/button";
+import { EXTERNAL_URLS } from "@/config/external-urls";
 import {
   Dialog,
   DialogContent,
@@ -23,8 +24,7 @@ export function WelcomeModal({ open, onClose }: WelcomeModalProps) {
   const { daysRemaining } = useLicense();
 
   const handleBuyLicense = async () => {
-    // TODO: Replace with actual purchase URL
-    await openUrl("https://example.com/buy-grimorium");
+    await openUrl(EXTERNAL_URLS.purchase);
   };
 
   const features = [

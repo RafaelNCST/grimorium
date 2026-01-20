@@ -142,15 +142,15 @@
     "bug_report": {
       "title": "Report Bug",
       "description": "Found a problem? Help us improve!",
-      "button": "Report Bug on GitHub",
-      "help": "Open issues page in repository",
+      "button": "Report Bug",
+      "help": "Report a problem or bug",
       "note": "When reporting a bug, include as many details as possible: what you were doing, what you expected to happen, and what actually happened."
     },
     "suggestions": {
       "title": "Suggestions and Feedback",
       "description": "Have ideas to improve Grimorium?",
-      "button": "Make Suggestion on GitHub",
-      "help": "Share ideas and feedback with the community"
+      "button": "Share Suggestions",
+      "help": "Share your ideas and suggestions with us"
     },
     "eula": {
       "title": "Terms of Use",

@@ -13,6 +13,7 @@ import { open as openUrl } from "@tauri-apps/plugin-shell";
 import { ActivateLicenseModal } from "@/components/modals/activate-license-modal";
 import { EULAModal } from "@/components/modals/eula-modal";
 import { Button } from "@/components/ui/button";
+import { EXTERNAL_URLS } from "@/config/external-urls";
 import {
   Dialog,
   DialogContent,
@@ -36,8 +37,7 @@ export function HowToActivateLicenseModal({
   const [showEULA, setShowEULA] = useState(false);
 
   const handlePurchase = async () => {
-    // TODO: Replace with actual purchase URL
-    await openUrl("https://grimorium.com/purchase");
+    await openUrl(EXTERNAL_URLS.purchase);
     onClose();
   };
 

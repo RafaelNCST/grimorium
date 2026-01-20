@@ -36,6 +36,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { EXTERNAL_URLS } from "@/config/external-urls";
 
 export function DataSection() {
   const { t } = useTranslation("advanced-settings");
@@ -151,7 +152,7 @@ export function DataSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div
             className="rounded-lg border bg-card p-4 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 cursor-pointer flex items-start gap-3"
-            onClick={() => openExternal("#privacy-policy")}
+            onClick={() => openExternal(EXTERNAL_URLS.privacyPolicy)}
           >
             <div className="rounded-lg bg-primary/10 p-2 flex-shrink-0">
               <Shield className="w-5 h-5 text-primary" />
@@ -168,7 +169,7 @@ export function DataSection() {
 
           <div
             className="rounded-lg border bg-card p-4 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 cursor-pointer flex items-start gap-3"
-            onClick={() => openExternal("#terms-of-use")}
+            onClick={() => openExternal(EXTERNAL_URLS.termsOfUse)}
           >
             <div className="rounded-lg bg-primary/10 p-2 flex-shrink-0">
               <FileText className="w-5 h-5 text-primary" />

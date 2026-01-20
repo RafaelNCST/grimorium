@@ -10,6 +10,7 @@ import { CongratulationsKnightModal } from "@/components/modals/congratulations-
 
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { EXTERNAL_URLS } from "@/config/external-urls";
 
 const IS_DEV = import.meta.env.DEV;
 
@@ -20,13 +21,11 @@ export function LicenseExpiredScreen() {
   const [showCongratulations, setShowCongratulations] = useState(false);
 
   const handlePurchase = async () => {
-    // TODO: Replace with actual purchase URL
-    await openUrl("https://example.com/buy-grimorium");
+    await openUrl(EXTERNAL_URLS.purchase);
   };
 
   const handleSupport = async () => {
-    // TODO: Replace with actual support email
-    await openUrl("mailto:support@grimorium.com");
+    await openUrl(EXTERNAL_URLS.support);
   };
 
   const handleDevLicense = async () => {

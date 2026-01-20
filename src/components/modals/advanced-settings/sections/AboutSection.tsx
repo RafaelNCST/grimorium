@@ -12,11 +12,9 @@ import { useTranslation } from "react-i18next";
 import { EULAModal } from "@/components/modals/eula-modal";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { EXTERNAL_URLS } from "@/config/external-urls";
 
 const APP_VERSION = "0.0.0";
-const GITHUB_ISSUES_URL = "https://github.com/seu-usuario/grimorium/issues";
-const GITHUB_DISCUSSIONS_URL =
-  "https://github.com/seu-usuario/grimorium/discussions";
 
 export function AboutSection() {
   const { t } = useTranslation("advanced-settings");
@@ -75,7 +73,7 @@ export function AboutSection() {
 
         <div
           className="rounded-lg border bg-card p-4 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 cursor-pointer flex items-start gap-3"
-          onClick={() => openExternal(GITHUB_ISSUES_URL)}
+          onClick={() => openExternal(EXTERNAL_URLS.bugReport)}
         >
           <div className="rounded-lg bg-destructive/10 p-2 flex-shrink-0">
             <Bug className="w-5 h-5 text-destructive" />
@@ -113,7 +111,7 @@ export function AboutSection() {
 
         <div
           className="rounded-lg border bg-card p-4 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 cursor-pointer flex items-start gap-3"
-          onClick={() => openExternal(GITHUB_DISCUSSIONS_URL)}
+          onClick={() => openExternal(EXTERNAL_URLS.suggestions)}
         >
           <div className="rounded-lg bg-amber-500/10 p-2 flex-shrink-0">
             <Lightbulb className="w-5 h-5 text-amber-500" />
