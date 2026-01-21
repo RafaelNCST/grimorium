@@ -135,27 +135,21 @@
   "about": {
     "app": {
       "tagline": "Your tool for creating fantasy worlds",
-      "version_label": "Version",
-      "release_label": "Status",
-      "release_status": "Private Beta"
+      "version_label": "Version"
     },
-    "bug_report": {
-      "title": "Report Bug",
-      "description": "Found a problem? Help us improve!",
-      "button": "Report Bug",
-      "help": "Report a problem or bug",
-      "note": "When reporting a bug, include as many details as possible: what you were doing, what you expected to happen, and what actually happened."
+    "links": {
+      "title": "Quick Links",
+      "description": "Access helpful resources and support",
+      "support": "Support & Help",
+      "support_description": "Get help with Grimorium"
     },
-    "suggestions": {
-      "title": "Suggestions and Feedback",
-      "description": "Have ideas to improve Grimorium?",
-      "button": "Share Suggestions",
-      "help": "Share your ideas and suggestions with us"
-    },
-    "eula": {
-      "title": "Terms of Use",
-      "description": "Read our software terms and conditions",
-      "button": "View Terms of Use"
+    "community": {
+      "title": "Community & Feedback",
+      "description": "Help us make Grimorium better",
+      "bug_report": "Report Bug",
+      "bug_report_description": "Found a problem? Let us know",
+      "suggestions": "Share Suggestions",
+      "suggestions_description": "Have ideas to improve the app?"
     },
     "footer": {
       "made_with": "Made with",

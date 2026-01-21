@@ -4,29 +4,22 @@
  * Informações do app, reportar bugs e fazer sugestões
  */
 
-import { useState } from "react";
-
-import { Bug, Lightbulb, ExternalLink, FileText } from "lucide-react";
+import { Bug, Lightbulb, ExternalLink, HelpCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { EULAModal } from "@/components/modals/eula-modal";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { EXTERNAL_URLS } from "@/config/external-urls";
-
-const APP_VERSION = "0.0.0";
+import packageJson from "../../../../../package.json";
 
 export function AboutSection() {
   const { t } = useTranslation("advanced-settings");
-  const [showEULA, setShowEULA] = useState(false);
 
   const openExternal = (url: string) => {
     window.open(url, "_blank");
   };
 
   return (
-    <>
-      <div className="space-y-8 w-full max-w-full">
+    <div className="space-y-8 w-full max-w-full">
       {/* App Info */}
       <div className="space-y-4">
         <div className="flex items-center gap-3">
@@ -41,114 +34,96 @@ export function AboutSection() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="rounded-lg border p-4 bg-muted/30">
-            <p className="text-xs text-muted-foreground mb-1">
-              {t("about.app.version_label")}
-            </p>
-            <p className="font-mono font-semibold">v{APP_VERSION}</p>
-          </div>
-
-          <div className="rounded-lg border p-4 bg-muted/30">
-            <p className="text-xs text-muted-foreground mb-1">
-              {t("about.app.release_label")}
-            </p>
-            <p className="font-semibold">{t("about.app.release_status")}</p>
-          </div>
+        <div className="rounded-lg border p-4 bg-muted/30">
+          <p className="text-xs text-muted-foreground mb-1">
+            {t("about.app.version_label")}
+          </p>
+          <p className="font-mono font-semibold text-lg">v{packageJson.version}</p>
         </div>
       </div>
 
-      {/* Report Bug */}
+      {/* Quick Links */}
       <Separator />
       <div className="space-y-4">
         <div>
-          <h3 className="text-base font-semibold mb-1 flex items-center gap-2">
-            <Bug className="w-4 h-4" />
-            {t("about.bug_report.title")}
+          <h3 className="text-base font-semibold mb-1">
+            {t("about.links.title")}
           </h3>
           <p className="text-sm text-muted-foreground">
-            {t("about.bug_report.description")}
+            {t("about.links.description")}
           </p>
         </div>
 
         <div
           className="rounded-lg border bg-card p-4 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 cursor-pointer flex items-start gap-3"
-          onClick={() => openExternal(EXTERNAL_URLS.bugReport)}
+          onClick={() => openExternal(EXTERNAL_URLS.support)}
         >
-          <div className="rounded-lg bg-destructive/10 p-2 flex-shrink-0">
-            <Bug className="w-5 h-5 text-destructive" />
+          <div className="rounded-lg bg-primary/10 p-2 flex-shrink-0">
+            <HelpCircle className="w-5 h-5 text-primary" />
           </div>
           <div className="flex-1">
             <div className="font-semibold text-sm flex items-center gap-2 mb-0.5">
-              {t("about.bug_report.button")}
+              {t("about.links.support")}
               <ExternalLink className="w-3 h-3" />
             </div>
             <div className="text-xs text-muted-foreground">
-              {t("about.bug_report.help")}
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-lg bg-muted/50 border p-3">
-          <p className="text-xs text-muted-foreground">
-            💡 {t("about.bug_report.note")}
-          </p>
-        </div>
-      </div>
-
-      {/* Suggestions */}
-      <Separator />
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-base font-semibold mb-1 flex items-center gap-2">
-            <Lightbulb className="w-4 h-4" />
-            {t("about.suggestions.title")}
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {t("about.suggestions.description")}
-          </p>
-        </div>
-
-        <div
-          className="rounded-lg border bg-card p-4 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 cursor-pointer flex items-start gap-3"
-          onClick={() => openExternal(EXTERNAL_URLS.suggestions)}
-        >
-          <div className="rounded-lg bg-amber-500/10 p-2 flex-shrink-0">
-            <Lightbulb className="w-5 h-5 text-amber-500" />
-          </div>
-          <div className="flex-1">
-            <div className="font-semibold text-sm flex items-center gap-2 mb-0.5">
-              {t("about.suggestions.button")}
-              <ExternalLink className="w-3 h-3" />
-            </div>
-            <div className="text-xs text-muted-foreground">
-              {t("about.suggestions.help")}
+              {t("about.links.support_description")}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Terms of Use / EULA */}
+      {/* Community & Feedback */}
       <Separator />
       <div className="space-y-4">
         <div>
-          <h3 className="text-base font-semibold mb-1 flex items-center gap-2">
-            <FileText className="w-4 h-4" />
-            {t("about.eula.title")}
+          <h3 className="text-base font-semibold mb-1">
+            {t("about.community.title")}
           </h3>
           <p className="text-sm text-muted-foreground">
-            {t("about.eula.description")}
+            {t("about.community.description")}
           </p>
         </div>
 
-        <Button
-          variant="secondary"
-          className="w-full"
-          onClick={() => setShowEULA(true)}
-        >
-          <FileText className="w-4 h-4 mr-2" />
-          {t("about.eula.button")}
-        </Button>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {/* Report Bug */}
+          <div
+            className="rounded-lg border bg-card p-4 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 cursor-pointer flex flex-col gap-3"
+            onClick={() => openExternal(EXTERNAL_URLS.bugReport)}
+          >
+            <div className="rounded-lg bg-destructive/10 p-2 w-fit">
+              <Bug className="w-5 h-5 text-destructive" />
+            </div>
+            <div className="flex-1">
+              <div className="font-semibold text-sm flex items-center gap-2 mb-1">
+                {t("about.community.bug_report")}
+                <ExternalLink className="w-3 h-3" />
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {t("about.community.bug_report_description")}
+              </div>
+            </div>
+          </div>
+
+          {/* Suggestions */}
+          <div
+            className="rounded-lg border bg-card p-4 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 cursor-pointer flex flex-col gap-3"
+            onClick={() => openExternal(EXTERNAL_URLS.suggestions)}
+          >
+            <div className="rounded-lg bg-amber-500/10 p-2 w-fit">
+              <Lightbulb className="w-5 h-5 text-amber-500" />
+            </div>
+            <div className="flex-1">
+              <div className="font-semibold text-sm flex items-center gap-2 mb-1">
+                {t("about.community.suggestions")}
+                <ExternalLink className="w-3 h-3" />
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {t("about.community.suggestions_description")}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Footer */}
@@ -162,8 +137,5 @@ export function AboutSection() {
         </p>
       </div>
     </div>
-
-    <EULAModal open={showEULA} onClose={() => setShowEULA(false)} />
-    </>
   );
 }

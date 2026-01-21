@@ -135,27 +135,21 @@
   "about": {
     "app": {
       "tagline": "Sua ferramenta para criar mundos de fantasia",
-      "version_label": "Versão",
-      "release_label": "Status",
-      "release_status": "Beta Privado"
+      "version_label": "Versão"
     },
-    "bug_report": {
-      "title": "Reportar Bug",
-      "description": "Encontrou um problema? Nos ajude a melhorar!",
-      "button": "Reportar Bug",
-      "help": "Reportar um problema ou bug",
-      "note": "Ao reportar um bug, inclua o máximo de detalhes possível: o que você estava fazendo, o que esperava que acontecesse, e o que aconteceu de fato."
+    "links": {
+      "title": "Links Rápidos",
+      "description": "Acesse recursos úteis e suporte",
+      "support": "Suporte e Ajuda",
+      "support_description": "Obtenha ajuda com o Grimorium"
     },
-    "suggestions": {
-      "title": "Sugestões e Feedback",
-      "description": "Tem ideias para melhorar o Grimorium?",
-      "button": "Compartilhar Sugestões",
-      "help": "Compartilhe suas ideias e sugestões conosco"
-    },
-    "eula": {
-      "title": "Termos de Uso",
-      "description": "Leia nossos termos e condições de uso do software",
-      "button": "Ver Termos de Uso"
+    "community": {
+      "title": "Comunidade e Feedback",
+      "description": "Nos ajude a melhorar o Grimorium",
+      "bug_report": "Reportar Bug",
+      "bug_report_description": "Encontrou um problema? Nos avise",
+      "suggestions": "Compartilhar Sugestões",
+      "suggestions_description": "Tem ideias para melhorar o app?"
     },
     "footer": {
       "made_with": "Feito com",
