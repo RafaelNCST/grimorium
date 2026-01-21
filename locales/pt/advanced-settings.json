@@ -7,6 +7,7 @@
     "account": "Minha Conta",
     "dashboard": "Dashboard",
     "data_privacy": "Dados e privacidade",
+    "updates": "Atualizações",
     "about": "Sobre"
   },
   "account": {
@@ -156,5 +157,49 @@
       "for_writers": "para escritores de fantasia",
       "rights": "Todos os direitos reservados."
     }
+  },
+  "updates": {
+    "current_version": {
+      "title": "Versão Atual",
+      "description": "Sua versão instalada do Grimorium",
+      "label": "Versão"
+    },
+    "status": {
+      "title": "Status de Atualizações",
+      "description": "Verifique se há uma nova versão disponível",
+      "checking": "Verificando atualizações...",
+      "checking_description": "Aguarde enquanto verificamos por novas versões",
+      "up_to_date": "Você está atualizado!",
+      "up_to_date_description": "Você tem a versão mais recente do Grimorium",
+      "available": "Nova versão {{version}} disponível!",
+      "available_description": "Uma nova versão está pronta para instalar",
+      "downloading": "Baixando atualização...",
+      "downloading_description": "Aguarde enquanto a atualização é baixada",
+      "installing": "Instalando atualização...",
+      "installing_description": "O app será reiniciado automaticamente",
+      "error": "Falha ao verificar atualizações",
+      "error_description": "Não foi possível verificar atualizações. Tente novamente mais tarde.",
+      "last_checked": "Última verificação"
+    },
+    "changelog": {
+      "title": "Novidades"
+    },
+    "actions": {
+      "check_for_updates": "Verificar Atualizações",
+      "download_and_install": "Baixar e Instalar"
+    },
+    "support": {
+      "title": "Precisa de Ajuda?",
+      "description": "Obtenha suporte e reporte problemas",
+      "button": "Visitar Central de Suporte",
+      "button_description": "Obtenha ajuda com atualizações e instalação"
+    },
+    "just_now": "Agora mesmo",
+    "minutes_ago": "{{count}} minuto atrás",
+    "minutes_ago_plural": "{{count}} minutos atrás",
+    "hours_ago": "{{count}} hora atrás",
+    "hours_ago_plural": "{{count}} horas atrás",
+    "days_ago": "{{count}} dia atrás",
+    "days_ago_plural": "{{count}} dias atrás"
   }
 }

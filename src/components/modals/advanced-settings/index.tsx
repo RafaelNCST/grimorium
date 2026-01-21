@@ -14,6 +14,7 @@ import {
   Edit2,
   Sword,
   Wheat,
+  Download,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -31,6 +32,7 @@ import { AboutSection } from "./sections/AboutSection";
 import { AccountSection } from "./sections/AccountSection";
 import { DashboardSection } from "./sections/DashboardSection";
 import { DataSection } from "./sections/DataSection";
+import { UpdatesSection } from "./sections/UpdatesSection";
 import { SettingsSection, SettingsSectionConfig } from "./types";
 
 interface AdvancedSettingsModalProps {
@@ -54,6 +56,7 @@ export function AdvancedSettingsModal({
     { id: "account", labelKey: "sections.account", icon: User },
     { id: "dashboard", labelKey: "sections.dashboard", icon: LayoutDashboard },
     { id: "data", labelKey: "sections.data_privacy", icon: Shield },
+    { id: "updates", labelKey: "sections.updates", icon: Download },
     { id: "about", labelKey: "sections.about", icon: Info },
   ];
 
@@ -77,6 +80,8 @@ export function AdvancedSettingsModal({
         return <DashboardSection />;
       case "data":
         return <DataSection />;
+      case "updates":
+        return <UpdatesSection />;
       case "about":
         return <AboutSection />;
       default:

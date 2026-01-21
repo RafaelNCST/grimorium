@@ -7,6 +7,7 @@
     "account": "My Account",
     "dashboard": "Dashboard",
     "data_privacy": "Data & privacy",
+    "updates": "Updates",
     "about": "About"
   },
   "account": {
@@ -156,5 +157,49 @@
       "for_writers": "for fantasy writers",
       "rights": "All rights reserved."
     }
+  },
+  "updates": {
+    "current_version": {
+      "title": "Current Version",
+      "description": "Your installed version of Grimorium",
+      "label": "Version"
+    },
+    "status": {
+      "title": "Update Status",
+      "description": "Check if a new version is available",
+      "checking": "Checking for updates...",
+      "checking_description": "Please wait while we check for new versions",
+      "up_to_date": "You're up to date!",
+      "up_to_date_description": "You have the latest version of Grimorium",
+      "available": "New version {{version}} available!",
+      "available_description": "A new version is ready to install",
+      "downloading": "Downloading update...",
+      "downloading_description": "Please wait while the update downloads",
+      "installing": "Installing update...",
+      "installing_description": "The app will restart automatically",
+      "error": "Update check failed",
+      "error_description": "Could not check for updates. Please try again later.",
+      "last_checked": "Last checked"
+    },
+    "changelog": {
+      "title": "What's New"
+    },
+    "actions": {
+      "check_for_updates": "Check for Updates",
+      "download_and_install": "Download and Install"
+    },
+    "support": {
+      "title": "Need Help?",
+      "description": "Get support and report issues",
+      "button": "Visit Support Center",
+      "button_description": "Get help with updates and installation"
+    },
+    "just_now": "Just now",
+    "minutes_ago": "{{count}} minute ago",
+    "minutes_ago_plural": "{{count}} minutes ago",
+    "hours_ago": "{{count}} hour ago",
+    "hours_ago_plural": "{{count}} hours ago",
+    "days_ago": "{{count}} day ago",
+    "days_ago_plural": "{{count}} days ago"
   }
 }

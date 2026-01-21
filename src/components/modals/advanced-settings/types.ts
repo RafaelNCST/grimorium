@@ -6,6 +6,7 @@ export type SettingsSection =
   | "account"
   | "dashboard"
   | "data"
+  | "updates"
   | "about";
 
 export interface SettingsSectionConfig {
